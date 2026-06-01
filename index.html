@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#b5465a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Frieda Report" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Frieda Report</title>
+  <style>
+    :root {
+      --primary: #b5465a;
+      --primary-dark: #8f3547;
+      --primary-light: #f9eaed;
+      --bg: #f7f7f7;
+      --card: #ffffff;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --success: #16a34a;
+      --radius: 12px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    /* Header */
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .header h1 { font-size: 18px; font-weight: 600; flex: 1; }
+    .header-back {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+      padding: 4px;
+      display: none;
+    }
+    .header-sub { font-size: 12px; opacity: 0.85; }
+
+    /* Screens */
+    .screen { display: none; padding: 20px; }
+    .screen.active { display: block; }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Form elements */
+    label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+    input[type="text"], input[type="number"], input[type="date"], select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+      color: var(--text);
+      background: white;
+      margin-bottom: 14px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    textarea { min-height: 80px; resize: vertical; }
+
+    /* Buttons */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.15s;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:active { background: var(--primary-dark); }
+    .btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+    .btn + .btn { margin-top: 10px; }
+
+    /* Menu buttons */
+    .menu-btn {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .menu-btn:active { background: var(--primary-light); }
+    .menu-icon { font-size: 28px; }
+    .menu-label { font-size: 16px; font-weight: 600; }
+    .menu-desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* Toggle / Radio group for products */
+    .radio-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .radio-group input[type="radio"] { display: none; }
+    .radio-group label {
+      flex: 1;
+      text-align: center;
+      padding: 8px 4px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0;
+      transition: all 0.1s;
+    }
+    .radio-group input[type="radio"]:checked + label {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Product section */
+    .product-section {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .product-name {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+    .umsatz-row { margin-top: 8px; display: none; }
+    .umsatz-row.visible { display: block; }
+    .umsatz-row label { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+    .umsatz-row input { margin-bottom: 0; }
+
+    /* PT section */
+    .pt-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .pt-toggle {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .pt-toggle input[type="checkbox"] { display: none; }
+    .pt-toggle label {
+      width: 100%;
+      text-align: center;
+      padding: 10px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+    .pt-toggle input:checked + label {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Today list */
+    .entry-item {
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .entry-item:last-child { border-bottom: none; }
+    .entry-name { font-weight: 600; font-size: 15px; }
+    .entry-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .entry-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1a1a1a;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* Divider */
+    .section-divider {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 20px 0 10px;
+    }
+
+    /* Badge row */
+    .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: var(--muted); }
+    .info-value { font-weight: 600; }
+
+    .spinner {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+
+    /* Login */
+    #screen-login { padding-top: 40px; }
+    .login-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-logo .logo-text {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .login-logo .logo-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header" id="app-header">
+  <button class="header-back" id="btn-back" onclick="goBack()">←</button>
+  <div>
+    <h1 id="header-title">Frieda Report</h1>
+    <div class="header-sub" id="header-sub"></div>
+  </div>
+</div>
+
+<!-- ======================== LOGIN ======================== -->
+<div class="screen active" id="screen-login">
+  <div class="login-logo">
+    <div class="logo-text">🌸 Frieda</div>
+    <div class="logo-sub">Tagesreporting</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Wer bist du?</div>
+    <label>Mitarbeiterin</label>
+    <select id="select-employee" onchange="onEmployeeChange()">
+      <option value="">– bitte auswählen –</option>
+    </select>
+    <label>Standort</label>
+    <input type="text" id="display-location" readonly style="background:#f3f4f6;color:var(--muted);" />
+    <button class="btn btn-primary" onclick="doLogin()">Anmelden</button>
+  </div>
+</div>
+
+<!-- ======================== MENU ======================== -->
+<div class="screen" id="screen-menu">
+  <div style="padding:4px 0 16px; color:var(--muted); font-size:14px;" id="menu-date"></div>
+
+  <button class="menu-btn" onclick="navigate('screen-entry')">
+    <span class="menu-icon">👤</span>
+    <div>
+      <div class="menu-label">Kundeneintrag</div>
+      <div class="menu-desc">Probetraining + Produktverkauf</div>
+    </div>
+  </button>
+
+  <button class="menu-btn" onclick="navigate('screen-calls')">
+    <span class="menu-icon">📞</span>
+    <div>
+      <div class="menu-label">Anrufe heute</div>
+      <div class="menu-desc">Kontakte, Call-in, VNM, Moti</div>
+    </div>
+  </button>
+
+  <button class="menu-btn" onclick="loadToday()">
+    <span class="menu-icon">📋</span>
+    <div>
+      <div class="menu-label">Meine Einträge heute</div>
+      <div class="menu-desc">Übersicht des heutigen Tages</div>
+    </div>
+  </button>
+
+  <div id="menu-manager-section" style="display:none;">
+    <div class="section-divider">Management</div>
+    <button class="menu-btn" onclick="navigate('screen-dashboard')">
+      <span class="menu-icon">📊</span>
+      <div>
+        <div class="menu-label">Dashboard</div>
+        <div class="menu-desc">Alle Mitarbeiterinnen &amp; Standorte</div>
+      </div>
+    </button>
+  </div>
+
+  <div style="margin-top:24px;">
+    <button class="btn btn-secondary" onclick="doLogout()">Abmelden</button>
+  </div>
+</div>
+
+<!-- ======================== ENTRY ======================== -->
+<div class="screen" id="screen-entry">
+  <form id="form-entry" onsubmit="submitEntry(event)">
+
+    <div class="card">
+      <div class="card-title">Kundeninfo</div>
+      <label>Datum</label>
+      <input type="date" id="entry-date" required />
+      <label>Kundenname</label>
+      <input type="text" id="entry-customer" placeholder="Vorname Nachname" />
+    </div>
+
+    <div class="card">
+      <div class="card-title">Probetraining</div>
+      <div class="pt-row">
+        <div class="pt-toggle">
+          <input type="checkbox" id="pt-kalender" />
+          <label for="pt-kalender">Im Kalender</label>
+        </div>
+        <div class="pt-toggle">
+          <input type="checkbox" id="pt-statt" />
+          <label for="pt-statt">Stattgefunden</label>
+        </div>
+        <div class="pt-toggle">
+          <input type="checkbox" id="pt-nicht" />
+          <label for="pt-nicht">Nicht stattgefunden</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Produkte</div>
+
+      <!-- Shaper -->
+      <div class="product-section" data-product="shaper">
+        <div class="product-name">Shaper</div>
+        <div class="radio-group">
+          <input type="radio" name="shaper" id="shaper-ab" value="abschluss" onchange="onProductChange('shaper')" />
+          <label for="shaper-ab">Abschluss</label>
+          <input type="radio" name="shaper" id="shaper-nein" value="nicht_abschluss" onchange="onProductChange('shaper')" />
+          <label for="shaper-nein">Kein Abschl.</label>
+          <input type="radio" name="shaper" id="shaper-folge" value="folge_abschluss" onchange="onProductChange('shaper')" />
+          <label for="shaper-folge">Folge</label>
+        </div>
+        <div class="umsatz-row" id="umsatz-shaper">
+          <label>Umsatz (€)</label>
+          <input type="number" step="0.01" min="0" id="umsatz-shaper-val" placeholder="0,00" />
+        </div>
+      </div>
+
+      <!-- Chair -->
+      <div class="product-section" data-product="chair">
+        <div class="product-name">Chair</div>
+        <div class="radio-group">
+          <input type="radio" name="chair" id="chair-ab" value="abschluss" onchange="onProductChange('chair')" />
+          <label for="chair-ab">Abschluss</label>
+          <input type="radio" name="chair" id="chair-nein" value="nicht_abschluss" onchange="onProductChange('chair')" />
+          <label for="chair-nein">Kein Abschl.</label>
+          <input type="radio" name="chair" id="chair-folge" value="folge_abschluss" onchange="onProductChange('chair')" />
+          <label for="chair-folge">Folge</label>
+        </div>
+        <div class="umsatz-row" id="umsatz-chair">
+          <label>Umsatz (€)</label>
+          <input type="number" step="0.01" min="0" id="umsatz-chair-val" placeholder="0,00" />
+        </div>
+      </div>
+
+      <!-- ACP -->
+      <div class="product-section" data-product="acp">
+        <div class="product-name">ACP</div>
+        <div class="radio-group">
+          <input type="radio" name="acp" id="acp-ab" value="abschluss" onchange="onProductChange('acp')" />
+          <label for="acp-ab">Abschluss</label>
+          <input type="radio" name="acp" id="acp-nein" value="nicht_abschluss" onchange="onProductChange('acp')" />
+          <label for="acp-nein">Kein Abschl.</label>
+          <input type="radio" name="acp" id="acp-folge" value="folge_abschluss" onchange="onProductChange('acp')" />
+          <label for="acp-folge">Folge</label>
+        </div>
+        <div class="umsatz-row" id="umsatz-acp">
+          <label>Umsatz (€)</label>
+          <input type="number" step="0.01" min="0" id="umsatz-acp-val" placeholder="0,00" />
+        </div>
+      </div>
+
+      <!-- Boots / Ballancer -->
+      <div class="product-section" data-product="boots">
+        <div class="product-name">Boots / Ballancer</div>
+        <div class="radio-group">
+          <input type="radio" name="boots" id="boots-ab" value="abschluss" onchange="onProductChange('boots')" />
+          <label for="boots-ab">Abschluss</label>
+          <input type="radio" name="boots" id="boots-nein" value="nicht_abschluss" onchange="onProductChange('boots')" />
+          <label for="boots-nein">Kein Abschl.</label>
+          <input type="radio" name="boots" id="boots-folge" value="folge_abschluss" onchange="onProductChange('boots')" />
+          <label for="boots-folge">Folge</label>
+        </div>
+        <div class="umsatz-row" id="umsatz-boots">
+          <label>Umsatz (€)</label>
+          <input type="number" step="0.01" min="0" id="umsatz-boots-val" placeholder="0,00" />
+        </div>
+      </div>
+
+      <!-- Fitness -->
+      <div class="product-section" data-product="fitness">
+        <div class="product-name">Fitness</div>
+        <div class="radio-group">
+          <input type="radio" name="fitness" id="fitness-ab" value="abschluss" onchange="onProductChange('fitness')" />
+          <label for="fitness-ab">Abschluss</label>
+          <input type="radio" name="fitness" id="fitness-nein" value="nicht_abschluss" onchange="onProductChange('fitness')" />
+          <label for="fitness-nein">Kein Abschl.</label>
+          <input type="radio" name="fitness" id="fitness-folge" value="folge_abschluss" onchange="onProductChange('fitness')" />
+          <label for="fitness-folge">Folge</label>
+        </div>
+        <div class="umsatz-row" id="umsatz-fitness">
+          <label>Umsatz (€)</label>
+          <input type="number" step="0.01" min="0" id="umsatz-fitness-val" placeholder="0,00" />
+        </div>
+      </div>
+
+      <!-- Reha -->
+      <div class="product-section" data-product="reha">
+        <div class="product-name">Reha</div>
+        <div class="radio-group">
+          <input type="radio" name="reha" id="reha-ab" value="abschluss" onchange="onProductChange('reha')" />
+          <label for="reha-ab">Abschluss</label>
+          <input type="radio" name="reha" id="reha-nein" value="nicht_abschluss" onchange="onProductChange('reha')" />
+          <label for="reha-nein">Kein Abschl.</label>
+          <input type="radio" name="reha" id="reha-folge" value="folge_abschluss" onchange="onProductChange('reha')" />
+          <label for="reha-folge">Folge</label>
+        </div>
+        <div class="umsatz-row" id="umsatz-reha">
+          <label>Umsatz (€)</label>
+          <input type="number" step="0.01" min="0" id="umsatz-reha-val" placeholder="0,00" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Nachbereitung</div>
+      <label>Grund kein Abschluss (falls zutreffend)</label>
+      <textarea id="entry-grund" placeholder="z.B. wartet auf Rückruf vom Arzt …"></textarea>
+      <div class="pt-toggle" style="margin-bottom:14px;">
+        <input type="checkbox" id="entry-anruftermin" />
+        <label for="entry-anruftermin" style="width:auto; padding:10px 20px;">📅 Anruftermin festgelegt</label>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">💾 Eintrag speichern</button>
+    <button type="button" class="btn btn-secondary" onclick="goBack()">Abbrechen</button>
+    <div style="height:30px;"></div>
+  </form>
+</div>
+
+<!-- ======================== CALLS ======================== -->
+<div class="screen" id="screen-calls">
+  <form id="form-calls" onsubmit="submitCalls(event)">
+    <div class="card">
+      <div class="card-title">Datum</div>
+      <input type="date" id="calls-date" required />
+    </div>
+
+    <div class="card">
+      <div class="card-title">Kontakt-Anrufe (ausgehend)</div>
+      <label>Ausgehend</label>
+      <input type="number" min="0" id="c-ausgehend" placeholder="0" />
+      <label>Erreicht</label>
+      <input type="number" min="0" id="c-erreicht" placeholder="0" />
+      <label>Gebucht</label>
+      <input type="number" min="0" id="c-gebucht" placeholder="0" />
+    </div>
+
+    <div class="card">
+      <div class="card-title">Call-in (eingehend)</div>
+      <label>Eingehende Anrufe gesamt</label>
+      <input type="number" min="0" id="c-callin" placeholder="0" />
+    </div>
+
+    <div class="card">
+      <div class="card-title">VNM-Anrufe</div>
+      <label>Durchgeführt</label>
+      <input type="number" min="0" id="c-vnm-durch" placeholder="0" />
+      <label>Erreicht</label>
+      <input type="number" min="0" id="c-vnm-err" placeholder="0" />
+    </div>
+
+    <div class="card">
+      <div class="card-title">Moti-Anrufe</div>
+      <label>Durchgeführt</label>
+      <input type="number" min="0" id="c-moti-durch" placeholder="0" />
+      <label>Erreicht</label>
+      <input type="number" min="0" id="c-moti-err" placeholder="0" />
+      <label>Gebucht</label>
+      <input type="number" min="0" id="c-moti-geb" placeholder="0" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">💾 Anrufe speichern</button>
+    <button type="button" class="btn btn-secondary" onclick="goBack()">Abbrechen</button>
+    <div style="height:30px;"></div>
+  </form>
+</div>
+
+<!-- ======================== TODAY ======================== -->
+<div class="screen" id="screen-today">
+  <div id="today-content"><div class="spinner">Lade Einträge …</div></div>
+</div>
+
+<!-- ======================== DASHBOARD ======================== -->
+<div class="screen" id="screen-dashboard">
+  <div class="card">
+    <div class="card-title">Zeitraum</div>
+    <label>Monat</label>
+    <input type="month" id="dash-month" onchange="loadDashboard()" />
+    <label>Standort</label>
+    <select id="dash-location" onchange="loadDashboard()">
+      <option value="">Alle Standorte</option>
+    </select>
+  </div>
+  <div id="dashboard-content"><div class="spinner">Bitte Monat wählen …</div></div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ============================================================
+// KONFIGURATION – nach Supabase-Einrichtung hier eintragen
+// ============================================================
+const SUPABASE_URL  = 'https://cqddbnnntskivtnrwhnv.supabase.co/rest/v1/';      // z.B. https://xyzxyz.supabase.co
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxZGRibm5udHNraXZ0bnJ3aG52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMDc5MDUsImV4cCI6MjA5NTg4MzkwNX0.bYJU8mR-NnsDh9rXF7r5F2szPCHyeHgRzsSEpmR_M08';  // aus Supabase → Settings → API
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ============================================================
+// State
+// ============================================================
+let currentEmployee = null;
+let currentLocation = null;
+let screenHistory   = [];
+
+// ============================================================
+// Navigation
+// ============================================================
+function navigate(screenId) {
+  const current = document.querySelector('.screen.active');
+  if (current) {
+    screenHistory.push(current.id);
+    current.classList.remove('active');
+  }
+  document.getElementById(screenId).classList.add('active');
+  updateHeader(screenId);
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  if (screenHistory.length === 0) return;
+  const prev = screenHistory.pop();
+  document.querySelector('.screen.active').classList.remove('active');
+  document.getElementById(prev).classList.add('active');
+  updateHeader(prev);
+  window.scrollTo(0, 0);
+}
+
+function updateHeader(screenId) {
+  const titles = {
+    'screen-login':     'Frieda Report',
+    'screen-menu':      'Frieda Report',
+    'screen-entry':     'Kundeneintrag',
+    'screen-calls':     'Anrufe heute',
+    'screen-today':     'Meine Einträge',
+    'screen-dashboard': 'Dashboard',
+  };
+  document.getElementById('header-title').textContent = titles[screenId] || 'Frieda Report';
+  const sub = currentEmployee ? `${currentEmployee.name} · ${currentLocation}` : '';
+  document.getElementById('header-sub').textContent = sub;
+  document.getElementById('btn-back').style.display = (screenId === 'screen-login' || screenId === 'screen-menu') ? 'none' : 'block';
+}
+
+// ============================================================
+// Init
+// ============================================================
+window.addEventListener('DOMContentLoaded', async () => {
+  await loadEmployees();
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('entry-date').value = today;
+  document.getElementById('calls-date').value = today;
+
+  const now = new Date();
+  document.getElementById('dash-month').value = now.toISOString().slice(0, 7);
+
+  updateHeader('screen-login');
+});
+
+async function loadEmployees() {
+  const { data, error } = await supabase.from('employees').select('*, locations(name)').order('name');
+  if (error) { showToast('Fehler beim Laden der Mitarbeiterinnen'); return; }
+  const sel = document.getElementById('select-employee');
+  sel.innerHTML = '<option value="">– bitte auswählen –</option>';
+  data.forEach(e => {
+    const opt = document.createElement('option');
+    opt.value = JSON.stringify({ id: e.id, name: e.name, location: e.locations?.name, location_id: e.location_id, is_manager: e.is_manager });
+    opt.textContent = `${e.name} (${e.locations?.name || '–'})`;
+    sel.appendChild(opt);
+  });
+
+  // Dashboard standort filter
+  const { data: locs } = await supabase.from('locations').select('*').order('name');
+  const dsel = document.getElementById('dash-location');
+  locs?.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id;
+    opt.textContent = l.name;
+    dsel.appendChild(opt);
+  });
+}
+
+function onEmployeeChange() {
+  const val = document.getElementById('select-employee').value;
+  if (!val) { document.getElementById('display-location').value = ''; return; }
+  const emp = JSON.parse(val);
+  document.getElementById('display-location').value = emp.location || '–';
+}
+
+function doLogin() {
+  const val = document.getElementById('select-employee').value;
+  if (!val) { showToast('Bitte Mitarbeiterin auswählen'); return; }
+  const emp = JSON.parse(val);
+  currentEmployee = emp;
+  currentLocation = emp.location;
+
+  // Manager section
+  document.getElementById('menu-manager-section').style.display = emp.is_manager ? 'block' : 'none';
+
+  // Date display in menu
+  const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  document.getElementById('menu-date').textContent = new Date().toLocaleDateString('de-DE', opts);
+
+  navigate('screen-menu');
+}
+
+function doLogout() {
+  currentEmployee = null;
+  currentLocation = null;
+  screenHistory = [];
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-login').classList.add('active');
+  updateHeader('screen-login');
+}
+
+// ============================================================
+// Product radio → show/hide Umsatz field
+// ============================================================
+function onProductChange(product) {
+  const val = document.querySelector(`input[name="${product}"]:checked`)?.value;
+  const row = document.getElementById(`umsatz-${product}`);
+  row.classList.toggle('visible', val === 'abschluss' || val === 'folge_abschluss');
+}
+
+// ============================================================
+// Submit entry
+// ============================================================
+async function submitEntry(e) {
+  e.preventDefault();
+  const products = ['shaper', 'chair', 'acp', 'boots', 'fitness', 'reha'];
+  const row = {
+    date:           document.getElementById('entry-date').value,
+    employee_id:    currentEmployee.id,
+    location_id:    currentEmployee.location_id,
+    customer_name:  document.getElementById('entry-customer').value || null,
+    pt_im_kalender:         document.getElementById('pt-kalender').checked,
+    pt_stattgefunden:       document.getElementById('pt-statt').checked,
+    pt_nicht_stattgefunden: document.getElementById('pt-nicht').checked,
+    kein_abschluss_grund:   document.getElementById('entry-grund').value || null,
+    anruftermin_festgelegt: document.getElementById('entry-anruftermin').checked,
+  };
+  products.forEach(p => {
+    const val = document.querySelector(`input[name="${p}"]:checked`)?.value || null;
+    row[`${p}_ergebnis`] = val;
+    row[`${p}_umsatz`]   = (val === 'abschluss' || val === 'folge_abschluss')
+      ? (parseFloat(document.getElementById(`umsatz-${p}-val`)?.value) || null)
+      : null;
+  });
+
+  const { error } = await supabase.from('reports').insert([row]);
+  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
+  showToast('✅ Eintrag gespeichert!');
+  e.target.reset();
+  document.getElementById('entry-date').value = new Date().toISOString().split('T')[0];
+  products.forEach(p => {
+    document.getElementById(`umsatz-${p}`).classList.remove('visible');
+    document.getElementById(`umsatz-${p}-val`).value = '';
+  });
+  goBack();
+}
+
+// ============================================================
+// Submit calls
+// ============================================================
+async function submitCalls(e) {
+  e.preventDefault();
+  const date = document.getElementById('calls-date').value;
+  const row = {
+    date,
+    employee_id:       currentEmployee.id,
+    location_id:       currentEmployee.location_id,
+    kontakt_ausgehend: parseInt(document.getElementById('c-ausgehend').value) || 0,
+    kontakt_erreicht:  parseInt(document.getElementById('c-erreicht').value) || 0,
+    kontakt_gebucht:   parseInt(document.getElementById('c-gebucht').value) || 0,
+    callin_gesamt:     parseInt(document.getElementById('c-callin').value) || 0,
+    vnm_durchgefuehrt: parseInt(document.getElementById('c-vnm-durch').value) || 0,
+    vnm_erreicht:      parseInt(document.getElementById('c-vnm-err').value) || 0,
+    moti_durchgefuehrt:parseInt(document.getElementById('c-moti-durch').value) || 0,
+    moti_erreicht:     parseInt(document.getElementById('c-moti-err').value) || 0,
+    moti_gebucht:      parseInt(document.getElementById('c-moti-geb').value) || 0,
+  };
+
+  // Upsert: wenn bereits für diesen Tag eingetragen, überschreiben
+  const { error } = await supabase.from('calls')
+    .upsert([row], { onConflict: 'date,employee_id' });
+  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
+  showToast('✅ Anrufe gespeichert!');
+  e.target.reset();
+  document.getElementById('calls-date').value = new Date().toISOString().split('T')[0];
+  goBack();
+}
+
+// ============================================================
+// Today's entries
+// ============================================================
+async function loadToday() {
+  navigate('screen-today');
+  const today = new Date().toISOString().split('T')[0];
+  const content = document.getElementById('today-content');
+  content.innerHTML = '<div class="spinner">Lade …</div>';
+
+  const { data: reports, error } = await supabase.from('reports')
+    .select('*')
+    .eq('employee_id', currentEmployee.id)
+    .eq('date', today)
+    .order('created_at', { ascending: false });
+
+  const { data: calls } = await supabase.from('calls')
+    .select('*')
+    .eq('employee_id', currentEmployee.id)
+    .eq('date', today)
+    .single();
+
+  if (error || !reports) { content.innerHTML = '<div class="spinner">Fehler beim Laden.</div>'; return; }
+
+  let html = '';
+
+  // Kundeneinträge
+  html += '<div class="card"><div class="card-title">Kundeneinträge heute</div>';
+  if (reports.length === 0) {
+    html += '<div style="color:var(--muted);font-size:14px;">Noch keine Einträge für heute.</div>';
+  } else {
+    const products = ['shaper', 'chair', 'acp', 'boots', 'fitness', 'reha'];
+    const labels   = { shaper: 'Shaper', chair: 'Chair', acp: 'ACP', boots: 'Boots/Ballancer', fitness: 'Fitness', reha: 'Reha' };
+    reports.forEach(r => {
+      const abschlüsse = products
+        .filter(p => r[`${p}_ergebnis`] === 'abschluss' || r[`${p}_ergebnis`] === 'folge_abschluss')
+        .map(p => labels[p]).join(', ');
+      const umsatz = products.reduce((s, p) => s + (r[`${p}_umsatz`] || 0), 0);
+      html += `<div class="entry-item">
+        <div>
+          <div class="entry-name">${r.customer_name || '(kein Name)'}</div>
+          <div class="entry-meta">${abschlüsse || 'Kein Abschluss'}</div>
+        </div>
+        ${umsatz > 0 ? `<div class="entry-badge">${umsatz.toFixed(2)} €</div>` : ''}
+      </div>`;
+    });
+  }
+  html += '</div>';
+
+  // Anrufe
+  if (calls) {
+    const erreich = calls.kontakt_ausgehend > 0
+      ? Math.round((calls.kontakt_erreicht / calls.kontakt_ausgehend) * 100) + '%'
+      : '–';
+    html += `<div class="card"><div class="card-title">Anrufe heute</div>
+      <div class="info-row"><span class="info-label">Kontakt ausgehend</span><span class="info-value">${calls.kontakt_ausgehend}</span></div>
+      <div class="info-row"><span class="info-label">Erreicht / Erreichbarkeit</span><span class="info-value">${calls.kontakt_erreicht} / ${erreich}</span></div>
+      <div class="info-row"><span class="info-label">Gebucht</span><span class="info-value">${calls.kontakt_gebucht}</span></div>
+      <div class="info-row"><span class="info-label">Call-in</span><span class="info-value">${calls.callin_gesamt}</span></div>
+      <div class="info-row"><span class="info-label">VNM durchgeführt / erreicht</span><span class="info-value">${calls.vnm_durchgefuehrt} / ${calls.vnm_erreicht}</span></div>
+      <div class="info-row"><span class="info-label">Moti durchgeführt / erreicht</span><span class="info-value">${calls.moti_durchgefuehrt} / ${calls.moti_erreicht}</span></div>
+      <div class="info-row"><span class="info-label">Moti gebucht</span><span class="info-value">${calls.moti_gebucht}</span></div>
+    </div>`;
+  } else {
+    html += '<div class="card" style="color:var(--muted);font-size:14px;">Noch keine Anrufe für heute eingetragen.</div>';
+  }
+
+  content.innerHTML = html;
+}
+
+// ============================================================
+// Dashboard
+// ============================================================
+async function loadDashboard() {
+  const month    = document.getElementById('dash-month').value;
+  const location = document.getElementById('dash-location').value;
+  const content  = document.getElementById('dashboard-content');
+  if (!month) return;
+
+  content.innerHTML = '<div class="spinner">Lade Dashboard …</div>';
+
+  const [year, mon] = month.split('-');
+  const from = `${year}-${mon}-01`;
+  const to   = new Date(year, mon, 0).toISOString().split('T')[0];
+
+  let rq = supabase.from('reports').select('*, employees(name, locations(name))').gte('date', from).lte('date', to);
+  let cq = supabase.from('calls').select('*, employees(name)').gte('date', from).lte('date', to);
+  if (location) { rq = rq.eq('location_id', location); cq = cq.eq('location_id', location); }
+
+  const [{ data: reports }, { data: calls }] = await Promise.all([rq, cq]);
+
+  if (!reports) { content.innerHTML = '<div class="spinner">Fehler beim Laden.</div>'; return; }
+
+  // Aggregate per employee
+  const empMap = {};
+  const products = ['shaper', 'chair', 'acp', 'boots', 'fitness', 'reha'];
+
+  reports.forEach(r => {
+    const key = r.employees?.name || r.employee_id;
+    if (!empMap[key]) empMap[key] = {
+      name: key,
+      location: r.employees?.locations?.name || '–',
+      pt_kalender: 0, pt_statt: 0, pt_nicht: 0,
+      shaper:  { ab: 0, nein: 0, folge: 0, umsatz: 0 },
+      chair:   { ab: 0, nein: 0, folge: 0, umsatz: 0 },
+      acp:     { ab: 0, nein: 0, folge: 0, umsatz: 0 },
+      boots:   { ab: 0, nein: 0, folge: 0, umsatz: 0 },
+      fitness: { ab: 0, nein: 0, folge: 0, umsatz: 0 },
+      reha:    { ab: 0, nein: 0, folge: 0, umsatz: 0 },
+      kontakt_aus: 0, kontakt_err: 0, kontakt_geb: 0,
+      callin: 0, vnm_durch: 0, vnm_err: 0, moti_durch: 0, moti_err: 0, moti_geb: 0,
+    };
+    const em = empMap[key];
+    if (r.pt_im_kalender)          em.pt_kalender++;
+    if (r.pt_stattgefunden)        em.pt_statt++;
+    if (r.pt_nicht_stattgefunden)  em.pt_nicht++;
+    products.forEach(p => {
+      const res = r[`${p}_ergebnis`];
+      if (res === 'abschluss')       em[p].ab++;
+      if (res === 'nicht_abschluss') em[p].nein++;
+      if (res === 'folge_abschluss') em[p].folge++;
+      em[p].umsatz += r[`${p}_umsatz`] || 0;
+    });
+  });
+
+  calls?.forEach(c => {
+    const key = c.employees?.name || c.employee_id;
+    if (!empMap[key]) return;
+    empMap[key].kontakt_aus += c.kontakt_ausgehend || 0;
+    empMap[key].kontakt_err += c.kontakt_erreicht  || 0;
+    empMap[key].kontakt_geb += c.kontakt_gebucht   || 0;
+    empMap[key].callin      += c.callin_gesamt      || 0;
+    empMap[key].vnm_durch   += c.vnm_durchgefuehrt || 0;
+    empMap[key].vnm_err     += c.vnm_erreicht       || 0;
+    empMap[key].moti_durch  += c.moti_durchgefuehrt || 0;
+    empMap[key].moti_err    += c.moti_erreicht      || 0;
+    empMap[key].moti_geb    += c.moti_gebucht       || 0;
+  });
+
+  const emps = Object.values(empMap);
+  if (emps.length === 0) {
+    content.innerHTML = '<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Daten für diesen Zeitraum.</div>';
+    return;
+  }
+
+  const pctFmt = (a, b) => b > 0 ? Math.round((a / b) * 100) + '%' : '–';
+  const eur    = v => v > 0 ? v.toFixed(2) + ' €' : '–';
+
+  let html = '';
+  emps.forEach(em => {
+    const totalAb = products.reduce((s, p) => s + em[p].ab + em[p].folge, 0);
+    const totalAll = products.reduce((s, p) => s + em[p].ab + em[p].nein + em[p].folge, 0);
+    const totalUmsatz = products.reduce((s, p) => s + em[p].umsatz, 0);
+
+    html += `<div class="card">
+      <div class="card-title">${em.name}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">${em.location}</div>
+
+      <div class="section-divider">Probetrainings</div>
+      <div class="info-row"><span class="info-label">Im Kalender</span><span class="info-value">${em.pt_kalender}</span></div>
+      <div class="info-row"><span class="info-label">Stattgefunden</span><span class="info-value">${em.pt_statt}</span></div>
+      <div class="info-row"><span class="info-label">Nicht stattgefunden</span><span class="info-value">${em.pt_nicht}</span></div>
+      <div class="info-row"><span class="info-label">Erscheinungsquote</span><span class="info-value">${pctFmt(em.pt_statt, em.pt_kalender)}</span></div>
+
+      <div class="section-divider">Verkauf gesamt</div>
+      <div class="info-row"><span class="info-label">Abschlüsse / Gesamt</span><span class="info-value">${totalAb} / ${totalAll}</span></div>
+      <div class="info-row"><span class="info-label">Verkaufsquote</span><span class="info-value">${pctFmt(totalAb, totalAll)}</span></div>
+      <div class="info-row"><span class="info-label">Umsatz gesamt</span><span class="info-value" style="color:var(--primary)">${eur(totalUmsatz)}</span></div>
+    `;
+
+    products.forEach(p => {
+      const pLabel = { shaper: 'Shaper', chair: 'Chair', acp: 'ACP', boots: 'Boots/Ballancer', fitness: 'Fitness', reha: 'Reha' }[p];
+      if (em[p].ab + em[p].nein + em[p].folge === 0) return;
+      html += `
+      <div class="section-divider">${pLabel}</div>
+      <div class="info-row"><span class="info-label">Abschluss / Folge / Kein</span><span class="info-value">${em[p].ab} / ${em[p].folge} / ${em[p].nein}</span></div>
+      <div class="info-row"><span class="info-label">Umsatz</span><span class="info-value">${eur(em[p].umsatz)}</span></div>`;
+    });
+
+    html += `
+      <div class="section-divider">Anrufe</div>
+      <div class="info-row"><span class="info-label">Kontakt ausgehend / erreicht</span><span class="info-value">${em.kontakt_aus} / ${em.kontakt_err} (${pctFmt(em.kontakt_err, em.kontakt_aus)})</span></div>
+      <div class="info-row"><span class="info-label">Kontakt gebucht</span><span class="info-value">${em.kontakt_geb}</span></div>
+      <div class="info-row"><span class="info-label">Call-in</span><span class="info-value">${em.callin}</span></div>
+      <div class="info-row"><span class="info-label">VNM durch. / err.</span><span class="info-value">${em.vnm_durch} / ${em.vnm_err}</span></div>
+      <div class="info-row"><span class="info-label">Moti durch. / err. / geb.</span><span class="info-value">${em.moti_durch} / ${em.moti_err} / ${em.moti_geb}</span></div>
+    </div>`;
+  });
+
+  content.innerHTML = html;
+}
+
+// ============================================================
+// Toast
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
