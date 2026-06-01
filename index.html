@@ -604,7 +604,7 @@
 const SUPABASE_URL  = 'https://cqddbnnntskivtnrwhnv.supabase.co';      // z.B. https://xyzxyz.supabase.co
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxZGRibm5udHNraXZ0bnJ3aG52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMDc5MDUsImV4cCI6MjA5NTg4MzkwNX0.bYJU8mR-NnsDh9rXF7r5F2szPCHyeHgRzsSEpmR_M08';  // aus Supabase → Settings → API
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ============================================================
 // State
@@ -667,7 +667,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadEmployees() {
-  const { data, error } = await supabase.from('employees').select('*, locations(name)').order('name');
+  const { data, error } = await db.from('employees').select('*, locations(name)').order('name');
   if (error) { showToast('Fehler beim Laden der Mitarbeiterinnen'); return; }
   const sel = document.getElementById('select-employee');
   sel.innerHTML = '<option value="">– bitte auswählen –</option>';
@@ -679,7 +679,7 @@ async function loadEmployees() {
   });
 
   // Dashboard standort filter
-  const { data: locs } = await supabase.from('locations').select('*').order('name');
+  const { data: locs } = await db.from('locations').select('*').order('name');
   const dsel = document.getElementById('dash-location');
   locs?.forEach(l => {
     const opt = document.createElement('option');
@@ -756,7 +756,7 @@ async function submitEntry(e) {
       : null;
   });
 
-  const { error } = await supabase.from('reports').insert([row]);
+  const { error } = await db.from('reports').insert([row]);
   if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
   showToast('✅ Eintrag gespeichert!');
   e.target.reset();
@@ -790,7 +790,7 @@ async function submitCalls(e) {
   };
 
   // Upsert: wenn bereits für diesen Tag eingetragen, überschreiben
-  const { error } = await supabase.from('calls')
+  const { error } = await db.from('calls')
     .upsert([row], { onConflict: 'date,employee_id' });
   if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
   showToast('✅ Anrufe gespeichert!');
@@ -808,13 +808,13 @@ async function loadToday() {
   const content = document.getElementById('today-content');
   content.innerHTML = '<div class="spinner">Lade …</div>';
 
-  const { data: reports, error } = await supabase.from('reports')
+  const { data: reports, error } = await db.from('reports')
     .select('*')
     .eq('employee_id', currentEmployee.id)
     .eq('date', today)
     .order('created_at', { ascending: false });
 
-  const { data: calls } = await supabase.from('calls')
+  const { data: calls } = await db.from('calls')
     .select('*')
     .eq('employee_id', currentEmployee.id)
     .eq('date', today)
@@ -883,8 +883,8 @@ async function loadDashboard() {
   const from = `${year}-${mon}-01`;
   const to   = new Date(year, mon, 0).toISOString().split('T')[0];
 
-  let rq = supabase.from('reports').select('*, employees(name, locations(name))').gte('date', from).lte('date', to);
-  let cq = supabase.from('calls').select('*, employees(name)').gte('date', from).lte('date', to);
+  let rq = db.from('reports').select('*, employees(name, locations(name))').gte('date', from).lte('date', to);
+  let cq = db.from('calls').select('*, employees(name)').gte('date', from).lte('date', to);
   if (location) { rq = rq.eq('location_id', location); cq = cq.eq('location_id', location); }
 
   const [{ data: reports }, { data: calls }] = await Promise.all([rq, cq]);
