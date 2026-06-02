@@ -300,6 +300,55 @@
       color: var(--muted);
       margin-top: 4px;
     }
+
+    /* Budget / Soll-Ist */
+    .ampel {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      margin-right: 6px;
+      flex-shrink: 0;
+    }
+    .ampel-gruen  { background: #16a34a; }
+    .ampel-gelb   { background: #ca8a04; }
+    .ampel-rot    { background: #dc2626; }
+    .ampel-grau   { background: #9ca3af; }
+
+    .budget-row {
+      display: flex;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      gap: 6px;
+    }
+    .budget-row:last-child { border-bottom: none; }
+    .budget-label { flex: 1; color: var(--muted); }
+    .budget-soll  { width: 80px; text-align: right; color: var(--muted); font-size: 12px; }
+    .budget-ist   { width: 80px; text-align: right; font-weight: 600; }
+
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .tab-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
   </style>
 </head>
 <body>
@@ -365,6 +414,13 @@
       <div>
         <div class="menu-label">Dashboard</div>
         <div class="menu-desc">Alle Mitarbeiterinnen &amp; Standorte</div>
+      </div>
+    </button>
+    <button class="menu-btn" onclick="navigate('screen-budget-entry')">
+      <span class="menu-icon">💰</span>
+      <div>
+        <div class="menu-label">Budget IST eintragen</div>
+        <div class="menu-desc">Ist-Kosten für Soll/Ist-Vergleich</div>
       </div>
     </button>
   </div>
@@ -590,7 +646,30 @@
       <option value="">Alle Standorte</option>
     </select>
   </div>
-  <div id="dashboard-content"><div class="spinner">Bitte Monat wählen …</div></div>
+
+  <!-- Tabs: Soll/Ist | Mitarbeiter -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-budget" onclick="switchTab('budget')">📊 Soll / Ist</button>
+    <button class="tab-btn" id="tab-team" onclick="switchTab('team')">👥 Mitarbeiterinnen</button>
+  </div>
+
+  <div id="panel-budget"><div class="spinner">Bitte Monat &amp; Standort wählen …</div></div>
+  <div id="panel-team" style="display:none;"><div class="spinner">Bitte Monat wählen …</div></div>
+</div>
+
+<!-- ======================== BUDGET IST ENTRY ======================== -->
+<div class="screen" id="screen-budget-entry">
+  <div class="card">
+    <div class="card-title">Zeitraum &amp; Standort</div>
+    <label>Monat</label>
+    <input type="month" id="be-month" />
+    <label>Standort</label>
+    <select id="be-location">
+      <option value="">– bitte wählen –</option>
+    </select>
+    <button class="btn btn-secondary" style="margin-top:4px;" onclick="loadBudgetIstForm()">Laden</button>
+  </div>
+  <div id="budget-ist-form"></div>
 </div>
 
 <!-- Toast -->
@@ -638,12 +717,13 @@ function goBack() {
 
 function updateHeader(screenId) {
   const titles = {
-    'screen-login':     'Frieda Report',
-    'screen-menu':      'Frieda Report',
-    'screen-entry':     'Kundeneintrag',
-    'screen-calls':     'Anrufe heute',
-    'screen-today':     'Meine Einträge',
-    'screen-dashboard': 'Dashboard',
+    'screen-login':        'Frieda Report',
+    'screen-menu':         'Frieda Report',
+    'screen-entry':        'Kundeneintrag',
+    'screen-calls':        'Anrufe heute',
+    'screen-today':        'Meine Einträge',
+    'screen-dashboard':    'Dashboard',
+    'screen-budget-entry': 'Budget IST eintragen',
   };
   document.getElementById('header-title').textContent = titles[screenId] || 'Frieda Report';
   const sub = currentEmployee ? `${currentEmployee.name} · ${currentLocation}` : '';
@@ -678,15 +758,22 @@ async function loadEmployees() {
     sel.appendChild(opt);
   });
 
-  // Dashboard standort filter
+  // Dashboard + budget entry standort filter
   const { data: locs } = await db.from('locations').select('*').order('name');
-  const dsel = document.getElementById('dash-location');
+  const dsel  = document.getElementById('dash-location');
+  const besel = document.getElementById('be-location');
   locs?.forEach(l => {
-    const opt = document.createElement('option');
-    opt.value = l.id;
-    opt.textContent = l.name;
-    dsel.appendChild(opt);
+    [dsel, besel].forEach(sel => {
+      const opt = document.createElement('option');
+      opt.value = l.id;
+      opt.textContent = l.name;
+      sel.appendChild(opt);
+    });
   });
+
+  // Default budget-entry month to current
+  const now2 = new Date();
+  document.getElementById('be-month').value = now2.toISOString().slice(0, 7);
 }
 
 function onEmployeeChange() {
@@ -869,19 +956,155 @@ async function loadToday() {
 }
 
 // ============================================================
+// Dashboard tab switching
+// ============================================================
+let _dashTab = 'budget';
+function switchTab(tab) {
+  _dashTab = tab;
+  document.getElementById('tab-budget').classList.toggle('active', tab === 'budget');
+  document.getElementById('tab-team').classList.toggle('active', tab === 'team');
+  document.getElementById('panel-budget').style.display = tab === 'budget' ? 'block' : 'none';
+  document.getElementById('panel-team').style.display   = tab === 'team'   ? 'block' : 'none';
+}
+
+// ============================================================
 // Dashboard
 // ============================================================
 async function loadDashboard() {
   const month    = document.getElementById('dash-month').value;
   const location = document.getElementById('dash-location').value;
-  const content  = document.getElementById('dashboard-content');
   if (!month) return;
-
-  content.innerHTML = '<div class="spinner">Lade Dashboard …</div>';
 
   const [year, mon] = month.split('-');
   const from = `${year}-${mon}-01`;
   const to   = new Date(year, mon, 0).toISOString().split('T')[0];
+
+  // Load both panels in parallel
+  loadBudgetPanel(month, location, from, to);
+  loadTeamPanel(from, to, location);
+}
+
+// ---- Budget / Soll-Ist Panel ----
+async function loadBudgetPanel(month, locationId, from, to) {
+  const panel = document.getElementById('panel-budget');
+  panel.innerHTML = '<div class="spinner">Lade Soll/Ist …</div>';
+
+  if (!locationId) {
+    panel.innerHTML = '<div class="card" style="color:var(--muted);font-size:14px;text-align:center;padding:20px;">Bitte einen Standort auswählen für den Soll/Ist-Vergleich.</div>';
+    return;
+  }
+
+  const [year, mon] = month.split('-');
+
+  // Load budgets for this location+month
+  const { data: budgets } = await db.from('budgets')
+    .select('kpi, soll, ist')
+    .eq('location_id', locationId)
+    .eq('year', parseInt(year))
+    .eq('month', parseInt(mon));
+
+  // Calculate IST Umsatz from reports
+  const { data: reports } = await db.from('reports')
+    .select('shaper_umsatz, chair_umsatz, acp_umsatz, boots_umsatz, fitness_umsatz, reha_umsatz')
+    .eq('location_id', locationId)
+    .gte('date', from)
+    .lte('date', to);
+
+  const products = ['shaper', 'chair', 'acp', 'boots', 'fitness', 'reha'];
+  const istUmsatz = (reports || []).reduce((sum, r) =>
+    sum + products.reduce((s, p) => s + (r[`${p}_umsatz`] || 0), 0), 0);
+
+  if (!budgets || budgets.length === 0) {
+    panel.innerHTML = `<div class="card">
+      <div class="card-title">Soll / Ist – Umsatz</div>
+      ${ampelRow('Umsatzerlöse', null, istUmsatz, true)}
+      <div style="margin-top:14px;font-size:13px;color:var(--muted);">
+        Keine Soll-Werte gefunden. Bitte zuerst das SQL-Skript <strong>budget_setup.txt</strong> in Supabase ausführen.
+      </div>
+    </div>`;
+    return;
+  }
+
+  const budgetMap = {};
+  budgets.forEach(b => { budgetMap[b.kpi] = { soll: b.soll, ist: b.ist }; });
+
+  // Umsatz IST kommt aus Reports (automatisch berechnet)
+  const umsatzSoll = budgetMap['Umsatzerlöse']?.soll || 0;
+
+  const kpiOrder = [
+    'Umsatzerlöse', 'Gesamtleistung', 'Rohertrag', 'Betriebl. Rohertrag',
+    'Personalkosten', 'Raumkosten', 'Versich./Beiträge', 'Werbe-/Reisekosten',
+    'Abschreibungen', 'Sonstige Kosten', 'Gesamtkosten', 'Betriebsergebnis',
+  ];
+  const isKosten = new Set(['Personalkosten', 'Raumkosten', 'Versich./Beiträge',
+    'Werbe-/Reisekosten', 'Abschreibungen', 'Sonstige Kosten', 'Gesamtkosten']);
+
+  let html = `<div class="card">
+    <div class="card-title">📊 Soll / Ist – ${new Date(year, mon-1).toLocaleDateString('de-DE', {month:'long', year:'numeric'})}</div>
+    <div style="display:flex;gap:6px;font-size:11px;color:var(--muted);padding:6px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+      <span style="flex:1;"></span>
+      <span style="width:80px;text-align:right;">SOLL</span>
+      <span style="width:80px;text-align:right;">IST</span>
+    </div>`;
+
+  kpiOrder.forEach(kpi => {
+    const d = budgetMap[kpi];
+    if (!d) return;
+    let istVal = d.ist || 0;
+    // Umsatzerlöse: IST aus Reports
+    if (kpi === 'Umsatzerlöse' || kpi === 'Gesamtleistung') istVal = istUmsatz;
+    html += ampelRow(kpi, d.soll, istVal, isKosten.has(kpi));
+  });
+
+  html += `<div style="font-size:11px;color:var(--muted);margin-top:10px;">
+    🟢 ≥ 90% &nbsp; 🟡 70–90% &nbsp; 🔴 &lt; 70%<br>
+    Bei Kosten: umgekehrt (weniger = besser).<br>
+    Umsatz-IST wird automatisch aus Einträgen berechnet.
+  </div></div>`;
+
+  // Mitglieder separat
+  const mg = budgetMap['Mitglieder'];
+  if (mg) {
+    html += `<div class="card">
+      <div class="card-title">👥 Mitglieder</div>
+      ${ampelRow('Mitglieder', mg.soll, mg.ist || 0, false, true)}
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;">IST-Wert über „Budget IST eintragen" pflegen.</div>
+    </div>`;
+  }
+
+  panel.innerHTML = html;
+}
+
+function ampelRow(label, soll, ist, invertiert = false, isCount = false) {
+  const fmtEur = v => v != null && v > 0 ? v.toFixed(2) + ' €' : (v === 0 ? '0,00 €' : '–');
+  const fmtNum = v => v != null ? v.toLocaleString('de-DE', {maximumFractionDigits:1}) : '–';
+  const fmt = isCount ? fmtNum : fmtEur;
+
+  let cls = 'ampel-grau';
+  if (soll && soll > 0 && ist != null) {
+    const ratio = ist / soll;
+    if (!invertiert) {
+      cls = ratio >= 0.9 ? 'ampel-gruen' : ratio >= 0.7 ? 'ampel-gelb' : 'ampel-rot';
+    } else {
+      // Kosten: IST ≤ SOLL ist gut
+      cls = ratio <= 1.0 ? 'ampel-gruen' : ratio <= 1.15 ? 'ampel-gelb' : 'ampel-rot';
+    }
+  } else if (ist > 0 && !soll) {
+    cls = 'ampel-grau';
+  }
+
+  return `<div class="budget-row">
+    <span class="ampel ${cls}"></span>
+    <span class="budget-label">${label}</span>
+    <span class="budget-soll">${soll != null ? fmt(soll) : '–'}</span>
+    <span class="budget-ist">${fmt(ist)}</span>
+  </div>`;
+}
+
+// ---- Team Panel ----
+async function loadTeamPanel(from, to, location) {
+  const panel = document.getElementById('panel-team');
+  panel.innerHTML = '<div class="spinner">Lade Mitarbeiterinnen …</div>';
 
   let rq = db.from('reports').select('*, employees(name, locations(name))').gte('date', from).lte('date', to);
   let cq = db.from('calls').select('*, employees(name)').gte('date', from).lte('date', to);
@@ -889,9 +1112,8 @@ async function loadDashboard() {
 
   const [{ data: reports }, { data: calls }] = await Promise.all([rq, cq]);
 
-  if (!reports) { content.innerHTML = '<div class="spinner">Fehler beim Laden.</div>'; return; }
+  if (!reports) { panel.innerHTML = '<div class="spinner">Fehler beim Laden.</div>'; return; }
 
-  // Aggregate per employee
   const empMap = {};
   const products = ['shaper', 'chair', 'acp', 'boots', 'fitness', 'reha'];
 
@@ -939,7 +1161,7 @@ async function loadDashboard() {
 
   const emps = Object.values(empMap);
   if (emps.length === 0) {
-    content.innerHTML = '<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Daten für diesen Zeitraum.</div>';
+    panel.innerHTML = '<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Daten für diesen Zeitraum.</div>';
     return;
   }
 
@@ -987,7 +1209,90 @@ async function loadDashboard() {
     </div>`;
   });
 
-  content.innerHTML = html;
+  panel.innerHTML = html;
+}
+
+// ============================================================
+// Budget IST eintragen
+// ============================================================
+const BUDGET_KPIS = [
+  { key: 'Mitglieder',         label: 'Mitglieder',          suffix: '' },
+  { key: 'Umsatzerlöse',       label: 'Umsatzerlöse (€)',    suffix: '€', info: 'Wird automatisch aus Einträgen berechnet' },
+  { key: 'Personalkosten',     label: 'Personalkosten (€)',  suffix: '€' },
+  { key: 'Raumkosten',         label: 'Raumkosten (€)',      suffix: '€' },
+  { key: 'Versich./Beiträge',  label: 'Versich./Beiträge (€)', suffix: '€' },
+  { key: 'Werbe-/Reisekosten', label: 'Werbe-/Reisekosten (€)', suffix: '€' },
+  { key: 'Abschreibungen',     label: 'Abschreibungen (€)',  suffix: '€' },
+  { key: 'Sonstige Kosten',    label: 'Sonstige Kosten (€)', suffix: '€' },
+  { key: 'Gesamtkosten',       label: 'Gesamtkosten (€)',    suffix: '€' },
+  { key: 'Betriebsergebnis',   label: 'Betriebsergebnis (€)', suffix: '€' },
+];
+
+async function loadBudgetIstForm() {
+  const month = document.getElementById('be-month').value;
+  const locId = document.getElementById('be-location').value;
+  const form  = document.getElementById('budget-ist-form');
+
+  if (!month || !locId) { showToast('Bitte Monat und Standort wählen'); return; }
+
+  const [year, mon] = month.split('-');
+
+  const { data: budgets } = await db.from('budgets')
+    .select('kpi, soll, ist')
+    .eq('location_id', locId)
+    .eq('year', parseInt(year))
+    .eq('month', parseInt(mon));
+
+  const bMap = {};
+  budgets?.forEach(b => { bMap[b.kpi] = b; });
+
+  let html = `<div class="card"><div class="card-title">IST-Werte – ${new Date(year, mon-1).toLocaleDateString('de-DE', {month:'long', year:'numeric'})}</div>`;
+
+  BUDGET_KPIS.forEach(kpi => {
+    const val = bMap[kpi.key]?.ist || '';
+    const soll = bMap[kpi.key]?.soll;
+    const infoTxt = kpi.info ? `<div style="font-size:11px;color:var(--muted);margin-top:-10px;margin-bottom:10px;">${kpi.info}</div>` : '';
+    html += `
+      <label>${kpi.label}${soll ? ` <span style="color:var(--muted);font-size:11px;">(SOLL: ${Number(soll).toLocaleString('de-DE', {maximumFractionDigits:2})})</span>` : ''}</label>
+      ${infoTxt}
+      <input type="number" step="0.01" id="ist-${kpi.key.replace(/[^a-zA-Z0-9]/g,'_')}" value="${val}" placeholder="0" ${kpi.info ? 'readonly style="background:#f3f4f6;color:var(--muted);"' : ''} />`;
+  });
+
+  html += `</div>
+    <button class="btn btn-primary" onclick="saveBudgetIst()">💾 Speichern</button>
+    <div style="height:30px;"></div>`;
+
+  form.innerHTML = html;
+}
+
+async function saveBudgetIst() {
+  const month = document.getElementById('be-month').value;
+  const locId = document.getElementById('be-location').value;
+  if (!month || !locId) return;
+
+  const [year, mon] = month.split('-');
+
+  const upserts = BUDGET_KPIS
+    .filter(kpi => !kpi.info) // skip auto-calculated
+    .map(kpi => {
+      const inputId = `ist-${kpi.key.replace(/[^a-zA-Z0-9]/g,'_')}`;
+      const el = document.getElementById(inputId);
+      const val = parseFloat(el?.value) || 0;
+      return {
+        location_id: locId,
+        year: parseInt(year),
+        month: parseInt(mon),
+        kpi: kpi.key,
+        ist: val,
+      };
+    });
+
+  const { error } = await db.from('budgets')
+    .upsert(upserts, { onConflict: 'location_id,year,month,kpi' });
+
+  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
+  showToast('✅ IST-Werte gespeichert!');
+  goBack();
 }
 
 // ============================================================
