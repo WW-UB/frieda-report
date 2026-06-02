@@ -397,6 +397,76 @@
       background: var(--primary-light);
       color: var(--primary);
     }
+
+    /* Übersichtstabelle */
+    .overview-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 0 -20px;
+      padding: 0 20px 8px;
+    }
+    .overview-table {
+      border-collapse: collapse;
+      min-width: 100%;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .overview-table th {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 8px 10px;
+      text-align: right;
+      font-weight: 600;
+      border-bottom: 2px solid var(--primary);
+      position: sticky;
+      top: 0;
+    }
+    .overview-table th:first-child { text-align: left; }
+    .overview-table td {
+      padding: 9px 10px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .overview-table td:first-child {
+      text-align: left;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      text-decoration: underline dotted;
+    }
+    .overview-table tr:last-child td { border-bottom: none; }
+    .overview-table .total-row td {
+      font-weight: 700;
+      background: #f9f9f9;
+      border-top: 2px solid var(--border);
+    }
+    .overview-table .umsatz-val { color: #15803d; font-weight: 600; }
+    .overview-table .pct-val { color: var(--muted); }
+
+    /* Ausklappbare Detailkarte */
+    .emp-detail-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .emp-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .emp-detail-header:active { background: var(--primary-light); }
+    .emp-detail-name { font-weight: 700; font-size: 15px; }
+    .emp-detail-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .emp-detail-chevron { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
+    .emp-detail-card.open .emp-detail-chevron { transform: rotate(90deg); }
+    .emp-detail-body { display: none; padding: 0 18px 16px; }
+    .emp-detail-card.open .emp-detail-body { display: block; }
   </style>
 </head>
 <body>
@@ -1252,26 +1322,22 @@ async function loadTeamPanel(from, to, location) {
   if (location) { rq = rq.eq('location_id', location); cq = cq.eq('location_id', location); }
 
   const [{ data: reports }, { data: calls }] = await Promise.all([rq, cq]);
-
   if (!reports) { panel.innerHTML = '<div class="spinner">Fehler beim Laden.</div>'; return; }
 
-  const empMap = {};
   const products = ['shaper', 'chair', 'acp', 'boots', 'fitness', 'reha'];
+  const pLabel   = { shaper:'Shaper', chair:'Chair', acp:'ACP', boots:'Boots/Bl.', fitness:'Fitness', reha:'Reha' };
 
+  const empMap = {};
   reports.forEach(r => {
     const key = r.employees?.name || r.employee_id;
     if (!empMap[key]) empMap[key] = {
-      name: key,
-      location: r.employees?.locations?.name || '–',
-      pt_kalender: 0, pt_statt: 0, pt_nicht: 0,
-      shaper:  { ab: 0, nein: 0, folge: 0, umsatz: 0 },
-      chair:   { ab: 0, nein: 0, folge: 0, umsatz: 0 },
-      acp:     { ab: 0, nein: 0, folge: 0, umsatz: 0 },
-      boots:   { ab: 0, nein: 0, folge: 0, umsatz: 0 },
-      fitness: { ab: 0, nein: 0, folge: 0, umsatz: 0 },
-      reha:    { ab: 0, nein: 0, folge: 0, umsatz: 0 },
-      kontakt_aus: 0, kontakt_err: 0, kontakt_geb: 0,
-      callin: 0, vnm_durch: 0, vnm_err: 0, moti_durch: 0, moti_err: 0, moti_geb: 0,
+      name: key, location: r.employees?.locations?.name || '–',
+      pt_kalender:0, pt_statt:0, pt_nicht:0,
+      shaper:{ab:0,nein:0,folge:0,umsatz:0}, chair:{ab:0,nein:0,folge:0,umsatz:0},
+      acp:{ab:0,nein:0,folge:0,umsatz:0},    boots:{ab:0,nein:0,folge:0,umsatz:0},
+      fitness:{ab:0,nein:0,folge:0,umsatz:0},reha:{ab:0,nein:0,folge:0,umsatz:0},
+      kontakt_aus:0, kontakt_err:0, kontakt_geb:0,
+      callin:0, vnm_durch:0, vnm_err:0, moti_durch:0, moti_err:0, moti_geb:0,
     };
     const em = empMap[key];
     if (r.pt_im_kalender)          em.pt_kalender++;
@@ -1289,68 +1355,160 @@ async function loadTeamPanel(from, to, location) {
   calls?.forEach(c => {
     const key = c.employees?.name || c.employee_id;
     if (!empMap[key]) return;
-    empMap[key].kontakt_aus += c.kontakt_ausgehend || 0;
-    empMap[key].kontakt_err += c.kontakt_erreicht  || 0;
-    empMap[key].kontakt_geb += c.kontakt_gebucht   || 0;
-    empMap[key].callin      += c.callin_gesamt      || 0;
-    empMap[key].vnm_durch   += c.vnm_durchgefuehrt || 0;
-    empMap[key].vnm_err     += c.vnm_erreicht       || 0;
-    empMap[key].moti_durch  += c.moti_durchgefuehrt || 0;
-    empMap[key].moti_err    += c.moti_erreicht      || 0;
-    empMap[key].moti_geb    += c.moti_gebucht       || 0;
+    const em = empMap[key];
+    em.kontakt_aus += c.kontakt_ausgehend  || 0;
+    em.kontakt_err += c.kontakt_erreicht   || 0;
+    em.kontakt_geb += c.kontakt_gebucht    || 0;
+    em.callin      += c.callin_gesamt      || 0;
+    em.vnm_durch   += c.vnm_durchgefuehrt  || 0;
+    em.vnm_err     += c.vnm_erreicht       || 0;
+    em.moti_durch  += c.moti_durchgefuehrt || 0;
+    em.moti_err    += c.moti_erreicht      || 0;
+    em.moti_geb    += c.moti_gebucht       || 0;
   });
 
-  const emps = Object.values(empMap);
+  const emps = Object.values(empMap).sort((a, b) => a.name.localeCompare(b.name));
   if (emps.length === 0) {
     panel.innerHTML = '<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Daten für diesen Zeitraum.</div>';
     return;
   }
 
-  const pctFmt = (a, b) => b > 0 ? Math.round((a / b) * 100) + '%' : '–';
-  const eur    = v => v > 0 ? v.toFixed(2) + ' €' : '–';
+  const pct = (a, b) => b > 0 ? Math.round((a/b)*100)+'%' : '–';
+  const eur = v => v > 0 ? v.toFixed(0)+'€' : '–';
+  const eurFull = v => v > 0 ? v.toFixed(2)+' €' : '–';
 
-  let html = '';
+  // ── Übersichtstabelle ──────────────────────────────────────
+  // Totals
+  const totals = { pt_kalender:0, pt_statt:0, kontakt_aus:0, kontakt_err:0, kontakt_geb:0,
+                   callin:0, vnm_durch:0, moti_durch:0, moti_geb:0 };
+  const totP = {};
+  products.forEach(p => { totP[p] = {ab:0, nein:0, folge:0, umsatz:0}; });
   emps.forEach(em => {
-    const totalAb = products.reduce((s, p) => s + em[p].ab + em[p].folge, 0);
-    const totalAll = products.reduce((s, p) => s + em[p].ab + em[p].nein + em[p].folge, 0);
-    const totalUmsatz = products.reduce((s, p) => s + em[p].umsatz, 0);
-
-    html += `<div class="card">
-      <div class="card-title">${em.name}</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">${em.location}</div>
-
-      <div class="section-divider">Probetrainings</div>
-      <div class="info-row"><span class="info-label">Im Kalender</span><span class="info-value">${em.pt_kalender}</span></div>
-      <div class="info-row"><span class="info-label">Stattgefunden</span><span class="info-value">${em.pt_statt}</span></div>
-      <div class="info-row"><span class="info-label">Nicht stattgefunden</span><span class="info-value">${em.pt_nicht}</span></div>
-      <div class="info-row"><span class="info-label">Erscheinungsquote</span><span class="info-value">${pctFmt(em.pt_statt, em.pt_kalender)}</span></div>
-
-      <div class="section-divider">Verkauf gesamt</div>
-      <div class="info-row"><span class="info-label">Abschlüsse / Gesamt</span><span class="info-value">${totalAb} / ${totalAll}</span></div>
-      <div class="info-row"><span class="info-label">Verkaufsquote</span><span class="info-value">${pctFmt(totalAb, totalAll)}</span></div>
-      <div class="info-row"><span class="info-label">Umsatz gesamt</span><span class="info-value" style="color:var(--primary)">${eur(totalUmsatz)}</span></div>
-    `;
-
+    totals.pt_kalender  += em.pt_kalender;
+    totals.pt_statt     += em.pt_statt;
+    totals.kontakt_aus  += em.kontakt_aus;
+    totals.kontakt_err  += em.kontakt_err;
+    totals.kontakt_geb  += em.kontakt_geb;
+    totals.callin       += em.callin;
+    totals.vnm_durch    += em.vnm_durch;
+    totals.moti_durch   += em.moti_durch;
+    totals.moti_geb     += em.moti_geb;
     products.forEach(p => {
-      const pLabel = { shaper: 'Shaper', chair: 'Chair', acp: 'ACP', boots: 'Boots/Ballancer', fitness: 'Fitness', reha: 'Reha' }[p];
-      if (em[p].ab + em[p].nein + em[p].folge === 0) return;
-      html += `
-      <div class="section-divider">${pLabel}</div>
-      <div class="info-row"><span class="info-label">Abschluss / Folge / Kein</span><span class="info-value">${em[p].ab} / ${em[p].folge} / ${em[p].nein}</span></div>
-      <div class="info-row"><span class="info-label">Umsatz</span><span class="info-value">${eur(em[p].umsatz)}</span></div>`;
+      totP[p].ab     += em[p].ab;
+      totP[p].folge  += em[p].folge;
+      totP[p].nein   += em[p].nein;
+      totP[p].umsatz += em[p].umsatz;
     });
+  });
+  const totUmsatz = products.reduce((s,p) => s + totP[p].umsatz, 0);
+  const totAb     = products.reduce((s,p) => s + totP[p].ab + totP[p].folge, 0);
+  const totAll    = products.reduce((s,p) => s + totP[p].ab + totP[p].folge + totP[p].nein, 0);
 
-    html += `
-      <div class="section-divider">Anrufe</div>
-      <div class="info-row"><span class="info-label">Kontakt ausgehend / erreicht</span><span class="info-value">${em.kontakt_aus} / ${em.kontakt_err} (${pctFmt(em.kontakt_err, em.kontakt_aus)})</span></div>
-      <div class="info-row"><span class="info-label">Kontakt gebucht</span><span class="info-value">${em.kontakt_geb}</span></div>
-      <div class="info-row"><span class="info-label">Call-in</span><span class="info-value">${em.callin}</span></div>
-      <div class="info-row"><span class="info-label">VNM durch. / err.</span><span class="info-value">${em.vnm_durch} / ${em.vnm_err}</span></div>
-      <div class="info-row"><span class="info-label">Moti durch. / err. / geb.</span><span class="info-value">${em.moti_durch} / ${em.moti_err} / ${em.moti_geb}</span></div>
+  const empRow = em => {
+    const totalAb  = products.reduce((s,p) => s + em[p].ab + em[p].folge, 0);
+    const totalAll = products.reduce((s,p) => s + em[p].ab + em[p].folge + em[p].nein, 0);
+    const totalU   = products.reduce((s,p) => s + em[p].umsatz, 0);
+    return `<tr>
+      <td onclick="toggleDetail('detail-${em.name.replace(/\s/g,'_')}')">${em.name}</td>
+      <td class="umsatz-val">${eur(totalU)}</td>
+      ${products.map(p => `<td class="${em[p].umsatz>0?'umsatz-val':''}">${eur(em[p].umsatz)}</td>`).join('')}
+      <td class="pct-val">${pct(totalAb,totalAll)}</td>
+      <td>${em.pt_statt}/${em.pt_kalender}</td>
+      <td>${em.kontakt_aus}/${em.kontakt_err}</td>
+      <td>${em.callin}</td>
+      <td>${em.vnm_durch}</td>
+      <td>${em.moti_geb}</td>
+    </tr>`;
+  };
+
+  let html = `<div class="card">
+    <div class="card-title">Übersicht Mitarbeiterinnen</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Auf Namen tippen → Details aufklappen</div>
+    <div class="overview-scroll">
+      <table class="overview-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Umsatz</th>
+            ${products.map(p => `<th>${pLabel[p]}</th>`).join('')}
+            <th>Quote</th>
+            <th>PT</th>
+            <th>Kt.aus/err</th>
+            <th>Call-in</th>
+            <th>VNM</th>
+            <th>Moti geb.</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${emps.map(empRow).join('')}
+          <tr class="total-row">
+            <td>Gesamt</td>
+            <td class="umsatz-val">${eur(totUmsatz)}</td>
+            ${products.map(p => `<td class="${totP[p].umsatz>0?'umsatz-val':''}">${eur(totP[p].umsatz)}</td>`).join('')}
+            <td class="pct-val">${pct(totAb,totAll)}</td>
+            <td>${totals.pt_statt}/${totals.pt_kalender}</td>
+            <td>${totals.kontakt_aus}/${totals.kontakt_err}</td>
+            <td>${totals.callin}</td>
+            <td>${totals.vnm_durch}</td>
+            <td>${totals.moti_geb}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+
+  // ── Detailkarten (ausklappbar) ─────────────────────────────
+  html += '<div style="margin-top:4px;">';
+  emps.forEach(em => {
+    const totalAb  = products.reduce((s,p) => s + em[p].ab + em[p].folge, 0);
+    const totalAll = products.reduce((s,p) => s + em[p].ab + em[p].folge + em[p].nein, 0);
+    const totalU   = products.reduce((s,p) => s + em[p].umsatz, 0);
+    const detailId = `detail-${em.name.replace(/\s/g,'_')}`;
+
+    html += `<div class="emp-detail-card" id="${detailId}">
+      <div class="emp-detail-header" onclick="toggleDetail('${detailId}')">
+        <div>
+          <div class="emp-detail-name">${em.name}</div>
+          <div class="emp-detail-sub">${em.location} · ${eurFull(totalU)} · Quote: ${pct(totalAb,totalAll)}</div>
+        </div>
+        <span class="emp-detail-chevron">›</span>
+      </div>
+      <div class="emp-detail-body">
+
+        <div class="section-divider">Probetrainings</div>
+        <div class="info-row"><span class="info-label">Im Kalender</span><span class="info-value">${em.pt_kalender}</span></div>
+        <div class="info-row"><span class="info-label">Stattgefunden</span><span class="info-value">${em.pt_statt}</span></div>
+        <div class="info-row"><span class="info-label">Nicht stattgefunden</span><span class="info-value">${em.pt_nicht}</span></div>
+        <div class="info-row"><span class="info-label">Erscheinungsquote</span><span class="info-value">${pct(em.pt_statt,em.pt_kalender)}</span></div>
+
+        <div class="section-divider">Verkauf gesamt</div>
+        <div class="info-row"><span class="info-label">Abschlüsse / Gesamt</span><span class="info-value">${totalAb} / ${totalAll}</span></div>
+        <div class="info-row"><span class="info-label">Verkaufsquote</span><span class="info-value">${pct(totalAb,totalAll)}</span></div>
+        <div class="info-row"><span class="info-label">Umsatz gesamt</span><span class="info-value" style="color:var(--primary)">${eurFull(totalU)}</span></div>
+
+        ${products.map(p => {
+          if (em[p].ab + em[p].nein + em[p].folge === 0) return '';
+          return `<div class="section-divider">${{shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Ballancer',fitness:'Fitness',reha:'Reha'}[p]}</div>
+          <div class="info-row"><span class="info-label">Abschluss / Folge / Kein</span><span class="info-value">${em[p].ab} / ${em[p].folge} / ${em[p].nein}</span></div>
+          <div class="info-row"><span class="info-label">Umsatz</span><span class="info-value">${eurFull(em[p].umsatz)}</span></div>`;
+        }).join('')}
+
+        <div class="section-divider">Anrufe</div>
+        <div class="info-row"><span class="info-label">Kontakt aus. / err.</span><span class="info-value">${em.kontakt_aus} / ${em.kontakt_err} (${pct(em.kontakt_err,em.kontakt_aus)})</span></div>
+        <div class="info-row"><span class="info-label">Kontakt gebucht</span><span class="info-value">${em.kontakt_geb}</span></div>
+        <div class="info-row"><span class="info-label">Call-in</span><span class="info-value">${em.callin}</span></div>
+        <div class="info-row"><span class="info-label">VNM durch. / err.</span><span class="info-value">${em.vnm_durch} / ${em.vnm_err}</span></div>
+        <div class="info-row"><span class="info-label">Moti durch. / err. / geb.</span><span class="info-value">${em.moti_durch} / ${em.moti_err} / ${em.moti_geb}</span></div>
+      </div>
     </div>`;
   });
+  html += '</div>';
 
   panel.innerHTML = html;
+}
+
+function toggleDetail(id) {
+  document.getElementById(id)?.classList.toggle('open');
 }
 
 // ============================================================
