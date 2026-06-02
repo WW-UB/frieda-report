@@ -284,6 +284,54 @@
       color: var(--muted);
     }
 
+    /* PIN input */
+    .pin-display {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin: 16px 0;
+    }
+    .pin-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: white;
+      transition: all 0.15s;
+    }
+    .pin-dot.filled {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .pin-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .pin-key {
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 22px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      color: var(--text);
+      transition: background 0.1s;
+    }
+    .pin-key:active { background: var(--primary-light); border-color: var(--primary); }
+    .pin-key.wide { grid-column: span 2; font-size: 16px; }
+    .pin-key.del { font-size: 18px; }
+    .pin-error {
+      color: #dc2626;
+      font-size: 13px;
+      text-align: center;
+      margin-top: 8px;
+      min-height: 20px;
+    }
+
     /* Login */
     #screen-login { padding-top: 40px; }
     .login-logo {
@@ -367,7 +415,7 @@
     <div class="logo-text">🌸 Frieda</div>
     <div class="logo-sub">Tagesreporting</div>
   </div>
-  <div class="card">
+  <div class="card" id="login-step-1">
     <div class="card-title">Wer bist du?</div>
     <label>Mitarbeiterin</label>
     <select id="select-employee" onchange="onEmployeeChange()">
@@ -375,7 +423,32 @@
     </select>
     <label>Standort</label>
     <input type="text" id="display-location" readonly style="background:#f3f4f6;color:var(--muted);" />
-    <button class="btn btn-primary" onclick="doLogin()">Anmelden</button>
+    <button class="btn btn-primary" onclick="showPinPad()">Weiter →</button>
+  </div>
+
+  <div class="card" id="login-step-2" style="display:none;">
+    <div class="card-title" id="pin-title">PIN eingeben</div>
+    <div class="pin-display">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-error" id="pin-error"></div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key wide" onclick="pinBack()">← Zurück</button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key del" onclick="pinDelete()">⌫</button>
+    </div>
   </div>
 </div>
 
@@ -783,21 +856,89 @@ function onEmployeeChange() {
   document.getElementById('display-location').value = emp.location || '–';
 }
 
-function doLogin() {
+// ---- PIN Pad ----
+let _pin = '';
+
+function showPinPad() {
   const val = document.getElementById('select-employee').value;
   if (!val) { showToast('Bitte Mitarbeiterin auswählen'); return; }
   const emp = JSON.parse(val);
+  _pin = '';
+  updatePinDots();
+  document.getElementById('pin-error').textContent = '';
+  document.getElementById('pin-title').textContent = `PIN für ${emp.name}`;
+  document.getElementById('login-step-1').style.display = 'none';
+  document.getElementById('login-step-2').style.display = 'block';
+}
+
+function pinBack() {
+  _pin = '';
+  updatePinDots();
+  document.getElementById('pin-error').textContent = '';
+  document.getElementById('login-step-2').style.display = 'none';
+  document.getElementById('login-step-1').style.display = 'block';
+}
+
+function pinKey(digit) {
+  if (_pin.length >= 4) return;
+  _pin += digit;
+  updatePinDots();
+  if (_pin.length === 4) setTimeout(doLogin, 150);
+}
+
+function pinDelete() {
+  _pin = _pin.slice(0, -1);
+  updatePinDots();
+}
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById(`pd${i}`).classList.toggle('filled', i < _pin.length);
+  }
+}
+
+async function doLogin() {
+  const val = document.getElementById('select-employee').value;
+  if (!val) return;
+  const emp = JSON.parse(val);
+
+  // Verify PIN against DB
+  const { data, error } = await db.from('employees').select('pin').eq('id', emp.id).single();
+  if (error || !data) { showPinError('Fehler – bitte erneut versuchen'); return; }
+
+  const storedPin = data.pin;
+  if (!storedPin) {
+    // No PIN set yet – allow login with 0000 and prompt to set one
+    if (_pin !== '0000') { showPinError('Falscher PIN'); return; }
+  } else if (_pin !== storedPin) {
+    showPinError('Falscher PIN');
+    return;
+  }
+
+  // Login erfolgreich
   currentEmployee = emp;
   currentLocation = emp.location;
-
-  // Manager section
   document.getElementById('menu-manager-section').style.display = emp.is_manager ? 'block' : 'none';
-
-  // Date display in menu
   const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   document.getElementById('menu-date').textContent = new Date().toLocaleDateString('de-DE', opts);
-
+  _pin = '';
+  updatePinDots();
+  document.getElementById('login-step-2').style.display = 'none';
+  document.getElementById('login-step-1').style.display = 'block';
   navigate('screen-menu');
+}
+
+function showPinError(msg) {
+  document.getElementById('pin-error').textContent = msg;
+  // shake animation
+  const step2 = document.getElementById('login-step-2');
+  step2.style.transform = 'translateX(-8px)';
+  setTimeout(() => step2.style.transform = 'translateX(8px)', 80);
+  setTimeout(() => step2.style.transform = 'translateX(-4px)', 160);
+  setTimeout(() => step2.style.transform = 'translateX(0)', 240);
+  // reset PIN
+  _pin = '';
+  setTimeout(updatePinDots, 300);
 }
 
 function doLogout() {
