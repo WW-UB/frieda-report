@@ -467,6 +467,56 @@
     .emp-detail-card.open .emp-detail-chevron { transform: rotate(90deg); }
     .emp-detail-body { display: none; padding: 0 18px 16px; }
     .emp-detail-card.open .emp-detail-body { display: block; }
+
+    /* Admin */
+    .admin-emp-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .admin-emp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      cursor: pointer;
+    }
+    .admin-emp-header:active { background: var(--primary-light); }
+    .admin-emp-info { flex: 1; }
+    .admin-emp-name { font-weight: 700; font-size: 15px; }
+    .admin-emp-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .admin-emp-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    .badge-manager { background: #fef3c7; color: #92400e; }
+    .badge-inactive { background: #fee2e2; color: #991b1b; }
+    .admin-emp-body { display: none; padding: 0 18px 18px; border-top: 1px solid var(--border); }
+    .admin-emp-card.open .admin-emp-body { display: block; }
+    .admin-emp-card.open .admin-emp-chevron { transform: rotate(90deg); }
+    .admin-emp-chevron { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
+
+    .form-row {
+      display: flex;
+      gap: 10px;
+    }
+    .form-row > * { flex: 1; }
+    .btn-sm {
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-sm-primary  { background: var(--primary); color: white; }
+    .btn-sm-danger   { background: #fee2e2; color: #991b1b; }
+    .btn-sm-success  { background: #dcfce7; color: #166534; }
   </style>
 </head>
 <body>
@@ -564,6 +614,13 @@
       <div>
         <div class="menu-label">Budget IST eintragen</div>
         <div class="menu-desc">Ist-Kosten für Soll/Ist-Vergleich</div>
+      </div>
+    </button>
+    <button class="menu-btn" onclick="loadAdmin()">
+      <span class="menu-icon">⚙️</span>
+      <div>
+        <div class="menu-label">Mitarbeiterverwaltung</div>
+        <div class="menu-desc">Anlegen, bearbeiten, PIN setzen</div>
       </div>
     </button>
   </div>
@@ -802,6 +859,27 @@
   <div id="panel-team" style="display:none;"><div class="spinner">Bitte Monat wählen …</div></div>
 </div>
 
+<!-- ======================== ADMIN ======================== -->
+<div class="screen" id="screen-admin">
+  <div class="card">
+    <div class="card-title">➕ Neue Mitarbeiterin</div>
+    <label>Name</label>
+    <input type="text" id="new-emp-name" placeholder="Vorname Nachname" />
+    <label>Standort</label>
+    <select id="new-emp-location"></select>
+    <label>PIN (4-stellig)</label>
+    <input type="text" id="new-emp-pin" maxlength="4" placeholder="z.B. 1234" inputmode="numeric" />
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <input type="checkbox" id="new-emp-manager" style="width:auto;margin:0;" />
+      <label for="new-emp-manager" style="margin:0;color:var(--text);">Manager-Zugang</label>
+    </div>
+    <button class="btn btn-primary" onclick="createEmployee()">Mitarbeiterin anlegen</button>
+  </div>
+
+  <div class="card-title" style="padding: 0 0 10px;">Bestehende Mitarbeiterinnen</div>
+  <div id="admin-emp-list"><div class="spinner">Lade …</div></div>
+</div>
+
 <!-- ======================== BUDGET IST ENTRY ======================== -->
 <div class="screen" id="screen-budget-entry">
   <div class="card">
@@ -869,6 +947,7 @@ function updateHeader(screenId) {
     'screen-today':        'Meine Einträge',
     'screen-dashboard':    'Dashboard',
     'screen-budget-entry': 'Budget IST eintragen',
+    'screen-admin':        'Mitarbeiterverwaltung',
   };
   document.getElementById('header-title').textContent = titles[screenId] || 'Frieda Report';
   const sub = currentEmployee ? `${currentEmployee.name} · ${currentLocation}` : '';
@@ -894,21 +973,24 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function loadEmployees() {
   const { data, error } = await db.from('employees').select('*, locations(name)').order('name');
   if (error) { showToast('Fehler beim Laden der Mitarbeiterinnen'); return; }
+  // Cache locations for admin selects
+  await getLocsCache();
   const sel = document.getElementById('select-employee');
   sel.innerHTML = '<option value="">– bitte auswählen –</option>';
-  data.forEach(e => {
+  data.filter(e => e.active !== false).forEach(e => {
     const opt = document.createElement('option');
     opt.value = JSON.stringify({ id: e.id, name: e.name, location: e.locations?.name, location_id: e.location_id, is_manager: e.is_manager });
     opt.textContent = `${e.name} (${e.locations?.name || '–'})`;
     sel.appendChild(opt);
   });
 
-  // Dashboard + budget entry standort filter
+  // Dashboard + budget entry + admin standort filter
   const { data: locs } = await db.from('locations').select('*').order('name');
   const dsel  = document.getElementById('dash-location');
   const besel = document.getElementById('be-location');
+  const asel  = document.getElementById('new-emp-location');
   locs?.forEach(l => {
-    [dsel, besel].forEach(sel => {
+    [dsel, besel, asel].forEach(sel => {
       const opt = document.createElement('option');
       opt.value = l.id;
       opt.textContent = l.name;
@@ -1756,6 +1838,142 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// Admin – Mitarbeiterverwaltung
+// ============================================================
+async function loadAdmin() {
+  navigate('screen-admin');
+  await refreshAdminList();
+}
+
+async function refreshAdminList() {
+  const list = document.getElementById('admin-emp-list');
+  list.innerHTML = '<div class="spinner">Lade …</div>';
+
+  const { data: emps } = await db.from('employees')
+    .select('*, locations(name)')
+    .order('name');
+
+  if (!emps || emps.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:14px;">Noch keine Mitarbeiterinnen.</div>';
+    return;
+  }
+
+  list.innerHTML = emps.map(emp => {
+    const locName = emp.locations?.name || '–';
+    const badges  = [
+      emp.is_manager ? `<span class="admin-emp-badge badge-manager">Manager</span>` : '',
+      emp.active === false ? `<span class="admin-emp-badge badge-inactive">Inaktiv</span>` : '',
+    ].join('');
+    const cardId = `admin-card-${emp.id}`;
+
+    return `<div class="admin-emp-card" id="${cardId}">
+      <div class="admin-emp-header" onclick="document.getElementById('${cardId}').classList.toggle('open')">
+        <div class="admin-emp-info">
+          <div class="admin-emp-name">${emp.name} ${badges}</div>
+          <div class="admin-emp-meta">${locName}</div>
+        </div>
+        <span class="admin-emp-chevron">›</span>
+      </div>
+      <div class="admin-emp-body">
+        <div style="margin-top:14px;">
+          <label>Name</label>
+          <input type="text" id="edit-name-${emp.id}" value="${emp.name}" />
+
+          <label>Standort</label>
+          <select id="edit-loc-${emp.id}">
+            ${buildLocOptions(emp.location_id)}
+          </select>
+
+          <label>PIN (4-stellig)</label>
+          <input type="text" id="edit-pin-${emp.id}" value="${emp.pin || ''}" maxlength="4" inputmode="numeric" placeholder="z.B. 5678" />
+
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <input type="checkbox" id="edit-mgr-${emp.id}" ${emp.is_manager ? 'checked' : ''} style="width:auto;margin:0;" />
+            <label for="edit-mgr-${emp.id}" style="margin:0;color:var(--text);">Manager-Zugang</label>
+          </div>
+
+          <div class="form-row">
+            <button class="btn-sm btn-sm-primary" onclick="saveEmployee('${emp.id}')">💾 Speichern</button>
+            <button class="btn-sm ${emp.active === false ? 'btn-sm-success' : 'btn-sm-danger'}"
+              onclick="toggleActive('${emp.id}', ${emp.active !== false})">
+              ${emp.active === false ? '✅ Aktivieren' : '🚫 Deaktivieren'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Cache locations for select options
+let _locsCache = null;
+async function getLocsCache() {
+  if (!_locsCache) {
+    const { data } = await db.from('locations').select('*').order('name');
+    _locsCache = data || [];
+  }
+  return _locsCache;
+}
+function buildLocOptions(selectedId) {
+  if (!_locsCache) return '';
+  return _locsCache.map(l =>
+    `<option value="${l.id}" ${l.id === selectedId ? 'selected' : ''}>${l.name}</option>`
+  ).join('');
+}
+
+async function createEmployee() {
+  const name    = document.getElementById('new-emp-name').value.trim();
+  const locId   = document.getElementById('new-emp-location').value;
+  const pin     = document.getElementById('new-emp-pin').value.trim();
+  const isMgr   = document.getElementById('new-emp-manager').checked;
+
+  if (!name)  { showToast('Bitte Name eingeben'); return; }
+  if (!locId) { showToast('Bitte Standort wählen'); return; }
+  if (pin && pin.length !== 4) { showToast('PIN muss genau 4 Ziffern haben'); return; }
+
+  const { error } = await db.from('employees').insert([{
+    name, location_id: locId, pin: pin || null, is_manager: isMgr, active: true
+  }]);
+  if (error) { showToast('❌ Fehler beim Anlegen'); console.error(error); return; }
+
+  showToast(`✅ ${name} angelegt`);
+  document.getElementById('new-emp-name').value = '';
+  document.getElementById('new-emp-pin').value  = '';
+  document.getElementById('new-emp-manager').checked = false;
+
+  // Refresh login dropdown + admin list
+  await loadEmployees();
+  await refreshAdminList();
+}
+
+async function saveEmployee(id) {
+  const name  = document.getElementById(`edit-name-${id}`).value.trim();
+  const locId = document.getElementById(`edit-loc-${id}`).value;
+  const pin   = document.getElementById(`edit-pin-${id}`).value.trim();
+  const isMgr = document.getElementById(`edit-mgr-${id}`).checked;
+
+  if (!name) { showToast('Name darf nicht leer sein'); return; }
+  if (pin && pin.length !== 4) { showToast('PIN muss genau 4 Ziffern haben'); return; }
+
+  const { error } = await db.from('employees').update({
+    name, location_id: locId, pin: pin || null, is_manager: isMgr
+  }).eq('id', id);
+
+  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
+  showToast('✅ Gespeichert');
+  await loadEmployees();
+  await refreshAdminList();
+}
+
+async function toggleActive(id, currentlyActive) {
+  const { error } = await db.from('employees').update({ active: !currentlyActive }).eq('id', id);
+  if (error) { showToast('❌ Fehler'); return; }
+  showToast(currentlyActive ? '🚫 Deaktiviert' : '✅ Aktiviert');
+  await loadEmployees();
+  await refreshAdminList();
 }
 
 // Register service worker
