@@ -32,7 +32,6 @@
       max-width: 480px;
       margin: 0 auto;
     }
-    /* Header */
     .header {
       background: var(--primary);
       color: white;
@@ -46,420 +45,96 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     .header h1 { font-size: 18px; font-weight: 600; flex: 1; }
-    .header-back {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 22px;
-      cursor: pointer;
-      padding: 4px;
-      display: none;
-    }
+    .header-back { background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 4px; display: none; }
     .header-sub { font-size: 12px; opacity: 0.85; }
-
-    /* Screens */
     .screen { display: none; padding: 20px; }
     .screen.active { display: block; }
-
-    /* Cards */
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--primary);
-      margin-bottom: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* Form elements */
+    .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--primary); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
     label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
-    input[type="text"], input[type="number"], input[type="date"], select, textarea {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      font-size: 16px;
-      color: var(--text);
-      background: white;
-      margin-bottom: 14px;
-      -webkit-appearance: none;
-      appearance: none;
+    input[type="text"], input[type="number"], input[type="date"], input[type="month"], select, textarea {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: 16px; color: var(--text); background: white; margin-bottom: 14px;
+      -webkit-appearance: none; appearance: none;
     }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
     textarea { min-height: 80px; resize: vertical; }
-
-    /* Buttons */
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      border-radius: var(--radius);
-      border: none;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-      transition: background 0.15s;
-    }
+    .btn { display: block; width: 100%; padding: 14px; border-radius: var(--radius); border: none; font-size: 16px; font-weight: 600; cursor: pointer; text-align: center; transition: background 0.15s; }
     .btn-primary { background: var(--primary); color: white; }
     .btn-primary:active { background: var(--primary-dark); }
-    .btn-secondary {
-      background: white;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-    }
+    .btn-secondary { background: white; color: var(--primary); border: 2px solid var(--primary); }
     .btn + .btn { margin-top: 10px; }
-
-    /* Menu buttons */
-    .menu-btn {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      width: 100%;
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-    }
+    .menu-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px 20px; width: 100%; text-align: left; cursor: pointer; display: flex; align-items: center; gap: 14px; margin-bottom: 12px; box-shadow: var(--shadow); }
     .menu-btn:active { background: var(--primary-light); }
     .menu-icon { font-size: 28px; }
     .menu-label { font-size: 16px; font-weight: 600; }
     .menu-desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
-
-    /* Toggle / Radio group for products */
-    .radio-group {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
+    .radio-group { display: flex; gap: 8px; margin-bottom: 8px; }
     .radio-group input[type="radio"] { display: none; }
-    .radio-group label {
-      flex: 1;
-      text-align: center;
-      padding: 8px 4px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--muted);
-      margin-bottom: 0;
-      transition: all 0.1s;
-    }
-    .radio-group input[type="radio"]:checked + label {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      color: var(--primary);
-      font-weight: 700;
-    }
-
-    /* Product section */
-    .product-section {
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    .product-name {
-      font-weight: 600;
-      font-size: 15px;
-      margin-bottom: 10px;
-    }
+    .radio-group label { flex: 1; text-align: center; padding: 8px 4px; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 0; transition: all 0.1s; }
+    .radio-group input[type="radio"]:checked + label { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 700; }
+    .product-section { border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+    .product-name { font-weight: 600; font-size: 15px; margin-bottom: 10px; }
     .umsatz-row { margin-top: 8px; display: none; }
     .umsatz-row.visible { display: block; }
     .umsatz-row label { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
     .umsatz-row input { margin-bottom: 0; }
-
-    /* PT section */
-    .pt-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .pt-toggle {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-    }
+    .pt-row { display: flex; gap: 10px; margin-bottom: 12px; }
+    .pt-toggle { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .pt-toggle input[type="checkbox"] { display: none; }
-    .pt-toggle label {
-      width: 100%;
-      text-align: center;
-      padding: 10px 6px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--muted);
-      margin-bottom: 0;
-    }
-    .pt-toggle input:checked + label {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      color: var(--primary);
-      font-weight: 700;
-    }
-
-    /* Today list */
-    .entry-item {
-      border-bottom: 1px solid var(--border);
-      padding: 12px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .pt-toggle label { width: 100%; text-align: center; padding: 10px 6px; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 0; }
+    .pt-toggle input:checked + label { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 700; }
+    .entry-item { border-bottom: 1px solid var(--border); padding: 12px 0; display: flex; justify-content: space-between; align-items: center; }
     .entry-item:last-child { border-bottom: none; }
     .entry-name { font-weight: 600; font-size: 15px; }
     .entry-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .entry-badge {
-      background: var(--primary-light);
-      color: var(--primary);
-      border-radius: 20px;
-      padding: 3px 10px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    /* Toast */
-    #toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(100px);
-      background: #1a1a1a;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-size: 14px;
-      font-weight: 500;
-      transition: transform 0.3s ease;
-      z-index: 999;
-      white-space: nowrap;
-    }
+    .entry-badge { background: var(--primary-light); color: var(--primary); border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+    #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #1a1a1a; color: white; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 500; transition: transform 0.3s ease; z-index: 999; white-space: nowrap; }
     #toast.show { transform: translateX(-50%) translateY(0); }
-
-    /* Divider */
-    .section-divider {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin: 20px 0 10px;
-    }
-
-    /* Badge row */
-    .info-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-    }
+    .section-divider { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 20px 0 10px; }
+    .info-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
     .info-row:last-child { border-bottom: none; }
     .info-label { color: var(--muted); }
     .info-value { font-weight: 600; }
-
-    .spinner {
-      text-align: center;
-      padding: 40px;
-      color: var(--muted);
-    }
-
-    /* PIN input */
-    .pin-display {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin: 16px 0;
-    }
-    .pin-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      background: white;
-      transition: all 0.15s;
-    }
-    .pin-dot.filled {
-      background: var(--primary);
-      border-color: var(--primary);
-    }
-    .pin-pad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .pin-key {
-      background: white;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      font-size: 22px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-      color: var(--text);
-      transition: background 0.1s;
-    }
+    .spinner { text-align: center; padding: 40px; color: var(--muted); }
+    .pin-display { display: flex; gap: 12px; justify-content: center; margin: 16px 0; }
+    .pin-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); background: white; transition: all 0.15s; }
+    .pin-dot.filled { background: var(--primary); border-color: var(--primary); }
+    .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
+    .pin-key { background: white; border: 1.5px solid var(--border); border-radius: 12px; padding: 16px; font-size: 22px; font-weight: 600; cursor: pointer; text-align: center; color: var(--text); transition: background 0.1s; }
     .pin-key:active { background: var(--primary-light); border-color: var(--primary); }
     .pin-key.wide { grid-column: span 2; font-size: 16px; }
     .pin-key.del { font-size: 18px; }
-    .pin-error {
-      color: #dc2626;
-      font-size: 13px;
-      text-align: center;
-      margin-top: 8px;
-      min-height: 20px;
-    }
-
-    /* Login */
+    .pin-error { color: #dc2626; font-size: 13px; text-align: center; margin-top: 8px; min-height: 20px; }
     #screen-login { padding-top: 40px; }
-    .login-logo {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    .login-logo .logo-text {
-      font-size: 32px;
-      font-weight: 800;
-      color: var(--primary);
-    }
-    .login-logo .logo-sub {
-      font-size: 14px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    /* Budget / Soll-Ist */
-    .ampel {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      margin-right: 6px;
-      flex-shrink: 0;
-    }
-    .ampel-gruen  { background: #16a34a; }
-    .ampel-gelb   { background: #ca8a04; }
-    .ampel-rot    { background: #dc2626; }
-    .ampel-grau   { background: #9ca3af; }
-
-    .budget-row {
-      display: flex;
-      align-items: center;
-      padding: 9px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      gap: 6px;
-    }
+    .login-logo { text-align: center; margin-bottom: 32px; }
+    .login-logo .logo-text { font-size: 32px; font-weight: 800; color: var(--primary); }
+    .login-logo .logo-sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
+    .ampel { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 6px; flex-shrink: 0; }
+    .ampel-gruen { background: #16a34a; }
+    .ampel-gelb  { background: #ca8a04; }
+    .ampel-rot   { background: #dc2626; }
+    .ampel-grau  { background: #9ca3af; }
+    .budget-row { display: flex; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; gap: 6px; }
     .budget-row:last-child { border-bottom: none; }
     .budget-label { flex: 1; color: var(--muted); }
     .budget-soll  { width: 80px; text-align: right; color: var(--muted); font-size: 12px; }
     .budget-ist   { width: 80px; text-align: right; font-weight: 600; }
-
-    .tab-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      background: white;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--muted);
-    }
-    .tab-btn.active {
-      border-color: var(--primary);
-      background: var(--primary-light);
-      color: var(--primary);
-    }
-
-    /* Übersichtstabelle */
-    .overview-scroll {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      margin: 0 -20px;
-      padding: 0 20px 8px;
-    }
-    .overview-table {
-      border-collapse: collapse;
-      min-width: 100%;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    .overview-table th {
-      background: var(--primary-light);
-      color: var(--primary);
-      padding: 8px 10px;
-      text-align: right;
-      font-weight: 600;
-      border-bottom: 2px solid var(--primary);
-      position: sticky;
-      top: 0;
-    }
+    .tab-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn { flex: 1; padding: 10px; border: 1.5px solid var(--border); border-radius: 8px; background: white; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--muted); }
+    .tab-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+    .overview-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -20px; padding: 0 20px 8px; }
+    .overview-table { border-collapse: collapse; min-width: 100%; font-size: 12px; white-space: nowrap; }
+    .overview-table th { background: var(--primary-light); color: var(--primary); padding: 8px 10px; text-align: right; font-weight: 600; border-bottom: 2px solid var(--primary); position: sticky; top: 0; }
     .overview-table th:first-child { text-align: left; }
-    .overview-table td {
-      padding: 9px 10px;
-      text-align: right;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-    .overview-table td:first-child {
-      text-align: left;
-      font-weight: 600;
-      color: var(--primary);
-      cursor: pointer;
-      text-decoration: underline dotted;
-    }
+    .overview-table td { padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--border); color: var(--text); }
+    .overview-table td:first-child { text-align: left; font-weight: 600; color: var(--primary); cursor: pointer; text-decoration: underline dotted; }
     .overview-table tr:last-child td { border-bottom: none; }
-    .overview-table .total-row td {
-      font-weight: 700;
-      background: #f9f9f9;
-      border-top: 2px solid var(--border);
-    }
+    .overview-table .total-row td { font-weight: 700; background: #f9f9f9; border-top: 2px solid var(--border); }
     .overview-table .umsatz-val { color: #15803d; font-weight: 600; }
     .overview-table .pct-val { color: var(--muted); }
-
-    /* Ausklappbare Detailkarte */
-    .emp-detail-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-    .emp-detail-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 18px;
-      cursor: pointer;
-      user-select: none;
-    }
+    .emp-detail-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 10px; overflow: hidden; }
+    .emp-detail-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; user-select: none; }
     .emp-detail-header:active { background: var(--primary-light); }
     .emp-detail-name { font-weight: 700; font-size: 15px; }
     .emp-detail-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
@@ -467,56 +142,38 @@
     .emp-detail-card.open .emp-detail-chevron { transform: rotate(90deg); }
     .emp-detail-body { display: none; padding: 0 18px 16px; }
     .emp-detail-card.open .emp-detail-body { display: block; }
-
-    /* Admin */
-    .admin-emp-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-    .admin-emp-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 18px;
-      cursor: pointer;
-    }
+    .admin-emp-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 10px; overflow: hidden; }
+    .admin-emp-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; }
     .admin-emp-header:active { background: var(--primary-light); }
     .admin-emp-info { flex: 1; }
     .admin-emp-name { font-weight: 700; font-size: 15px; }
     .admin-emp-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .admin-emp-badge {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-weight: 600;
-      margin-left: 8px;
-    }
+    .admin-emp-badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; margin-left: 8px; }
     .badge-manager { background: #fef3c7; color: #92400e; }
     .badge-inactive { background: #fee2e2; color: #991b1b; }
     .admin-emp-body { display: none; padding: 0 18px 18px; border-top: 1px solid var(--border); }
     .admin-emp-card.open .admin-emp-body { display: block; }
     .admin-emp-card.open .admin-emp-chevron { transform: rotate(90deg); }
     .admin-emp-chevron { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
-
-    .form-row {
-      display: flex;
-      gap: 10px;
-    }
+    .form-row { display: flex; gap: 10px; }
     .form-row > * { flex: 1; }
-    .btn-sm {
-      padding: 9px 14px;
-      border-radius: 8px;
-      border: none;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .btn-sm { padding: 9px 14px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
     .btn-sm-primary  { background: var(--primary); color: white; }
     .btn-sm-danger   { background: #fee2e2; color: #991b1b; }
     .btn-sm-success  { background: #dcfce7; color: #166534; }
+    /* Zieltableau */
+    .zt-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -20px; padding: 0 0 8px; }
+    .zt-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; min-width: 100%; }
+    .zt-table thead th { background: var(--primary); color: white; padding: 7px 8px; text-align: center; font-weight: 700; border-right: 1px solid rgba(255,255,255,0.2); position: sticky; top: 0; z-index: 2; }
+    .zt-table thead th:first-child { text-align: left; min-width: 120px; position: sticky; left: 0; z-index: 3; }
+    .zt-table thead th.zt-current { background: var(--primary-dark); }
+    .zt-table thead th.zt-ytd { background: #374151; border-left: 2px solid white; }
+    .zt-table tbody td { padding: 5px 8px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: center; vertical-align: middle; }
+    .zt-table tbody td.zt-kpi { text-align: left; font-weight: 600; font-size: 11px; color: var(--text); background: var(--card); position: sticky; left: 0; z-index: 1; min-width: 120px; border-right: 2px solid var(--border); }
+    .zt-table tbody td.zt-current { border-left: 1px solid var(--primary); border-right: 1px solid var(--primary); }
+    .zt-table tbody td.zt-ytd { border-left: 2px solid #374151; }
+    .zt-soll { font-size: 10px; color: var(--muted); line-height: 1.2; }
+    .zt-ist  { font-size: 12px; font-weight: 700; line-height: 1.4; }
   </style>
 </head>
 <body>
@@ -545,7 +202,6 @@
     <input type="text" id="display-location" readonly style="background:#f3f4f6;color:var(--muted);" />
     <button class="btn btn-primary" onclick="showPinPad()">Weiter →</button>
   </div>
-
   <div class="card" id="login-step-2" style="display:none;">
     <div class="card-title" id="pin-title">PIN eingeben</div>
     <div class="pin-display">
@@ -623,6 +279,20 @@
         <div class="menu-desc">Anlegen, bearbeiten, PIN setzen</div>
       </div>
     </button>
+    <button class="menu-btn" onclick="loadReport()">
+      <span class="menu-icon">🖨️</span>
+      <div>
+        <div class="menu-label">Report drucken</div>
+        <div class="menu-desc">Gefilterte Auswertung &amp; PDF-Export</div>
+      </div>
+    </button>
+    <button class="menu-btn" onclick="loadZieltableau()">
+      <span class="menu-icon">🎯</span>
+      <div>
+        <div class="menu-label">Zieltableau</div>
+        <div class="menu-desc">Soll/Ist Monatsband – komplettes Jahr</div>
+      </div>
+    </button>
   </div>
 
   <div style="margin-top:24px;">
@@ -633,7 +303,6 @@
 <!-- ======================== ENTRY ======================== -->
 <div class="screen" id="screen-entry">
   <form id="form-entry" onsubmit="submitEntry(event)">
-
     <div class="card">
       <div class="card-title">Kundeninfo</div>
       <label>Datum</label>
@@ -641,7 +310,6 @@
       <label>Kundenname</label>
       <input type="text" id="entry-customer" placeholder="Vorname Nachname" />
     </div>
-
     <div class="card">
       <div class="card-title">Probetraining</div>
       <div class="pt-row">
@@ -659,11 +327,8 @@
         </div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">Produkte</div>
-
-      <!-- Shaper -->
       <div class="product-section" data-product="shaper">
         <div class="product-name">Shaper</div>
         <div class="radio-group">
@@ -679,8 +344,6 @@
           <input type="number" step="0.01" min="0" id="umsatz-shaper-val" placeholder="0,00" />
         </div>
       </div>
-
-      <!-- Chair -->
       <div class="product-section" data-product="chair">
         <div class="product-name">Chair</div>
         <div class="radio-group">
@@ -696,8 +359,6 @@
           <input type="number" step="0.01" min="0" id="umsatz-chair-val" placeholder="0,00" />
         </div>
       </div>
-
-      <!-- ACP -->
       <div class="product-section" data-product="acp">
         <div class="product-name">ACP</div>
         <div class="radio-group">
@@ -713,8 +374,6 @@
           <input type="number" step="0.01" min="0" id="umsatz-acp-val" placeholder="0,00" />
         </div>
       </div>
-
-      <!-- Boots / Ballancer -->
       <div class="product-section" data-product="boots">
         <div class="product-name">Boots / Ballancer</div>
         <div class="radio-group">
@@ -730,8 +389,6 @@
           <input type="number" step="0.01" min="0" id="umsatz-boots-val" placeholder="0,00" />
         </div>
       </div>
-
-      <!-- Fitness -->
       <div class="product-section" data-product="fitness">
         <div class="product-name">Fitness</div>
         <div class="radio-group">
@@ -747,8 +404,6 @@
           <input type="number" step="0.01" min="0" id="umsatz-fitness-val" placeholder="0,00" />
         </div>
       </div>
-
-      <!-- Reha -->
       <div class="product-section" data-product="reha">
         <div class="product-name">Reha</div>
         <div class="radio-group">
@@ -765,7 +420,6 @@
         </div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-title">Nachbereitung</div>
       <label>Grund kein Abschluss (falls zutreffend)</label>
@@ -775,7 +429,6 @@
         <label for="entry-anruftermin" style="width:auto; padding:10px 20px;">📅 Anruftermin festgelegt</label>
       </div>
     </div>
-
     <button type="submit" class="btn btn-primary">💾 Eintrag speichern</button>
     <button type="button" class="btn btn-secondary" onclick="goBack()">Abbrechen</button>
     <div style="height:30px;"></div>
@@ -789,41 +442,28 @@
       <div class="card-title">Datum</div>
       <input type="date" id="calls-date" required />
     </div>
-
     <div class="card">
       <div class="card-title">Kontakt-Anrufe (ausgehend)</div>
-      <label>Ausgehend</label>
-      <input type="number" min="0" id="c-ausgehend" placeholder="0" />
-      <label>Erreicht</label>
-      <input type="number" min="0" id="c-erreicht" placeholder="0" />
-      <label>Gebucht</label>
-      <input type="number" min="0" id="c-gebucht" placeholder="0" />
+      <label>Ausgehend</label><input type="number" min="0" id="c-ausgehend" placeholder="0" />
+      <label>Erreicht</label><input type="number" min="0" id="c-erreicht" placeholder="0" />
+      <label>Gebucht</label><input type="number" min="0" id="c-gebucht" placeholder="0" />
     </div>
-
     <div class="card">
       <div class="card-title">Call-in (eingehend)</div>
       <label>Eingehende Anrufe gesamt</label>
       <input type="number" min="0" id="c-callin" placeholder="0" />
     </div>
-
     <div class="card">
       <div class="card-title">VNM-Anrufe</div>
-      <label>Durchgeführt</label>
-      <input type="number" min="0" id="c-vnm-durch" placeholder="0" />
-      <label>Erreicht</label>
-      <input type="number" min="0" id="c-vnm-err" placeholder="0" />
+      <label>Durchgeführt</label><input type="number" min="0" id="c-vnm-durch" placeholder="0" />
+      <label>Erreicht</label><input type="number" min="0" id="c-vnm-err" placeholder="0" />
     </div>
-
     <div class="card">
       <div class="card-title">Moti-Anrufe</div>
-      <label>Durchgeführt</label>
-      <input type="number" min="0" id="c-moti-durch" placeholder="0" />
-      <label>Erreicht</label>
-      <input type="number" min="0" id="c-moti-err" placeholder="0" />
-      <label>Gebucht</label>
-      <input type="number" min="0" id="c-moti-geb" placeholder="0" />
+      <label>Durchgeführt</label><input type="number" min="0" id="c-moti-durch" placeholder="0" />
+      <label>Erreicht</label><input type="number" min="0" id="c-moti-err" placeholder="0" />
+      <label>Gebucht</label><input type="number" min="0" id="c-moti-geb" placeholder="0" />
     </div>
-
     <button type="submit" class="btn btn-primary">💾 Anrufe speichern</button>
     <button type="button" class="btn btn-secondary" onclick="goBack()">Abbrechen</button>
     <div style="height:30px;"></div>
@@ -846,14 +486,11 @@
       <option value="">Alle Standorte</option>
     </select>
   </div>
-
-  <!-- Tabs: Soll/Ist | YTD | Mitarbeiter -->
   <div class="tab-bar">
     <button class="tab-btn active" id="tab-budget" onclick="switchTab('budget')">📊 Monat</button>
     <button class="tab-btn" id="tab-ytd" onclick="switchTab('ytd')">📈 YTD</button>
     <button class="tab-btn" id="tab-team" onclick="switchTab('team')">👥 Team</button>
   </div>
-
   <div id="panel-budget"><div class="spinner">Bitte Monat &amp; Standort wählen …</div></div>
   <div id="panel-ytd" style="display:none;"><div class="spinner">Bitte Monat &amp; Standort wählen …</div></div>
   <div id="panel-team" style="display:none;"><div class="spinner">Bitte Monat wählen …</div></div>
@@ -875,7 +512,6 @@
     </div>
     <button class="btn btn-primary" onclick="createEmployee()">Mitarbeiterin anlegen</button>
   </div>
-
   <div class="card-title" style="padding: 0 0 10px;">Bestehende Mitarbeiterinnen</div>
   <div id="admin-emp-list"><div class="spinner">Lade …</div></div>
 </div>
@@ -895,22 +531,62 @@
   <div id="budget-ist-form"></div>
 </div>
 
+<!-- ======================== REPORT ======================== -->
+<div class="screen" id="screen-report">
+  <div class="card">
+    <div class="card-title">Filter</div>
+    <label>Standort</label>
+    <select id="rep-location" onchange="loadReportData()"></select>
+    <label>Mitarbeiterin</label>
+    <select id="rep-employee" onchange="loadReportData()">
+      <option value="">Alle Mitarbeiterinnen</option>
+    </select>
+    <div style="display:flex;gap:10px;">
+      <div style="flex:1;"><label>Von</label><input type="month" id="rep-from" onchange="loadReportData()" style="margin-bottom:0;" /></div>
+      <div style="flex:1;"><label>Bis</label><input type="month" id="rep-to" onchange="loadReportData()" style="margin-bottom:0;" /></div>
+    </div>
+    <div id="rep-umsatz-filter" style="display:none;margin-top:10px;">
+      <div style="display:flex;gap:10px;">
+        <div style="flex:1;"><label>Umsatz min (€)</label><input type="number" id="rep-umsatz-min" placeholder="0" onchange="loadReportData()" style="margin-bottom:0;" /></div>
+        <div style="flex:1;"><label>Umsatz max (€)</label><input type="number" id="rep-umsatz-max" placeholder="9999" onchange="loadReportData()" style="margin-bottom:0;" /></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">
+    <button class="tab-btn active" id="rep-tab-entries" onclick="switchRepTab('entries')">👤 Kundeneinträge</button>
+    <button class="tab-btn" id="rep-tab-calls" onclick="switchRepTab('calls')">📞 Anrufe</button>
+    <button class="tab-btn" id="rep-tab-team" onclick="switchRepTab('team')">📊 Team</button>
+    <button class="tab-btn" id="rep-tab-budget" onclick="switchRepTab('budget')">💰 Soll/Ist</button>
+  </div>
+  <button class="btn btn-primary" style="margin-bottom:14px;" onclick="printFriedaReport()">🖨️ Drucken / PDF exportieren</button>
+  <div id="rep-content"><div class="spinner">Filter wählen …</div></div>
+</div>
+
+<!-- ======================== ZIELTABLEAU ======================== -->
+<div class="screen" id="screen-zieltableau">
+  <div class="card">
+    <div class="card-title">Filter</div>
+    <label>Standort</label>
+    <select id="zt-location" onchange="renderZieltableau()"></select>
+    <label>Jahr</label>
+    <select id="zt-year" onchange="renderZieltableau()"></select>
+  </div>
+  <button class="btn btn-primary" style="margin-bottom:14px;" onclick="printZieltableau()">🖨️ Drucken / PDF exportieren</button>
+  <div id="zt-content"><div class="spinner">Standort wählen …</div></div>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-// ============================================================
-// KONFIGURATION – nach Supabase-Einrichtung hier eintragen
-// ============================================================
-const SUPABASE_URL  = 'https://cqddbnnntskivtnrwhnv.supabase.co';      // z.B. https://xyzxyz.supabase.co
-const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxZGRibm5udHNraXZ0bnJ3aG52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMDc5MDUsImV4cCI6MjA5NTg4MzkwNX0.bYJU8mR-NnsDh9rXF7r5F2szPCHyeHgRzsSEpmR_M08';  // aus Supabase → Settings → API
-
+const SUPABASE_URL = 'https://cqddbnnntskivtnrwhnv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxZGRibm5udHNraXZ0bnJ3aG52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzMDc5MDUsImV4cCI6MjA5NTg4MzkwNX0.bYJU8mR-NnsDh9rXF7r5F2szPCHyeHgRzsSEpmR_M08';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ============================================================
-// State
-// ============================================================
+const PRODUCTS = ['shaper','chair','acp','boots','fitness','reha'];
+const PROD_LABELS = {shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Ballancer',fitness:'Fitness',reha:'Reha'};
+
 let currentEmployee = null;
 let currentLocation = null;
 let screenHistory   = [];
@@ -920,10 +596,7 @@ let screenHistory   = [];
 // ============================================================
 function navigate(screenId) {
   const current = document.querySelector('.screen.active');
-  if (current) {
-    screenHistory.push(current.id);
-    current.classList.remove('active');
-  }
+  if (current) { screenHistory.push(current.id); current.classList.remove('active'); }
   document.getElementById(screenId).classList.add('active');
   updateHeader(screenId);
   window.scrollTo(0, 0);
@@ -948,11 +621,14 @@ function updateHeader(screenId) {
     'screen-dashboard':    'Dashboard',
     'screen-budget-entry': 'Budget IST eintragen',
     'screen-admin':        'Mitarbeiterverwaltung',
+    'screen-report':       'Report drucken',
+    'screen-zieltableau':  'Zieltableau',
   };
   document.getElementById('header-title').textContent = titles[screenId] || 'Frieda Report';
   const sub = currentEmployee ? `${currentEmployee.name} · ${currentLocation}` : '';
   document.getElementById('header-sub').textContent = sub;
-  document.getElementById('btn-back').style.display = (screenId === 'screen-login' || screenId === 'screen-menu') ? 'none' : 'block';
+  document.getElementById('btn-back').style.display =
+    (screenId === 'screen-login' || screenId === 'screen-menu') ? 'none' : 'block';
 }
 
 // ============================================================
@@ -963,44 +639,43 @@ window.addEventListener('DOMContentLoaded', async () => {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('entry-date').value = today;
   document.getElementById('calls-date').value = today;
-
-  const now = new Date();
-  document.getElementById('dash-month').value = now.toISOString().slice(0, 7);
-
+  document.getElementById('dash-month').value = new Date().toISOString().slice(0, 7);
   updateHeader('screen-login');
 });
 
 async function loadEmployees() {
   const { data, error } = await db.from('employees').select('*, locations(name)').order('name');
-  if (error) { showToast('Fehler beim Laden der Mitarbeiterinnen'); return; }
-  // Cache locations for admin selects
+  if (error) {
+    console.error('loadEmployees error:', error);
+    showToast('Fehler beim Laden der Mitarbeiterinnen');
+    return;
+  }
   await getLocsCache();
   const sel = document.getElementById('select-employee');
   sel.innerHTML = '<option value="">– bitte auswählen –</option>';
-  data.filter(e => e.active !== false).forEach(e => {
+  (data || []).filter(e => e.active !== false).forEach(e => {
     const opt = document.createElement('option');
     opt.value = JSON.stringify({ id: e.id, name: e.name, location: e.locations?.name, location_id: e.location_id, is_manager: e.is_manager });
     opt.textContent = `${e.name} (${e.locations?.name || '–'})`;
     sel.appendChild(opt);
   });
 
-  // Dashboard + budget entry + admin standort filter
   const { data: locs } = await db.from('locations').select('*').order('name');
   const dsel  = document.getElementById('dash-location');
   const besel = document.getElementById('be-location');
   const asel  = document.getElementById('new-emp-location');
-  locs?.forEach(l => {
-    [dsel, besel, asel].forEach(sel => {
+  // clear existing options (except "Alle Standorte")
+  [besel, asel].forEach(s => { s.innerHTML = s === besel ? '<option value="">– bitte wählen –</option>' : ''; });
+  dsel.innerHTML = '<option value="">Alle Standorte</option>';
+  (locs || []).forEach(l => {
+    [dsel, besel, asel].forEach(s => {
       const opt = document.createElement('option');
       opt.value = l.id;
       opt.textContent = l.name;
-      sel.appendChild(opt);
+      s.appendChild(opt);
     });
   });
-
-  // Default budget-entry month to current
-  const now2 = new Date();
-  document.getElementById('be-month').value = now2.toISOString().slice(0, 7);
+  document.getElementById('be-month').value = new Date().toISOString().slice(0, 7);
 }
 
 function onEmployeeChange() {
@@ -1040,41 +715,29 @@ function pinKey(digit) {
   if (_pin.length === 4) setTimeout(doLogin, 150);
 }
 
-function pinDelete() {
-  _pin = _pin.slice(0, -1);
-  updatePinDots();
-}
+function pinDelete() { _pin = _pin.slice(0, -1); updatePinDots(); }
 
 function updatePinDots() {
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 4; i++)
     document.getElementById(`pd${i}`).classList.toggle('filled', i < _pin.length);
-  }
 }
 
 async function doLogin() {
   const val = document.getElementById('select-employee').value;
   if (!val) return;
   const emp = JSON.parse(val);
-
-  // Verify PIN against DB
   const { data, error } = await db.from('employees').select('pin').eq('id', emp.id).single();
   if (error || !data) { showPinError('Fehler – bitte erneut versuchen'); return; }
-
   const storedPin = data.pin;
   if (!storedPin) {
-    // No PIN set yet – allow login with 0000 and prompt to set one
     if (_pin !== '0000') { showPinError('Falscher PIN'); return; }
   } else if (_pin !== storedPin) {
-    showPinError('Falscher PIN');
-    return;
+    showPinError('Falscher PIN'); return;
   }
-
-  // Login erfolgreich
   currentEmployee = emp;
   currentLocation = emp.location;
   document.getElementById('menu-manager-section').style.display = emp.is_manager ? 'block' : 'none';
-  const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  document.getElementById('menu-date').textContent = new Date().toLocaleDateString('de-DE', opts);
+  document.getElementById('menu-date').textContent = new Date().toLocaleDateString('de-DE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   _pin = '';
   updatePinDots();
   document.getElementById('login-step-2').style.display = 'none';
@@ -1084,33 +747,28 @@ async function doLogin() {
 
 function showPinError(msg) {
   document.getElementById('pin-error').textContent = msg;
-  // shake animation
   const step2 = document.getElementById('login-step-2');
   step2.style.transform = 'translateX(-8px)';
   setTimeout(() => step2.style.transform = 'translateX(8px)', 80);
   setTimeout(() => step2.style.transform = 'translateX(-4px)', 160);
   setTimeout(() => step2.style.transform = 'translateX(0)', 240);
-  // reset PIN
   _pin = '';
   setTimeout(updatePinDots, 300);
 }
 
 function doLogout() {
-  currentEmployee = null;
-  currentLocation = null;
-  screenHistory = [];
+  currentEmployee = null; currentLocation = null; screenHistory = [];
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-login').classList.add('active');
   updateHeader('screen-login');
 }
 
 // ============================================================
-// Product radio → show/hide Umsatz field
+// Product radio
 // ============================================================
 function onProductChange(product) {
   const val = document.querySelector(`input[name="${product}"]:checked`)?.value;
-  const row = document.getElementById(`umsatz-${product}`);
-  row.classList.toggle('visible', val === 'abschluss' || val === 'folge_abschluss');
+  document.getElementById(`umsatz-${product}`).classList.toggle('visible', val === 'abschluss' || val === 'folge_abschluss');
 }
 
 // ============================================================
@@ -1118,32 +776,30 @@ function onProductChange(product) {
 // ============================================================
 async function submitEntry(e) {
   e.preventDefault();
-  const products = ['shaper', 'chair', 'acp', 'boots', 'fitness', 'reha'];
   const row = {
-    date:           document.getElementById('entry-date').value,
-    employee_id:    currentEmployee.id,
-    location_id:    currentEmployee.location_id,
-    customer_name:  document.getElementById('entry-customer').value || null,
+    date:          document.getElementById('entry-date').value,
+    employee_id:   currentEmployee.id,
+    location_id:   currentEmployee.location_id,
+    customer_name: document.getElementById('entry-customer').value || null,
     pt_im_kalender:         document.getElementById('pt-kalender').checked,
     pt_stattgefunden:       document.getElementById('pt-statt').checked,
     pt_nicht_stattgefunden: document.getElementById('pt-nicht').checked,
     kein_abschluss_grund:   document.getElementById('entry-grund').value || null,
     anruftermin_festgelegt: document.getElementById('entry-anruftermin').checked,
   };
-  products.forEach(p => {
+  PRODUCTS.forEach(p => {
     const val = document.querySelector(`input[name="${p}"]:checked`)?.value || null;
     row[`${p}_ergebnis`] = val;
     row[`${p}_umsatz`]   = (val === 'abschluss' || val === 'folge_abschluss')
-      ? (parseFloat(document.getElementById(`umsatz-${p}-val`)?.value) || null)
-      : null;
+      ? (parseFloat(document.getElementById(`umsatz-${p}-val`)?.value) || null) : null;
   });
-
   const { error } = await db.from('reports').insert([row]);
   if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
   showToast('✅ Eintrag gespeichert!');
+  await syncUmsatzToZieltableau(currentEmployee.location_id, document.getElementById('entry-date').value);
   e.target.reset();
   document.getElementById('entry-date').value = new Date().toISOString().split('T')[0];
-  products.forEach(p => {
+  PRODUCTS.forEach(p => {
     document.getElementById(`umsatz-${p}`).classList.remove('visible');
     document.getElementById(`umsatz-${p}-val`).value = '';
   });
@@ -1158,22 +814,19 @@ async function submitCalls(e) {
   const date = document.getElementById('calls-date').value;
   const row = {
     date,
-    employee_id:       currentEmployee.id,
-    location_id:       currentEmployee.location_id,
-    kontakt_ausgehend: parseInt(document.getElementById('c-ausgehend').value) || 0,
-    kontakt_erreicht:  parseInt(document.getElementById('c-erreicht').value) || 0,
-    kontakt_gebucht:   parseInt(document.getElementById('c-gebucht').value) || 0,
-    callin_gesamt:     parseInt(document.getElementById('c-callin').value) || 0,
-    vnm_durchgefuehrt: parseInt(document.getElementById('c-vnm-durch').value) || 0,
-    vnm_erreicht:      parseInt(document.getElementById('c-vnm-err').value) || 0,
-    moti_durchgefuehrt:parseInt(document.getElementById('c-moti-durch').value) || 0,
-    moti_erreicht:     parseInt(document.getElementById('c-moti-err').value) || 0,
-    moti_gebucht:      parseInt(document.getElementById('c-moti-geb').value) || 0,
+    employee_id:        currentEmployee.id,
+    location_id:        currentEmployee.location_id,
+    kontakt_ausgehend:  parseInt(document.getElementById('c-ausgehend').value) || 0,
+    kontakt_erreicht:   parseInt(document.getElementById('c-erreicht').value) || 0,
+    kontakt_gebucht:    parseInt(document.getElementById('c-gebucht').value) || 0,
+    callin_gesamt:      parseInt(document.getElementById('c-callin').value) || 0,
+    vnm_durchgefuehrt:  parseInt(document.getElementById('c-vnm-durch').value) || 0,
+    vnm_erreicht:       parseInt(document.getElementById('c-vnm-err').value) || 0,
+    moti_durchgefuehrt: parseInt(document.getElementById('c-moti-durch').value) || 0,
+    moti_erreicht:      parseInt(document.getElementById('c-moti-err').value) || 0,
+    moti_gebucht:       parseInt(document.getElementById('c-moti-geb').value) || 0,
   };
-
-  // Upsert: wenn bereits für diesen Tag eingetragen, überschreiben
-  const { error } = await db.from('calls')
-    .upsert([row], { onConflict: 'date,employee_id' });
+  const { error } = await db.from('calls').upsert([row], { onConflict: 'date,employee_id' });
   if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
   showToast('✅ Anrufe gespeichert!');
   e.target.reset();
@@ -1189,51 +842,23 @@ async function loadToday() {
   const today = new Date().toISOString().split('T')[0];
   const content = document.getElementById('today-content');
   content.innerHTML = '<div class="spinner">Lade …</div>';
-
-  const { data: reports, error } = await db.from('reports')
-    .select('*')
-    .eq('employee_id', currentEmployee.id)
-    .eq('date', today)
-    .order('created_at', { ascending: false });
-
-  const { data: calls } = await db.from('calls')
-    .select('*')
-    .eq('employee_id', currentEmployee.id)
-    .eq('date', today)
-    .single();
-
+  const { data: reports, error } = await db.from('reports').select('*').eq('employee_id', currentEmployee.id).eq('date', today).order('created_at', { ascending: false });
+  const { data: calls } = await db.from('calls').select('*').eq('employee_id', currentEmployee.id).eq('date', today).single();
   if (error || !reports) { content.innerHTML = '<div class="spinner">Fehler beim Laden.</div>'; return; }
-
-  let html = '';
-
-  // Kundeneinträge
-  html += '<div class="card"><div class="card-title">Kundeneinträge heute</div>';
+  let html = '<div class="card"><div class="card-title">Kundeneinträge heute</div>';
   if (reports.length === 0) {
     html += '<div style="color:var(--muted);font-size:14px;">Noch keine Einträge für heute.</div>';
   } else {
-    const products = ['shaper', 'chair', 'acp', 'boots', 'fitness', 'reha'];
-    const labels   = { shaper: 'Shaper', chair: 'Chair', acp: 'ACP', boots: 'Boots/Ballancer', fitness: 'Fitness', reha: 'Reha' };
+    const labels = { shaper:'Shaper', chair:'Chair', acp:'ACP', boots:'Boots/Ballancer', fitness:'Fitness', reha:'Reha' };
     reports.forEach(r => {
-      const abschlüsse = products
-        .filter(p => r[`${p}_ergebnis`] === 'abschluss' || r[`${p}_ergebnis`] === 'folge_abschluss')
-        .map(p => labels[p]).join(', ');
-      const umsatz = products.reduce((s, p) => s + (r[`${p}_umsatz`] || 0), 0);
-      html += `<div class="entry-item">
-        <div>
-          <div class="entry-name">${r.customer_name || '(kein Name)'}</div>
-          <div class="entry-meta">${abschlüsse || 'Kein Abschluss'}</div>
-        </div>
-        ${umsatz > 0 ? `<div class="entry-badge">${umsatz.toFixed(2)} €</div>` : ''}
-      </div>`;
+      const abschlüsse = PRODUCTS.filter(p => r[`${p}_ergebnis`]==='abschluss'||r[`${p}_ergebnis`]==='folge_abschluss').map(p=>labels[p]).join(', ');
+      const umsatz = PRODUCTS.reduce((s,p) => s+(r[`${p}_umsatz`]||0), 0);
+      html += `<div class="entry-item"><div><div class="entry-name">${r.customer_name||'(kein Name)'}</div><div class="entry-meta">${abschlüsse||'Kein Abschluss'}</div></div>${umsatz>0?`<div class="entry-badge">${umsatz.toFixed(2)} €</div>`:''}</div>`;
     });
   }
   html += '</div>';
-
-  // Anrufe
   if (calls) {
-    const erreich = calls.kontakt_ausgehend > 0
-      ? Math.round((calls.kontakt_erreicht / calls.kontakt_ausgehend) * 100) + '%'
-      : '–';
+    const erreich = calls.kontakt_ausgehend > 0 ? Math.round((calls.kontakt_erreicht/calls.kontakt_ausgehend)*100)+'%' : '–';
     html += `<div class="card"><div class="card-title">Anrufe heute</div>
       <div class="info-row"><span class="info-label">Kontakt ausgehend</span><span class="info-value">${calls.kontakt_ausgehend}</span></div>
       <div class="info-row"><span class="info-label">Erreicht / Erreichbarkeit</span><span class="info-value">${calls.kontakt_erreicht} / ${erreich}</span></div>
@@ -1246,734 +871,641 @@ async function loadToday() {
   } else {
     html += '<div class="card" style="color:var(--muted);font-size:14px;">Noch keine Anrufe für heute eingetragen.</div>';
   }
-
   content.innerHTML = html;
-}
-
-// ============================================================
-// Dashboard tab switching
-// ============================================================
-let _dashTab = 'budget';
-function switchTab(tab) {
-  _dashTab = tab;
-  ['budget','ytd','team'].forEach(t => {
-    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
-    document.getElementById(`panel-${t}`).style.display = t === tab ? 'block' : 'none';
-  });
 }
 
 // ============================================================
 // Dashboard
 // ============================================================
+let _dashTab = 'budget';
+function switchTab(tab) {
+  _dashTab = tab;
+  ['budget','ytd','team'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('active', t===tab);
+    document.getElementById(`panel-${t}`).style.display = t===tab ? 'block' : 'none';
+  });
+}
+
 async function loadDashboard() {
-  const month    = document.getElementById('dash-month').value;
+  const month = document.getElementById('dash-month').value;
   const location = document.getElementById('dash-location').value;
   if (!month) return;
-
   const [year, mon] = month.split('-');
   const from = `${year}-${mon}-01`;
   const to   = new Date(year, mon, 0).toISOString().split('T')[0];
-
-  // Load all panels
   loadBudgetPanel(month, location, from, to);
   loadYtdPanel(month, location);
   loadTeamPanel(from, to, location);
 }
 
-// ---- Budget / Soll-Ist Panel ----
 async function loadBudgetPanel(month, locationId, from, to) {
   const panel = document.getElementById('panel-budget');
   panel.innerHTML = '<div class="spinner">Lade Soll/Ist …</div>';
-
-  if (!locationId) {
-    panel.innerHTML = '<div class="card" style="color:var(--muted);font-size:14px;text-align:center;padding:20px;">Bitte einen Standort auswählen für den Soll/Ist-Vergleich.</div>';
-    return;
-  }
-
+  if (!locationId) { panel.innerHTML = '<div class="card" style="color:var(--muted);font-size:14px;text-align:center;padding:20px;">Bitte einen Standort auswählen für den Soll/Ist-Vergleich.</div>'; return; }
   const [year, mon] = month.split('-');
-
-  // Load budgets for this location+month
-  const { data: budgets } = await db.from('budgets')
-    .select('kpi, soll, ist')
-    .eq('location_id', locationId)
-    .eq('year', parseInt(year))
-    .eq('month', parseInt(mon));
-
-  // Calculate IST Umsatz from reports
-  const { data: reports } = await db.from('reports')
-    .select('shaper_umsatz, chair_umsatz, acp_umsatz, boots_umsatz, fitness_umsatz, reha_umsatz')
-    .eq('location_id', locationId)
-    .gte('date', from)
-    .lte('date', to);
-
-  const products = ['shaper', 'chair', 'acp', 'boots', 'fitness', 'reha'];
-  const zusatzUmsatz = (reports || []).reduce((sum, r) =>
-    sum + products.reduce((s, p) => s + (r[`${p}_umsatz`] || 0), 0), 0);
-
+  const { data: budgets } = await db.from('budgets').select('kpi,soll,ist').eq('location_id',locationId).eq('year',parseInt(year)).eq('month',parseInt(mon));
+  const { data: reports } = await db.from('reports').select(PRODUCTS.map(p=>`${p}_umsatz`).join(',')).eq('location_id',locationId).gte('date',from).lte('date',to);
+  const zusatzUmsatz = (reports||[]).reduce((sum,r) => sum+PRODUCTS.reduce((s,p)=>s+(r[`${p}_umsatz`]||0),0), 0);
   if (!budgets || budgets.length === 0) {
-    panel.innerHTML = `<div class="card">
-      <div class="card-title">Soll / Ist – Umsatz</div>
-      ${ampelRow('Zusatzumsätze (automatisch)', null, zusatzUmsatz, false)}
-      <div style="margin-top:14px;font-size:13px;color:var(--muted);">
-        Keine Soll-Werte gefunden. Bitte zuerst das SQL-Skript <strong>budget_setup.txt</strong> in Supabase ausführen.
-      </div>
-    </div>`;
+    panel.innerHTML = `<div class="card"><div class="card-title">Soll / Ist – Umsatz</div>${ampelRow('Zusatzumsätze (automatisch)',null,zusatzUmsatz,false)}<div style="margin-top:14px;font-size:13px;color:var(--muted);">Keine Soll-Werte gefunden.</div></div>`;
     return;
   }
-
   const budgetMap = {};
-  budgets.forEach(b => { budgetMap[b.kpi] = { soll: b.soll, ist: b.ist }; });
-
-  // IST Umsatz = Mitgliedschaftsumsatz (manuell) + Zusatzumsätze (automatisch)
+  budgets.forEach(b => { budgetMap[b.kpi] = {soll:b.soll, ist:b.ist}; });
   const mitgliedUmsatz = budgetMap['Mitgliedschaftsumsatz']?.ist || 0;
   const istUmsatz = mitgliedUmsatz + zusatzUmsatz;
-  const umsatzSoll = budgetMap['Umsatzerlöse']?.soll || 0;
-
-  const kpiOrder = [
-    'Umsatzerlöse', 'Gesamtleistung', 'Rohertrag', 'Betriebl. Rohertrag',
-    'Personalkosten', 'Raumkosten', 'Versich./Beiträge', 'Werbe-/Reisekosten',
-    'Abschreibungen', 'Sonstige Kosten', 'Gesamtkosten', 'Betriebsergebnis',
-  ];
-  const isKosten = new Set(['Personalkosten', 'Raumkosten', 'Versich./Beiträge',
-    'Werbe-/Reisekosten', 'Abschreibungen', 'Sonstige Kosten', 'Gesamtkosten']);
-
-  let html = `<div class="card">
-    <div class="card-title">📊 Soll / Ist – ${new Date(year, mon-1).toLocaleDateString('de-DE', {month:'long', year:'numeric'})}</div>
-    <div style="display:flex;gap:6px;font-size:11px;color:var(--muted);padding:6px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px;">
-      <span style="flex:1;"></span>
-      <span style="width:80px;text-align:right;">SOLL</span>
-      <span style="width:80px;text-align:right;">IST</span>
-    </div>`;
-
+  const kpiOrder = ['Umsatzerlöse','Gesamtleistung','Rohertrag','Betriebl. Rohertrag','Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten','Betriebsergebnis'];
+  const isKosten = new Set(['Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten']);
+  let html = `<div class="card"><div class="card-title">📊 Soll / Ist – ${new Date(year,mon-1).toLocaleDateString('de-DE',{month:'long',year:'numeric'})}</div>
+    <div style="display:flex;gap:6px;font-size:11px;color:var(--muted);padding:6px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px;"><span style="flex:1;"></span><span style="width:80px;text-align:right;">SOLL</span><span style="width:80px;text-align:right;">IST</span></div>`;
   kpiOrder.forEach(kpi => {
-    const d = budgetMap[kpi];
-    if (!d) return;
-    let istVal = d.ist || 0;
-    if (kpi === 'Umsatzerlöse' || kpi === 'Gesamtleistung') istVal = istUmsatz;
+    const d = budgetMap[kpi]; if (!d) return;
+    let istVal = d.ist||0;
+    if (kpi==='Umsatzerlöse'||kpi==='Gesamtleistung') istVal = istUmsatz;
     html += ampelRow(kpi, d.soll, istVal, isKosten.has(kpi));
   });
-
-  // Aufschlüsselung Umsatz
   html += `<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);">
     <div style="margin-bottom:4px;font-weight:600;color:var(--text);">Umsatz-Aufschlüsselung (IST)</div>
-    <div style="display:flex;justify-content:space-between;padding:3px 0;">
-      <span>Mitgliedschaftsumsatz</span><span style="font-weight:600;">${mitgliedUmsatz.toFixed(2)} €</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;padding:3px 0;">
-      <span>Zusatzumsätze (automatisch)</span><span style="font-weight:600;">${zusatzUmsatz.toFixed(2)} €</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;padding:5px 0 0;border-top:1px solid var(--border);margin-top:4px;font-weight:700;color:var(--text);">
-      <span>Gesamt IST</span><span>${istUmsatz.toFixed(2)} €</span>
-    </div>
+    <div style="display:flex;justify-content:space-between;padding:3px 0;"><span>Mitgliedschaftsumsatz</span><span style="font-weight:600;">${mitgliedUmsatz.toFixed(2)} €</span></div>
+    <div style="display:flex;justify-content:space-between;padding:3px 0;"><span>Zusatzumsätze (automatisch)</span><span style="font-weight:600;">${zusatzUmsatz.toFixed(2)} €</span></div>
+    <div style="display:flex;justify-content:space-between;padding:5px 0 0;border-top:1px solid var(--border);margin-top:4px;font-weight:700;color:var(--text);"><span>Gesamt IST</span><span>${istUmsatz.toFixed(2)} €</span></div>
   </div>`;
-
-  html += `<div style="font-size:11px;color:var(--muted);margin-top:10px;">
-    🟢 ≥ 90% &nbsp; 🟡 70–90% &nbsp; 🔴 &lt; 70% &nbsp;|&nbsp; Bei Kosten umgekehrt.
-  </div></div>`;
-
-  // Mitglieder separat
+  html += `<div style="font-size:11px;color:var(--muted);margin-top:10px;">🟢 ≥ 90% &nbsp; 🟡 70–90% &nbsp; 🔴 &lt; 70% &nbsp;|&nbsp; Bei Kosten umgekehrt.</div></div>`;
   const mg = budgetMap['Mitglieder'];
-  if (mg) {
-    html += `<div class="card">
-      <div class="card-title">👥 Mitglieder</div>
-      ${ampelRow('Mitglieder', mg.soll, mg.ist || 0, false, true)}
-      <div style="font-size:11px;color:var(--muted);margin-top:8px;">IST-Wert über „Budget IST eintragen" pflegen.</div>
-    </div>`;
-  }
-
+  if (mg) html += `<div class="card"><div class="card-title">👥 Mitglieder</div>${ampelRow('Mitglieder',mg.soll,mg.ist||0,false,true)}<div style="font-size:11px;color:var(--muted);margin-top:8px;">IST-Wert über „Budget IST eintragen" pflegen.</div></div>`;
   panel.innerHTML = html;
 }
 
-// ---- YTD Panel ----
 async function loadYtdPanel(month, locationId) {
   const panel = document.getElementById('panel-ytd');
   panel.innerHTML = '<div class="spinner">Lade YTD …</div>';
-
-  if (!locationId) {
-    panel.innerHTML = '<div class="card" style="color:var(--muted);font-size:14px;text-align:center;padding:20px;">Bitte einen Standort auswählen.</div>';
-    return;
-  }
-
+  if (!locationId) { panel.innerHTML = '<div class="card" style="color:var(--muted);font-size:14px;text-align:center;padding:20px;">Bitte einen Standort auswählen.</div>'; return; }
   const [year, mon] = month.split('-').map(Number);
   const fromDate = `${year}-01-01`;
-  const toDate   = new Date(year, mon, 0).toISOString().split('T')[0];
-
-  // Load budgets Jan–selected month for this location
-  const { data: budgets } = await db.from('budgets')
-    .select('kpi, month, soll, ist')
-    .eq('location_id', locationId)
-    .eq('year', year)
-    .lte('month', mon);
-
-  // Load reports for Umsatz IST
-  const products = ['shaper','chair','acp','boots','fitness','reha'];
-  const { data: reports } = await db.from('reports')
-    .select('date,' + products.map(p => `${p}_umsatz`).join(','))
-    .eq('location_id', locationId)
-    .gte('date', fromDate)
-    .lte('date', toDate);
-
-  // Aggregate Umsatz IST per month
+  const toDate   = new Date(year,mon,0).toISOString().split('T')[0];
+  const { data: budgets } = await db.from('budgets').select('kpi,month,soll,ist').eq('location_id',locationId).eq('year',year).lte('month',mon);
+  const { data: reports } = await db.from('reports').select('date,'+PRODUCTS.map(p=>`${p}_umsatz`).join(',')).eq('location_id',locationId).gte('date',fromDate).lte('date',toDate);
   const umsatzByMonth = {};
-  (reports || []).forEach(r => {
-    const m = parseInt(r.date.split('-')[1]);
-    umsatzByMonth[m] = (umsatzByMonth[m] || 0) + products.reduce((s,p) => s + (r[`${p}_umsatz`] || 0), 0);
-  });
-
-  // Aggregate budgets into KPI totals
-  const kpiOrder = ['Umsatzerlöse','Gesamtleistung','Rohertrag','Betriebl. Rohertrag',
-    'Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten',
-    'Abschreibungen','Sonstige Kosten','Gesamtkosten','Betriebsergebnis'];
-  const isKosten = new Set(['Personalkosten','Raumkosten','Versich./Beiträge',
-    'Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten']);
-  const isAutoUmsatz = new Set(['Umsatzerlöse','Gesamtleistung']);
-
-  const totSoll = {}, totIst = {};
-  kpiOrder.forEach(k => { totSoll[k] = 0; totIst[k] = 0; });
-
-  (budgets || []).forEach(b => {
-    if (totSoll[b.kpi] !== undefined) totSoll[b.kpi] += b.soll || 0;
-    if (totIst[b.kpi]  !== undefined) totIst[b.kpi]  += b.ist  || 0;
-  });
-
-  // Mitgliedschaftsumsatz YTD (manuell eingetragen)
-  const mitgliedUmsatzYtd = (budgets || [])
-    .filter(b => b.kpi === 'Mitgliedschaftsumsatz')
-    .reduce((s, b) => s + (b.ist || 0), 0);
-
-  // IST Umsatz = Zusatzumsätze (auto) + Mitgliedschaft (manuell)
-  const totalZusatzIst = Object.values(umsatzByMonth).reduce((s,v) => s+v, 0);
-  const totalUmsatzIst = totalZusatzIst + mitgliedUmsatzYtd;
-  isAutoUmsatz.forEach(k => { totIst[k] = totalUmsatzIst; });
-
-  // Month-by-month breakdown for Umsatz
-  const monthNames = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-  const umsatzSollByMonth = {};
-  const mitgliedByMonth   = {};
-  (budgets || []).forEach(b => {
-    if (b.kpi === 'Umsatzerlöse')          umsatzSollByMonth[b.month] = b.soll || 0;
-    if (b.kpi === 'Mitgliedschaftsumsatz') mitgliedByMonth[b.month]   = b.ist  || 0;
-  });
-
-  const locName = document.getElementById('dash-location').options[document.getElementById('dash-location').selectedIndex]?.text || '';
-
-  let html = `<div class="card">
-    <div class="card-title">📈 YTD – Jan bis ${monthNames[mon-1]} ${year}</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">${locName}</div>
-    <div style="display:flex;gap:6px;font-size:11px;color:var(--muted);padding:6px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px;">
-      <span style="flex:1;"></span>
-      <span style="width:90px;text-align:right;">SOLL kum.</span>
-      <span style="width:90px;text-align:right;">IST kum.</span>
-    </div>`;
-
-  kpiOrder.forEach(kpi => {
-    if (!totSoll[kpi] && !totIst[kpi]) return;
-    html += ampelRow(kpi, totSoll[kpi], totIst[kpi], isKosten.has(kpi));
-  });
-
-  html += `<div style="font-size:11px;color:var(--muted);margin-top:10px;">
-    🟢 ≥ 90% &nbsp; 🟡 70–90% &nbsp; 🔴 &lt; 70% &nbsp;|&nbsp; Umsatz-IST automatisch aus Einträgen.
-  </div></div>`;
-
-  // Monatsaufschlüsselung Umsatz
-  html += `<div class="card">
-    <div class="card-title">Umsatz pro Monat</div>
-    <div style="display:flex;font-size:11px;color:var(--muted);padding:4px 0 8px;border-bottom:1px solid var(--border);gap:4px;">
-      <span style="width:36px;">Monat</span>
-      <span style="flex:1;text-align:right;">SOLL</span>
-      <span style="flex:1;text-align:right;">IST</span>
-      <span style="flex:1;text-align:right;">Abw.</span>
-      <span style="width:24px;"></span>
-    </div>`;
-
-  let cumSoll = 0, cumIst = 0;
-  for (let m = 1; m <= mon; m++) {
-    const s = umsatzSollByMonth[m] || 0;
-    const i = (umsatzByMonth[m] || 0) + (mitgliedByMonth[m] || 0);
-    const abw = i - s;
-    cumSoll += s; cumIst += i;
-    const ratio = s > 0 ? i/s : null;
-    const cls = ratio === null ? 'ampel-grau' : ratio >= 0.9 ? 'ampel-gruen' : ratio >= 0.7 ? 'ampel-gelb' : 'ampel-rot';
-    const abwStr = abw >= 0 ? `+${abw.toFixed(0)}€` : `${abw.toFixed(0)}€`;
-    const abwColor = abw >= 0 ? '#15803d' : '#dc2626';
-    html += `<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;gap:4px;">
-      <span style="width:36px;font-weight:600;">${monthNames[m-1]}</span>
-      <span style="flex:1;text-align:right;color:var(--muted);">${s.toFixed(0)}€</span>
-      <span style="flex:1;text-align:right;font-weight:600;">${i.toFixed(0)}€</span>
-      <span style="flex:1;text-align:right;color:${abwColor};font-weight:600;">${abwStr}</span>
-      <span style="width:24px;text-align:right;"><span class="ampel ${cls}" style="display:inline-block;"></span></span>
-    </div>`;
+  (reports||[]).forEach(r => { const m=parseInt(r.date.split('-')[1]); umsatzByMonth[m]=(umsatzByMonth[m]||0)+PRODUCTS.reduce((s,p)=>s+(r[`${p}_umsatz`]||0),0); });
+  const kpiOrder=['Umsatzerlöse','Gesamtleistung','Rohertrag','Betriebl. Rohertrag','Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten','Betriebsergebnis'];
+  const isKosten=new Set(['Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten']);
+  const isAutoUmsatz=new Set(['Umsatzerlöse','Gesamtleistung']);
+  const totSoll={},totIst={};
+  kpiOrder.forEach(k=>{totSoll[k]=0;totIst[k]=0;});
+  (budgets||[]).forEach(b=>{if(totSoll[b.kpi]!==undefined){totSoll[b.kpi]+=b.soll||0;totIst[b.kpi]+=b.ist||0;}});
+  const mitgliedUmsatzYtd=(budgets||[]).filter(b=>b.kpi==='Mitgliedschaftsumsatz').reduce((s,b)=>s+(b.ist||0),0);
+  const totalZusatzIst=Object.values(umsatzByMonth).reduce((s,v)=>s+v,0);
+  isAutoUmsatz.forEach(k=>{totIst[k]=totalZusatzIst+mitgliedUmsatzYtd;});
+  const monthNames=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  const umsatzSollByMonth={},mitgliedByMonth={};
+  (budgets||[]).forEach(b=>{if(b.kpi==='Umsatzerlöse')umsatzSollByMonth[b.month]=b.soll||0;if(b.kpi==='Mitgliedschaftsumsatz')mitgliedByMonth[b.month]=b.ist||0;});
+  const locName=document.getElementById('dash-location').options[document.getElementById('dash-location').selectedIndex]?.text||'';
+  let html=`<div class="card"><div class="card-title">📈 YTD – Jan bis ${monthNames[mon-1]} ${year}</div><div style="font-size:12px;color:var(--muted);margin-bottom:12px;">${locName}</div>
+    <div style="display:flex;gap:6px;font-size:11px;color:var(--muted);padding:6px 0 10px;border-bottom:1px solid var(--border);margin-bottom:4px;"><span style="flex:1;"></span><span style="width:90px;text-align:right;">SOLL kum.</span><span style="width:90px;text-align:right;">IST kum.</span></div>`;
+  kpiOrder.forEach(kpi=>{if(!totSoll[kpi]&&!totIst[kpi])return;html+=ampelRow(kpi,totSoll[kpi],totIst[kpi],isKosten.has(kpi));});
+  html+=`<div style="font-size:11px;color:var(--muted);margin-top:10px;">🟢 ≥ 90% &nbsp; 🟡 70–90% &nbsp; 🔴 &lt; 70% &nbsp;|&nbsp; Umsatz-IST automatisch aus Einträgen.</div></div>`;
+  html+=`<div class="card"><div class="card-title">Umsatz pro Monat</div><div style="display:flex;font-size:11px;color:var(--muted);padding:4px 0 8px;border-bottom:1px solid var(--border);gap:4px;"><span style="width:36px;">Monat</span><span style="flex:1;text-align:right;">SOLL</span><span style="flex:1;text-align:right;">IST</span><span style="flex:1;text-align:right;">Abw.</span><span style="width:24px;"></span></div>`;
+  let cumSoll=0,cumIst=0;
+  for(let m=1;m<=mon;m++){
+    const s=umsatzSollByMonth[m]||0;const i=(umsatzByMonth[m]||0)+(mitgliedByMonth[m]||0);const abw=i-s;
+    cumSoll+=s;cumIst+=i;
+    const ratio=s>0?i/s:null;
+    const cls=ratio===null?'ampel-grau':ratio>=0.9?'ampel-gruen':ratio>=0.7?'ampel-gelb':'ampel-rot';
+    const abwStr=abw>=0?`+${abw.toFixed(0)}€`:`${abw.toFixed(0)}€`;
+    const abwColor=abw>=0?'#15803d':'#dc2626';
+    html+=`<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;gap:4px;"><span style="width:36px;font-weight:600;">${monthNames[m-1]}</span><span style="flex:1;text-align:right;color:var(--muted);">${s.toFixed(0)}€</span><span style="flex:1;text-align:right;font-weight:600;">${i.toFixed(0)}€</span><span style="flex:1;text-align:right;color:${abwColor};font-weight:600;">${abwStr}</span><span style="width:24px;text-align:right;"><span class="ampel ${cls}" style="display:inline-block;"></span></span></div>`;
   }
-
-  const cumAbw = cumIst - cumSoll;
-  const cumAbwStr = cumAbw >= 0 ? `+${cumAbw.toFixed(0)}€` : `${cumAbw.toFixed(0)}€`;
-  const cumColor  = cumAbw >= 0 ? '#15803d' : '#dc2626';
-  html += `<div style="display:flex;align-items:center;padding:10px 0 4px;font-size:13px;font-weight:700;gap:4px;border-top:2px solid var(--border);margin-top:2px;">
-    <span style="width:36px;">Ges.</span>
-    <span style="flex:1;text-align:right;color:var(--muted);">${cumSoll.toFixed(0)}€</span>
-    <span style="flex:1;text-align:right;">${cumIst.toFixed(0)}€</span>
-    <span style="flex:1;text-align:right;color:${cumColor};">${cumAbwStr}</span>
-    <span style="width:24px;"></span>
-  </div>`;
-
-  html += '</div>';
-  panel.innerHTML = html;
+  const cumAbw=cumIst-cumSoll;const cumColor=cumAbw>=0?'#15803d':'#dc2626';
+  html+=`<div style="display:flex;align-items:center;padding:10px 0 4px;font-size:13px;font-weight:700;gap:4px;border-top:2px solid var(--border);margin-top:2px;"><span style="width:36px;">Ges.</span><span style="flex:1;text-align:right;color:var(--muted);">${cumSoll.toFixed(0)}€</span><span style="flex:1;text-align:right;">${cumIst.toFixed(0)}€</span><span style="flex:1;text-align:right;color:${cumColor};">${cumAbw>=0?'+':''}${cumAbw.toFixed(0)}€</span><span style="width:24px;"></span></div></div>`;
+  panel.innerHTML=html;
 }
 
-function ampelRow(label, soll, ist, invertiert = false, isCount = false) {
-  const fmtEur = v => v != null && v > 0 ? v.toFixed(2) + ' €' : (v === 0 ? '0,00 €' : '–');
-  const fmtNum = v => v != null ? v.toLocaleString('de-DE', {maximumFractionDigits:1}) : '–';
-  const fmt = isCount ? fmtNum : fmtEur;
-
+function ampelRow(label, soll, ist, invertiert=false, isCount=false) {
+  const fmtEur = v => v!=null&&v>0?v.toFixed(2)+' €':(v===0?'0,00 €':'–');
+  const fmtNum = v => v!=null?v.toLocaleString('de-DE',{maximumFractionDigits:1}):'–';
+  const fmt = isCount?fmtNum:fmtEur;
   let cls = 'ampel-grau';
-  if (soll && soll > 0 && ist != null) {
-    const ratio = ist / soll;
-    if (!invertiert) {
-      cls = ratio >= 0.9 ? 'ampel-gruen' : ratio >= 0.7 ? 'ampel-gelb' : 'ampel-rot';
-    } else {
-      // Kosten: IST ≤ SOLL ist gut
-      cls = ratio <= 1.0 ? 'ampel-gruen' : ratio <= 1.15 ? 'ampel-gelb' : 'ampel-rot';
-    }
-  } else if (ist > 0 && !soll) {
-    cls = 'ampel-grau';
+  if (soll&&soll>0&&ist!=null) {
+    const ratio=ist/soll;
+    cls=!invertiert?(ratio>=0.9?'ampel-gruen':ratio>=0.7?'ampel-gelb':'ampel-rot'):(ratio<=1.0?'ampel-gruen':ratio<=1.15?'ampel-gelb':'ampel-rot');
   }
-
-  return `<div class="budget-row">
-    <span class="ampel ${cls}"></span>
-    <span class="budget-label">${label}</span>
-    <span class="budget-soll">${soll != null ? fmt(soll) : '–'}</span>
-    <span class="budget-ist">${fmt(ist)}</span>
-  </div>`;
+  return `<div class="budget-row"><span class="ampel ${cls}"></span><span class="budget-label">${label}</span><span class="budget-soll">${soll!=null?fmt(soll):'–'}</span><span class="budget-ist">${fmt(ist)}</span></div>`;
 }
 
-// ---- Team Panel ----
 async function loadTeamPanel(from, to, location) {
   const panel = document.getElementById('panel-team');
   panel.innerHTML = '<div class="spinner">Lade Mitarbeiterinnen …</div>';
-
-  let rq = db.from('reports').select('*, employees(name, locations(name))').gte('date', from).lte('date', to);
-  let cq = db.from('calls').select('*, employees(name)').gte('date', from).lte('date', to);
-  if (location) { rq = rq.eq('location_id', location); cq = cq.eq('location_id', location); }
-
-  const [{ data: reports }, { data: calls }] = await Promise.all([rq, cq]);
-  if (!reports) { panel.innerHTML = '<div class="spinner">Fehler beim Laden.</div>'; return; }
-
-  const products = ['shaper', 'chair', 'acp', 'boots', 'fitness', 'reha'];
-  const pLabel   = { shaper:'Shaper', chair:'Chair', acp:'ACP', boots:'Boots/Bl.', fitness:'Fitness', reha:'Reha' };
-
-  const empMap = {};
-  reports.forEach(r => {
-    const key = r.employees?.name || r.employee_id;
-    if (!empMap[key]) empMap[key] = {
-      name: key, location: r.employees?.locations?.name || '–',
-      pt_kalender:0, pt_statt:0, pt_nicht:0,
-      shaper:{ab:0,nein:0,folge:0,umsatz:0}, chair:{ab:0,nein:0,folge:0,umsatz:0},
-      acp:{ab:0,nein:0,folge:0,umsatz:0},    boots:{ab:0,nein:0,folge:0,umsatz:0},
-      fitness:{ab:0,nein:0,folge:0,umsatz:0},reha:{ab:0,nein:0,folge:0,umsatz:0},
-      kontakt_aus:0, kontakt_err:0, kontakt_geb:0,
-      callin:0, vnm_durch:0, vnm_err:0, moti_durch:0, moti_err:0, moti_geb:0,
-    };
-    const em = empMap[key];
-    if (r.pt_im_kalender)          em.pt_kalender++;
-    if (r.pt_stattgefunden)        em.pt_statt++;
-    if (r.pt_nicht_stattgefunden)  em.pt_nicht++;
-    products.forEach(p => {
-      const res = r[`${p}_ergebnis`];
-      if (res === 'abschluss')       em[p].ab++;
-      if (res === 'nicht_abschluss') em[p].nein++;
-      if (res === 'folge_abschluss') em[p].folge++;
-      em[p].umsatz += r[`${p}_umsatz`] || 0;
-    });
+  let rq = db.from('reports').select('*, employees(name, locations(name))').gte('date',from).lte('date',to);
+  let cq = db.from('calls').select('*, employees(name)').gte('date',from).lte('date',to);
+  if (location) { rq=rq.eq('location_id',location); cq=cq.eq('location_id',location); }
+  const [{data:reports},{data:calls}] = await Promise.all([rq,cq]);
+  if (!reports) { panel.innerHTML='<div class="spinner">Fehler beim Laden.</div>'; return; }
+  const pLabel={shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Bl.',fitness:'Fitness',reha:'Reha'};
+  const empMap={};
+  reports.forEach(r=>{
+    const key=r.employees?.name||r.employee_id;
+    if(!empMap[key])empMap[key]={name:key,location:r.employees?.locations?.name||'–',pt_kalender:0,pt_statt:0,pt_nicht:0,shaper:{ab:0,nein:0,folge:0,umsatz:0},chair:{ab:0,nein:0,folge:0,umsatz:0},acp:{ab:0,nein:0,folge:0,umsatz:0},boots:{ab:0,nein:0,folge:0,umsatz:0},fitness:{ab:0,nein:0,folge:0,umsatz:0},reha:{ab:0,nein:0,folge:0,umsatz:0},kontakt_aus:0,kontakt_err:0,kontakt_geb:0,callin:0,vnm_durch:0,vnm_err:0,moti_durch:0,moti_err:0,moti_geb:0};
+    const em=empMap[key];
+    if(r.pt_im_kalender)em.pt_kalender++;if(r.pt_stattgefunden)em.pt_statt++;if(r.pt_nicht_stattgefunden)em.pt_nicht++;
+    PRODUCTS.forEach(p=>{const res=r[`${p}_ergebnis`];if(res==='abschluss')em[p].ab++;if(res==='nicht_abschluss')em[p].nein++;if(res==='folge_abschluss')em[p].folge++;em[p].umsatz+=r[`${p}_umsatz`]||0;});
   });
-
-  calls?.forEach(c => {
-    const key = c.employees?.name || c.employee_id;
-    if (!empMap[key]) return;
-    const em = empMap[key];
-    em.kontakt_aus += c.kontakt_ausgehend  || 0;
-    em.kontakt_err += c.kontakt_erreicht   || 0;
-    em.kontakt_geb += c.kontakt_gebucht    || 0;
-    em.callin      += c.callin_gesamt      || 0;
-    em.vnm_durch   += c.vnm_durchgefuehrt  || 0;
-    em.vnm_err     += c.vnm_erreicht       || 0;
-    em.moti_durch  += c.moti_durchgefuehrt || 0;
-    em.moti_err    += c.moti_erreicht      || 0;
-    em.moti_geb    += c.moti_gebucht       || 0;
+  calls?.forEach(c=>{
+    const key=c.employees?.name||c.employee_id;if(!empMap[key])return;const em=empMap[key];
+    em.kontakt_aus+=c.kontakt_ausgehend||0;em.kontakt_err+=c.kontakt_erreicht||0;em.kontakt_geb+=c.kontakt_gebucht||0;em.callin+=c.callin_gesamt||0;em.vnm_durch+=c.vnm_durchgefuehrt||0;em.vnm_err+=c.vnm_erreicht||0;em.moti_durch+=c.moti_durchgefuehrt||0;em.moti_err+=c.moti_erreicht||0;em.moti_geb+=c.moti_gebucht||0;
   });
-
-  const emps = Object.values(empMap).sort((a, b) => a.name.localeCompare(b.name));
-  if (emps.length === 0) {
-    panel.innerHTML = '<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Daten für diesen Zeitraum.</div>';
-    return;
-  }
-
-  const pct = (a, b) => b > 0 ? Math.round((a/b)*100)+'%' : '–';
-  const eur = v => v > 0 ? v.toFixed(0)+'€' : '–';
-  const eurFull = v => v > 0 ? v.toFixed(2)+' €' : '–';
-
-  // ── Übersichtstabelle ──────────────────────────────────────
-  // Totals
-  const totals = { pt_kalender:0, pt_statt:0, kontakt_aus:0, kontakt_err:0, kontakt_geb:0,
-                   callin:0, vnm_durch:0, moti_durch:0, moti_geb:0 };
-  const totP = {};
-  products.forEach(p => { totP[p] = {ab:0, nein:0, folge:0, umsatz:0}; });
-  emps.forEach(em => {
-    totals.pt_kalender  += em.pt_kalender;
-    totals.pt_statt     += em.pt_statt;
-    totals.kontakt_aus  += em.kontakt_aus;
-    totals.kontakt_err  += em.kontakt_err;
-    totals.kontakt_geb  += em.kontakt_geb;
-    totals.callin       += em.callin;
-    totals.vnm_durch    += em.vnm_durch;
-    totals.moti_durch   += em.moti_durch;
-    totals.moti_geb     += em.moti_geb;
-    products.forEach(p => {
-      totP[p].ab     += em[p].ab;
-      totP[p].folge  += em[p].folge;
-      totP[p].nein   += em[p].nein;
-      totP[p].umsatz += em[p].umsatz;
-    });
+  const emps=Object.values(empMap).sort((a,b)=>a.name.localeCompare(b.name));
+  if(emps.length===0){panel.innerHTML='<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Daten für diesen Zeitraum.</div>';return;}
+  const pct=(a,b)=>b>0?Math.round((a/b)*100)+'%':'–';
+  const eur=v=>v>0?v.toFixed(0)+'€':'–';
+  const eurFull=v=>v>0?v.toFixed(2)+' €':'–';
+  const totals={pt_kalender:0,pt_statt:0,kontakt_aus:0,kontakt_err:0,kontakt_geb:0,callin:0,vnm_durch:0,moti_durch:0,moti_geb:0};
+  const totP={};
+  PRODUCTS.forEach(p=>{totP[p]={ab:0,nein:0,folge:0,umsatz:0};});
+  emps.forEach(em=>{
+    totals.pt_kalender+=em.pt_kalender;totals.pt_statt+=em.pt_statt;totals.kontakt_aus+=em.kontakt_aus;totals.kontakt_err+=em.kontakt_err;totals.kontakt_geb+=em.kontakt_geb;totals.callin+=em.callin;totals.vnm_durch+=em.vnm_durch;totals.moti_durch+=em.moti_durch;totals.moti_geb+=em.moti_geb;
+    PRODUCTS.forEach(p=>{totP[p].ab+=em[p].ab;totP[p].folge+=em[p].folge;totP[p].nein+=em[p].nein;totP[p].umsatz+=em[p].umsatz;});
   });
-  const totUmsatz = products.reduce((s,p) => s + totP[p].umsatz, 0);
-  const totAb     = products.reduce((s,p) => s + totP[p].ab + totP[p].folge, 0);
-  const totAll    = products.reduce((s,p) => s + totP[p].ab + totP[p].folge + totP[p].nein, 0);
-
-  const empRow = em => {
-    const totalAb  = products.reduce((s,p) => s + em[p].ab + em[p].folge, 0);
-    const totalAll = products.reduce((s,p) => s + em[p].ab + em[p].folge + em[p].nein, 0);
-    const totalU   = products.reduce((s,p) => s + em[p].umsatz, 0);
-    return `<tr>
-      <td onclick="toggleDetail('detail-${em.name.replace(/\s/g,'_')}')">${em.name}</td>
-      <td class="umsatz-val">${eur(totalU)}</td>
-      ${products.map(p => `<td class="${em[p].umsatz>0?'umsatz-val':''}">${eur(em[p].umsatz)}</td>`).join('')}
-      <td class="pct-val">${pct(totalAb,totalAll)}</td>
-      <td>${em.pt_statt}/${em.pt_kalender}</td>
-      <td>${em.kontakt_aus}/${em.kontakt_err}</td>
-      <td>${em.callin}</td>
-      <td>${em.vnm_durch}</td>
-      <td>${em.moti_geb}</td>
-    </tr>`;
+  const totUmsatz=PRODUCTS.reduce((s,p)=>s+totP[p].umsatz,0);
+  const totAb=PRODUCTS.reduce((s,p)=>s+totP[p].ab+totP[p].folge,0);
+  const totAll=PRODUCTS.reduce((s,p)=>s+totP[p].ab+totP[p].folge+totP[p].nein,0);
+  const empRow=em=>{
+    const tAb=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge,0);
+    const tAll=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge+em[p].nein,0);
+    const tU=PRODUCTS.reduce((s,p)=>s+em[p].umsatz,0);
+    return `<tr><td onclick="toggleDetail('detail-${em.name.replace(/\s/g,'_')}')">${em.name}</td><td class="umsatz-val">${eur(tU)}</td>${PRODUCTS.map(p=>`<td class="${em[p].umsatz>0?'umsatz-val':''}">${eur(em[p].umsatz)}</td>`).join('')}<td class="pct-val">${pct(tAb,tAll)}</td><td>${em.pt_statt}/${em.pt_kalender}</td><td>${em.kontakt_aus}/${em.kontakt_err}</td><td>${em.callin}</td><td>${em.vnm_durch}</td><td>${em.moti_geb}</td></tr>`;
   };
-
-  let html = `<div class="card">
-    <div class="card-title">Übersicht Mitarbeiterinnen</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Auf Namen tippen → Details aufklappen</div>
-    <div class="overview-scroll">
-      <table class="overview-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Umsatz</th>
-            ${products.map(p => `<th>${pLabel[p]}</th>`).join('')}
-            <th>Quote</th>
-            <th>PT</th>
-            <th>Kt.aus/err</th>
-            <th>Call-in</th>
-            <th>VNM</th>
-            <th>Moti geb.</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${emps.map(empRow).join('')}
-          <tr class="total-row">
-            <td>Gesamt</td>
-            <td class="umsatz-val">${eur(totUmsatz)}</td>
-            ${products.map(p => `<td class="${totP[p].umsatz>0?'umsatz-val':''}">${eur(totP[p].umsatz)}</td>`).join('')}
-            <td class="pct-val">${pct(totAb,totAll)}</td>
-            <td>${totals.pt_statt}/${totals.pt_kalender}</td>
-            <td>${totals.kontakt_aus}/${totals.kontakt_err}</td>
-            <td>${totals.callin}</td>
-            <td>${totals.vnm_durch}</td>
-            <td>${totals.moti_geb}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>`;
-
-  // ── Detailkarten (ausklappbar) ─────────────────────────────
-  html += '<div style="margin-top:4px;">';
-  emps.forEach(em => {
-    const totalAb  = products.reduce((s,p) => s + em[p].ab + em[p].folge, 0);
-    const totalAll = products.reduce((s,p) => s + em[p].ab + em[p].folge + em[p].nein, 0);
-    const totalU   = products.reduce((s,p) => s + em[p].umsatz, 0);
-    const detailId = `detail-${em.name.replace(/\s/g,'_')}`;
-
-    html += `<div class="emp-detail-card" id="${detailId}">
-      <div class="emp-detail-header" onclick="toggleDetail('${detailId}')">
-        <div>
-          <div class="emp-detail-name">${em.name}</div>
-          <div class="emp-detail-sub">${em.location} · ${eurFull(totalU)} · Quote: ${pct(totalAb,totalAll)}</div>
-        </div>
-        <span class="emp-detail-chevron">›</span>
-      </div>
-      <div class="emp-detail-body">
-
-        <div class="section-divider">Probetrainings</div>
-        <div class="info-row"><span class="info-label">Im Kalender</span><span class="info-value">${em.pt_kalender}</span></div>
-        <div class="info-row"><span class="info-label">Stattgefunden</span><span class="info-value">${em.pt_statt}</span></div>
-        <div class="info-row"><span class="info-label">Nicht stattgefunden</span><span class="info-value">${em.pt_nicht}</span></div>
-        <div class="info-row"><span class="info-label">Erscheinungsquote</span><span class="info-value">${pct(em.pt_statt,em.pt_kalender)}</span></div>
-
-        <div class="section-divider">Verkauf gesamt</div>
-        <div class="info-row"><span class="info-label">Abschlüsse / Gesamt</span><span class="info-value">${totalAb} / ${totalAll}</span></div>
-        <div class="info-row"><span class="info-label">Verkaufsquote</span><span class="info-value">${pct(totalAb,totalAll)}</span></div>
-        <div class="info-row"><span class="info-label">Umsatz gesamt</span><span class="info-value" style="color:var(--primary)">${eurFull(totalU)}</span></div>
-
-        ${products.map(p => {
-          if (em[p].ab + em[p].nein + em[p].folge === 0) return '';
-          return `<div class="section-divider">${{shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Ballancer',fitness:'Fitness',reha:'Reha'}[p]}</div>
-          <div class="info-row"><span class="info-label">Abschluss / Folge / Kein</span><span class="info-value">${em[p].ab} / ${em[p].folge} / ${em[p].nein}</span></div>
-          <div class="info-row"><span class="info-label">Umsatz</span><span class="info-value">${eurFull(em[p].umsatz)}</span></div>`;
-        }).join('')}
-
-        <div class="section-divider">Anrufe</div>
-        <div class="info-row"><span class="info-label">Kontakt aus. / err.</span><span class="info-value">${em.kontakt_aus} / ${em.kontakt_err} (${pct(em.kontakt_err,em.kontakt_aus)})</span></div>
-        <div class="info-row"><span class="info-label">Kontakt gebucht</span><span class="info-value">${em.kontakt_geb}</span></div>
-        <div class="info-row"><span class="info-label">Call-in</span><span class="info-value">${em.callin}</span></div>
-        <div class="info-row"><span class="info-label">VNM durch. / err.</span><span class="info-value">${em.vnm_durch} / ${em.vnm_err}</span></div>
-        <div class="info-row"><span class="info-label">Moti durch. / err. / geb.</span><span class="info-value">${em.moti_durch} / ${em.moti_err} / ${em.moti_geb}</span></div>
-      </div>
-    </div>`;
+  let html=`<div class="card"><div class="card-title">Übersicht Mitarbeiterinnen</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Auf Namen tippen → Details aufklappen</div><div class="overview-scroll"><table class="overview-table"><thead><tr><th>Name</th><th>Umsatz</th>${PRODUCTS.map(p=>`<th>${pLabel[p]}</th>`).join('')}<th>Quote</th><th>PT</th><th>Kt.aus/err</th><th>Call-in</th><th>VNM</th><th>Moti geb.</th></tr></thead><tbody>${emps.map(empRow).join('')}<tr class="total-row"><td>Gesamt</td><td class="umsatz-val">${eur(totUmsatz)}</td>${PRODUCTS.map(p=>`<td class="${totP[p].umsatz>0?'umsatz-val':''}">${eur(totP[p].umsatz)}</td>`).join('')}<td class="pct-val">${pct(totAb,totAll)}</td><td>${totals.pt_statt}/${totals.pt_kalender}</td><td>${totals.kontakt_aus}/${totals.kontakt_err}</td><td>${totals.callin}</td><td>${totals.vnm_durch}</td><td>${totals.moti_geb}</td></tr></tbody></table></div></div>`;
+  html+='<div style="margin-top:4px;">';
+  emps.forEach(em=>{
+    const tAb=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge,0);
+    const tAll=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge+em[p].nein,0);
+    const tU=PRODUCTS.reduce((s,p)=>s+em[p].umsatz,0);
+    const did=`detail-${em.name.replace(/\s/g,'_')}`;
+    html+=`<div class="emp-detail-card" id="${did}"><div class="emp-detail-header" onclick="toggleDetail('${did}')"><div><div class="emp-detail-name">${em.name}</div><div class="emp-detail-sub">${em.location} · ${eurFull(tU)} · Quote: ${pct(tAb,tAll)}</div></div><span class="emp-detail-chevron">›</span></div><div class="emp-detail-body">
+      <div class="section-divider">Probetrainings</div>
+      <div class="info-row"><span class="info-label">Im Kalender</span><span class="info-value">${em.pt_kalender}</span></div>
+      <div class="info-row"><span class="info-label">Stattgefunden</span><span class="info-value">${em.pt_statt}</span></div>
+      <div class="info-row"><span class="info-label">Nicht stattgefunden</span><span class="info-value">${em.pt_nicht}</span></div>
+      <div class="info-row"><span class="info-label">Erscheinungsquote</span><span class="info-value">${pct(em.pt_statt,em.pt_kalender)}</span></div>
+      <div class="section-divider">Verkauf gesamt</div>
+      <div class="info-row"><span class="info-label">Abschlüsse / Gesamt</span><span class="info-value">${tAb} / ${tAll}</span></div>
+      <div class="info-row"><span class="info-label">Verkaufsquote</span><span class="info-value">${pct(tAb,tAll)}</span></div>
+      <div class="info-row"><span class="info-label">Umsatz gesamt</span><span class="info-value" style="color:var(--primary)">${eurFull(tU)}</span></div>
+      ${PRODUCTS.map(p=>{if(em[p].ab+em[p].nein+em[p].folge===0)return '';return `<div class="section-divider">${PROD_LABELS[p]}</div><div class="info-row"><span class="info-label">Abschluss / Folge / Kein</span><span class="info-value">${em[p].ab} / ${em[p].folge} / ${em[p].nein}</span></div><div class="info-row"><span class="info-label">Umsatz</span><span class="info-value">${eurFull(em[p].umsatz)}</span></div>`;}).join('')}
+      <div class="section-divider">Anrufe</div>
+      <div class="info-row"><span class="info-label">Kontakt aus. / err.</span><span class="info-value">${em.kontakt_aus} / ${em.kontakt_err} (${pct(em.kontakt_err,em.kontakt_aus)})</span></div>
+      <div class="info-row"><span class="info-label">Kontakt gebucht</span><span class="info-value">${em.kontakt_geb}</span></div>
+      <div class="info-row"><span class="info-label">Call-in</span><span class="info-value">${em.callin}</span></div>
+      <div class="info-row"><span class="info-label">VNM durch. / err.</span><span class="info-value">${em.vnm_durch} / ${em.vnm_err}</span></div>
+      <div class="info-row"><span class="info-label">Moti durch. / err. / geb.</span><span class="info-value">${em.moti_durch} / ${em.moti_err} / ${em.moti_geb}</span></div>
+    </div></div>`;
   });
-  html += '</div>';
-
-  panel.innerHTML = html;
+  html+='</div>';
+  panel.innerHTML=html;
 }
 
-function toggleDetail(id) {
-  document.getElementById(id)?.classList.toggle('open');
-}
+function toggleDetail(id) { document.getElementById(id)?.classList.toggle('open'); }
 
 // ============================================================
 // Budget IST eintragen
 // ============================================================
 const BUDGET_KPIS = [
-  { key: 'Mitglieder',              label: 'Mitglieder (Anzahl)',         suffix: '' },
-  { key: 'Mitgliedschaftsumsatz',   label: 'Mitgliedschaftsumsatz (€)',   suffix: '€', info2: 'Umsatz aus Mitgliedsbeiträgen dieses Monats' },
-  { key: 'Umsatzerlöse',            label: 'Umsatzerlöse gesamt (€)',     suffix: '€', info: 'Automatisch: Mitgliedschaft + Zusatzumsätze aus Einträgen' },
-  { key: 'Personalkosten',          label: 'Personalkosten (€)',          suffix: '€' },
-  { key: 'Raumkosten',              label: 'Raumkosten (€)',              suffix: '€' },
-  { key: 'Versich./Beiträge',       label: 'Versich./Beiträge (€)',       suffix: '€' },
-  { key: 'Werbe-/Reisekosten',      label: 'Werbe-/Reisekosten (€)',      suffix: '€' },
-  { key: 'Abschreibungen',          label: 'Abschreibungen (€)',          suffix: '€' },
-  { key: 'Sonstige Kosten',         label: 'Sonstige Kosten (€)',         suffix: '€' },
-  { key: 'Gesamtkosten',            label: 'Gesamtkosten (€)',            suffix: '€' },
-  { key: 'Betriebsergebnis',        label: 'Betriebsergebnis (€)',        suffix: '€' },
+  { key:'Mitglieder',            label:'Mitglieder (Anzahl)',       suffix:'' },
+  { key:'Mitgliedschaftsumsatz', label:'Mitgliedschaftsumsatz (€)', suffix:'€', info2:'Umsatz aus Mitgliedsbeiträgen dieses Monats' },
+  { key:'Umsatzerlöse',          label:'Umsatzerlöse gesamt (€)',   suffix:'€', info:'Automatisch: Mitgliedschaft + Zusatzumsätze aus Einträgen' },
+  { key:'Personalkosten',        label:'Personalkosten (€)',        suffix:'€' },
+  { key:'Raumkosten',            label:'Raumkosten (€)',            suffix:'€' },
+  { key:'Versich./Beiträge',     label:'Versich./Beiträge (€)',     suffix:'€' },
+  { key:'Werbe-/Reisekosten',    label:'Werbe-/Reisekosten (€)',    suffix:'€' },
+  { key:'Abschreibungen',        label:'Abschreibungen (€)',        suffix:'€' },
+  { key:'Sonstige Kosten',       label:'Sonstige Kosten (€)',       suffix:'€' },
+  { key:'Gesamtkosten',          label:'Gesamtkosten (€)',          suffix:'€' },
+  { key:'Betriebsergebnis',      label:'Betriebsergebnis (€)',      suffix:'€' },
 ];
 
 async function loadBudgetIstForm() {
-  const month = document.getElementById('be-month').value;
-  const locId = document.getElementById('be-location').value;
-  const form  = document.getElementById('budget-ist-form');
-
-  if (!month || !locId) { showToast('Bitte Monat und Standort wählen'); return; }
-
-  const [year, mon] = month.split('-');
-
-  const { data: budgets } = await db.from('budgets')
-    .select('kpi, soll, ist')
-    .eq('location_id', locId)
-    .eq('year', parseInt(year))
-    .eq('month', parseInt(mon));
-
-  const bMap = {};
-  budgets?.forEach(b => { bMap[b.kpi] = b; });
-
-  let html = `<div class="card"><div class="card-title">IST-Werte – ${new Date(year, mon-1).toLocaleDateString('de-DE', {month:'long', year:'numeric'})}</div>`;
-
-  BUDGET_KPIS.forEach(kpi => {
-    const val = bMap[kpi.key]?.ist || '';
-    const soll = bMap[kpi.key]?.soll;
-    const infoTxt  = kpi.info  ? `<div style="font-size:11px;color:var(--muted);margin-top:-10px;margin-bottom:10px;">${kpi.info}</div>` : '';
-    const info2Txt = kpi.info2 ? `<div style="font-size:11px;color:var(--muted);margin-top:-10px;margin-bottom:10px;">${kpi.info2}</div>` : '';
-    html += `
-      <label>${kpi.label}${soll ? ` <span style="color:var(--muted);font-size:11px;">(SOLL: ${Number(soll).toLocaleString('de-DE', {maximumFractionDigits:2})})</span>` : ''}</label>
-      ${infoTxt}${info2Txt}
-      <input type="number" step="0.01" id="ist-${kpi.key.replace(/[^a-zA-Z0-9]/g,'_')}" value="${val}" placeholder="0" ${kpi.info ? 'readonly style="background:#f3f4f6;color:var(--muted);"' : ''} />`;
+  const month=document.getElementById('be-month').value;
+  const locId=document.getElementById('be-location').value;
+  const form=document.getElementById('budget-ist-form');
+  if(!month||!locId){showToast('Bitte Monat und Standort wählen');return;}
+  const [year,mon]=month.split('-');
+  const {data:budgets}=await db.from('budgets').select('kpi,soll,ist').eq('location_id',locId).eq('year',parseInt(year)).eq('month',parseInt(mon));
+  const bMap={};budgets?.forEach(b=>{bMap[b.kpi]=b;});
+  let html=`<div class="card"><div class="card-title">IST-Werte – ${new Date(year,mon-1).toLocaleDateString('de-DE',{month:'long',year:'numeric'})}</div>`;
+  BUDGET_KPIS.forEach(kpi=>{
+    const val=bMap[kpi.key]?.ist||'';const soll=bMap[kpi.key]?.soll;
+    const infoTxt=kpi.info?`<div style="font-size:11px;color:var(--muted);margin-top:-10px;margin-bottom:10px;">${kpi.info}</div>`:'';
+    const info2Txt=kpi.info2?`<div style="font-size:11px;color:var(--muted);margin-top:-10px;margin-bottom:10px;">${kpi.info2}</div>`:'';
+    html+=`<label>${kpi.label}${soll?` <span style="color:var(--muted);font-size:11px;">(SOLL: ${Number(soll).toLocaleString('de-DE',{maximumFractionDigits:2})})</span>`:''}</label>${infoTxt}${info2Txt}<input type="number" step="0.01" id="ist-${kpi.key.replace(/[^a-zA-Z0-9]/g,'_')}" value="${val}" placeholder="0" ${kpi.info?'readonly style="background:#f3f4f6;color:var(--muted);"':''} />`;
   });
-
-  html += `</div>
-    <button class="btn btn-primary" onclick="saveBudgetIst()">💾 Speichern</button>
-    <div style="height:30px;"></div>`;
-
-  form.innerHTML = html;
+  html+=`</div><button class="btn btn-primary" onclick="saveBudgetIst()">💾 Speichern</button><div style="height:30px;"></div>`;
+  form.innerHTML=html;
 }
 
 async function saveBudgetIst() {
-  const month = document.getElementById('be-month').value;
-  const locId = document.getElementById('be-location').value;
-  if (!month || !locId) return;
-
-  const [year, mon] = month.split('-');
-
-  const upserts = BUDGET_KPIS
-    .filter(kpi => !kpi.info) // skip auto-calculated
-    .map(kpi => {
-      const inputId = `ist-${kpi.key.replace(/[^a-zA-Z0-9]/g,'_')}`;
-      const el = document.getElementById(inputId);
-      const val = parseFloat(el?.value) || 0;
-      return {
-        location_id: locId,
-        year: parseInt(year),
-        month: parseInt(mon),
-        kpi: kpi.key,
-        ist: val,
-      };
-    });
-
-  const { error } = await db.from('budgets')
-    .upsert(upserts, { onConflict: 'location_id,year,month,kpi' });
-
-  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
-  showToast('✅ IST-Werte gespeichert!');
-  goBack();
+  const month=document.getElementById('be-month').value;const locId=document.getElementById('be-location').value;
+  if(!month||!locId)return;
+  const [year,mon]=month.split('-');
+  const upserts=BUDGET_KPIS.filter(kpi=>!kpi.info).map(kpi=>{
+    const el=document.getElementById(`ist-${kpi.key.replace(/[^a-zA-Z0-9]/g,'_')}`);
+    return {location_id:locId,year:parseInt(year),month:parseInt(mon),kpi:kpi.key,ist:parseFloat(el?.value)||0};
+  });
+  const {error}=await db.from('budgets').upsert(upserts,{onConflict:'location_id,year,month,kpi'});
+  if(error){showToast('❌ Fehler beim Speichern');console.error(error);return;}
+  showToast('✅ IST-Werte gespeichert!');goBack();
 }
 
 // ============================================================
 // Toast
 // ============================================================
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
 // ============================================================
-// Admin – Mitarbeiterverwaltung
+// Admin
 // ============================================================
-async function loadAdmin() {
-  navigate('screen-admin');
-  await refreshAdminList();
-}
+async function loadAdmin() { navigate('screen-admin'); await refreshAdminList(); }
 
 async function refreshAdminList() {
-  const list = document.getElementById('admin-emp-list');
-  list.innerHTML = '<div class="spinner">Lade …</div>';
-
-  const { data: emps } = await db.from('employees')
-    .select('*, locations(name)')
-    .order('name');
-
-  if (!emps || emps.length === 0) {
-    list.innerHTML = '<div style="color:var(--muted);font-size:14px;">Noch keine Mitarbeiterinnen.</div>';
-    return;
-  }
-
-  list.innerHTML = emps.map(emp => {
-    const locName = emp.locations?.name || '–';
-    const badges  = [
-      emp.is_manager ? `<span class="admin-emp-badge badge-manager">Manager</span>` : '',
-      emp.active === false ? `<span class="admin-emp-badge badge-inactive">Inaktiv</span>` : '',
-    ].join('');
-    const cardId = `admin-card-${emp.id}`;
-
-    return `<div class="admin-emp-card" id="${cardId}">
-      <div class="admin-emp-header" onclick="document.getElementById('${cardId}').classList.toggle('open')">
-        <div class="admin-emp-info">
-          <div class="admin-emp-name">${emp.name} ${badges}</div>
-          <div class="admin-emp-meta">${locName}</div>
-        </div>
-        <span class="admin-emp-chevron">›</span>
-      </div>
-      <div class="admin-emp-body">
-        <div style="margin-top:14px;">
-          <label>Name</label>
-          <input type="text" id="edit-name-${emp.id}" value="${emp.name}" />
-
-          <label>Standort</label>
-          <select id="edit-loc-${emp.id}">
-            ${buildLocOptions(emp.location_id)}
-          </select>
-
-          <label>PIN (4-stellig)</label>
-          <input type="text" id="edit-pin-${emp.id}" value="${emp.pin || ''}" maxlength="4" inputmode="numeric" placeholder="z.B. 5678" />
-
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-            <input type="checkbox" id="edit-mgr-${emp.id}" ${emp.is_manager ? 'checked' : ''} style="width:auto;margin:0;" />
-            <label for="edit-mgr-${emp.id}" style="margin:0;color:var(--text);">Manager-Zugang</label>
-          </div>
-
-          <div class="form-row">
-            <button class="btn-sm btn-sm-primary" onclick="saveEmployee('${emp.id}')">💾 Speichern</button>
-            <button class="btn-sm ${emp.active === false ? 'btn-sm-success' : 'btn-sm-danger'}"
-              onclick="toggleActive('${emp.id}', ${emp.active !== false})">
-              ${emp.active === false ? '✅ Aktivieren' : '🚫 Deaktivieren'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>`;
+  const list=document.getElementById('admin-emp-list');
+  list.innerHTML='<div class="spinner">Lade …</div>';
+  const {data:emps}=await db.from('employees').select('*, locations(name)').order('name');
+  if(!emps||emps.length===0){list.innerHTML='<div style="color:var(--muted);font-size:14px;">Noch keine Mitarbeiterinnen.</div>';return;}
+  list.innerHTML=emps.map(emp=>{
+    const locName=emp.locations?.name||'–';
+    const badges=[emp.is_manager?`<span class="admin-emp-badge badge-manager">Manager</span>`:'',emp.active===false?`<span class="admin-emp-badge badge-inactive">Inaktiv</span>`:''].join('');
+    const cardId=`admin-card-${emp.id}`;
+    return `<div class="admin-emp-card" id="${cardId}"><div class="admin-emp-header" onclick="document.getElementById('${cardId}').classList.toggle('open')"><div class="admin-emp-info"><div class="admin-emp-name">${emp.name} ${badges}</div><div class="admin-emp-meta">${locName}</div></div><span class="admin-emp-chevron">›</span></div><div class="admin-emp-body"><div style="margin-top:14px;">
+      <label>Name</label><input type="text" id="edit-name-${emp.id}" value="${emp.name}" />
+      <label>Standort</label><select id="edit-loc-${emp.id}">${buildLocOptions(emp.location_id)}</select>
+      <label>PIN (4-stellig)</label><input type="text" id="edit-pin-${emp.id}" value="${emp.pin||''}" maxlength="4" inputmode="numeric" placeholder="z.B. 5678" />
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><input type="checkbox" id="edit-mgr-${emp.id}" ${emp.is_manager?'checked':''} style="width:auto;margin:0;" /><label for="edit-mgr-${emp.id}" style="margin:0;color:var(--text);">Manager-Zugang</label></div>
+      <div class="form-row"><button class="btn-sm btn-sm-primary" onclick="saveEmployee('${emp.id}')">💾 Speichern</button><button class="btn-sm ${emp.active===false?'btn-sm-success':'btn-sm-danger'}" onclick="toggleActive('${emp.id}',${emp.active!==false})">${emp.active===false?'✅ Aktivieren':'🚫 Deaktivieren'}</button></div>
+    </div></div></div>`;
   }).join('');
 }
 
-// Cache locations for select options
-let _locsCache = null;
+let _locsCache=null;
 async function getLocsCache() {
-  if (!_locsCache) {
-    const { data } = await db.from('locations').select('*').order('name');
-    _locsCache = data || [];
-  }
+  if(!_locsCache){const{data}=await db.from('locations').select('*').order('name');_locsCache=data||[];}
   return _locsCache;
 }
 function buildLocOptions(selectedId) {
-  if (!_locsCache) return '';
-  return _locsCache.map(l =>
-    `<option value="${l.id}" ${l.id === selectedId ? 'selected' : ''}>${l.name}</option>`
-  ).join('');
+  if(!_locsCache)return '';
+  return _locsCache.map(l=>`<option value="${l.id}" ${l.id===selectedId?'selected':''}>${l.name}</option>`).join('');
 }
 
 async function createEmployee() {
-  const name    = document.getElementById('new-emp-name').value.trim();
-  const locId   = document.getElementById('new-emp-location').value;
-  const pin     = document.getElementById('new-emp-pin').value.trim();
-  const isMgr   = document.getElementById('new-emp-manager').checked;
-
-  if (!name)  { showToast('Bitte Name eingeben'); return; }
-  if (!locId) { showToast('Bitte Standort wählen'); return; }
-  if (pin && pin.length !== 4) { showToast('PIN muss genau 4 Ziffern haben'); return; }
-
-  const { error } = await db.from('employees').insert([{
-    name, location_id: locId, pin: pin || null, is_manager: isMgr, active: true
-  }]);
-  if (error) { showToast('❌ Fehler beim Anlegen'); console.error(error); return; }
-
+  const name=document.getElementById('new-emp-name').value.trim();
+  const locId=document.getElementById('new-emp-location').value;
+  const pin=document.getElementById('new-emp-pin').value.trim();
+  const isMgr=document.getElementById('new-emp-manager').checked;
+  if(!name){showToast('Bitte Name eingeben');return;}
+  if(!locId){showToast('Bitte Standort wählen');return;}
+  if(pin&&pin.length!==4){showToast('PIN muss genau 4 Ziffern haben');return;}
+  const{error}=await db.from('employees').insert([{name,location_id:locId,pin:pin||null,is_manager:isMgr,active:true}]);
+  if(error){showToast('❌ Fehler beim Anlegen');console.error(error);return;}
   showToast(`✅ ${name} angelegt`);
-  document.getElementById('new-emp-name').value = '';
-  document.getElementById('new-emp-pin').value  = '';
-  document.getElementById('new-emp-manager').checked = false;
-
-  // Refresh login dropdown + admin list
-  await loadEmployees();
-  await refreshAdminList();
+  document.getElementById('new-emp-name').value='';document.getElementById('new-emp-pin').value='';document.getElementById('new-emp-manager').checked=false;
+  await loadEmployees();await refreshAdminList();
 }
 
 async function saveEmployee(id) {
-  const name  = document.getElementById(`edit-name-${id}`).value.trim();
-  const locId = document.getElementById(`edit-loc-${id}`).value;
-  const pin   = document.getElementById(`edit-pin-${id}`).value.trim();
-  const isMgr = document.getElementById(`edit-mgr-${id}`).checked;
-
-  if (!name) { showToast('Name darf nicht leer sein'); return; }
-  if (pin && pin.length !== 4) { showToast('PIN muss genau 4 Ziffern haben'); return; }
-
-  const { error } = await db.from('employees').update({
-    name, location_id: locId, pin: pin || null, is_manager: isMgr
-  }).eq('id', id);
-
-  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
-  showToast('✅ Gespeichert');
-  await loadEmployees();
-  await refreshAdminList();
+  const name=document.getElementById(`edit-name-${id}`).value.trim();
+  const locId=document.getElementById(`edit-loc-${id}`).value;
+  const pin=document.getElementById(`edit-pin-${id}`).value.trim();
+  const isMgr=document.getElementById(`edit-mgr-${id}`).checked;
+  if(!name){showToast('Name darf nicht leer sein');return;}
+  if(pin&&pin.length!==4){showToast('PIN muss genau 4 Ziffern haben');return;}
+  const{error}=await db.from('employees').update({name,location_id:locId,pin:pin||null,is_manager:isMgr}).eq('id',id);
+  if(error){showToast('❌ Fehler beim Speichern');console.error(error);return;}
+  showToast('✅ Gespeichert');await loadEmployees();await refreshAdminList();
 }
 
 async function toggleActive(id, currentlyActive) {
-  const { error } = await db.from('employees').update({ active: !currentlyActive }).eq('id', id);
-  if (error) { showToast('❌ Fehler'); return; }
-  showToast(currentlyActive ? '🚫 Deaktiviert' : '✅ Aktiviert');
-  await loadEmployees();
-  await refreshAdminList();
+  const{error}=await db.from('employees').update({active:!currentlyActive}).eq('id',id);
+  if(error){showToast('❌ Fehler');return;}
+  showToast(currentlyActive?'🚫 Deaktiviert':'✅ Aktiviert');
+  await loadEmployees();await refreshAdminList();
+}
+
+// ============================================================
+// Report drucken
+// ============================================================
+function loadReport() {
+  navigate('screen-report');
+  const sel=document.getElementById('rep-location');
+  sel.innerHTML='';
+  (_locsCache||[]).forEach(l=>{const opt=document.createElement('option');opt.value=l.id;opt.textContent=l.name;sel.appendChild(opt);});
+  const ym=new Date().toISOString().slice(0,7);
+  document.getElementById('rep-from').value=ym;
+  document.getElementById('rep-to').value=ym;
+  _repTab='entries';
+  ['entries','calls','team','budget'].forEach(t=>document.getElementById(`rep-tab-${t}`).classList.toggle('active',t==='entries'));
+  document.getElementById('rep-umsatz-filter').style.display='block';
+  // reload employees for this location
+  document.getElementById('rep-employee').innerHTML='<option value="">Alle Mitarbeiterinnen</option>';
+  loadReportData();
+}
+
+let _repTab='entries';
+function switchRepTab(tab) {
+  _repTab=tab;
+  ['entries','calls','team','budget'].forEach(t=>document.getElementById(`rep-tab-${t}`).classList.toggle('active',t===tab));
+  document.getElementById('rep-umsatz-filter').style.display=(tab==='entries')?'block':'none';
+  loadReportData();
+}
+
+async function loadReportData() {
+  switch(_repTab) {
+    case 'entries': await loadRepEntries(); break;
+    case 'calls':   await loadRepCalls();   break;
+    case 'team':    await loadRepTeam();    break;
+    case 'budget':  await loadRepBudget();  break;
+  }
+}
+
+async function loadRepEntries() {
+  const content=document.getElementById('rep-content');
+  content.innerHTML='<div class="spinner">Lade …</div>';
+  const locId=document.getElementById('rep-location').value;
+  const empId=document.getElementById('rep-employee').value;
+  const from=document.getElementById('rep-from').value;
+  const to=document.getElementById('rep-to').value;
+  const uMin=parseFloat(document.getElementById('rep-umsatz-min').value)||0;
+  const uMax=parseFloat(document.getElementById('rep-umsatz-max').value)||999999;
+  if(!locId||!from||!to){content.innerHTML='<div class="spinner">Bitte Filter wählen.</div>';return;}
+
+  // populate employee select for this location
+  const empSel=document.getElementById('rep-employee');
+  if(empSel.dataset.locId!==locId){
+    const{data:emps}=await db.from('employees').select('id,name').eq('location_id',locId).order('name');
+    empSel.innerHTML='<option value="">Alle Mitarbeiterinnen</option>';
+    (emps||[]).forEach(e=>{const opt=document.createElement('option');opt.value=e.id;opt.textContent=e.name;empSel.appendChild(opt);});
+    empSel.dataset.locId=locId;
+  }
+
+  let q=db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31');
+  if(empId)q=q.eq('employee_id',empId);
+  const{data:rows,error}=await q.order('date',{ascending:false});
+  if(error||!rows){content.innerHTML='<div class="spinner">Fehler beim Laden.</div>';return;}
+
+  const filtered=rows.filter(r=>{const u=PRODUCTS.reduce((s,p)=>s+(r[`${p}_umsatz`]||0),0);return u>=uMin&&u<=uMax;});
+  if(filtered.length===0){content.innerHTML='<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Einträge gefunden.</div>';return;}
+
+  let html=`<div class="card"><div class="card-title">Kundeneinträge (${filtered.length})</div>`;
+  filtered.forEach(r=>{
+    const u=PRODUCTS.reduce((s,p)=>s+(r[`${p}_umsatz`]||0),0);
+    const abschl=PRODUCTS.filter(p=>r[`${p}_ergebnis`]==='abschluss'||r[`${p}_ergebnis`]==='folge_abschluss').map(p=>PROD_LABELS[p]).join(', ');
+    html+=`<div class="entry-item"><div><div class="entry-name">${r.customer_name||'(kein Name)'}</div><div class="entry-meta">${r.date} · ${r.employees?.name||'–'} · ${abschl||'Kein Abschluss'}</div></div>${u>0?`<div class="entry-badge">${u.toFixed(2)} €</div>`:''}</div>`;
+  });
+  const total=filtered.reduce((s,r)=>s+PRODUCTS.reduce((ss,p)=>ss+(r[`${p}_umsatz`]||0),0),0);
+  html+=`<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-weight:700;text-align:right;font-size:14px;">Gesamt: ${total.toFixed(2)} €</div></div>`;
+  content.innerHTML=html;
+}
+
+async function loadRepCalls() {
+  const content=document.getElementById('rep-content');
+  content.innerHTML='<div class="spinner">Lade …</div>';
+  const locId=document.getElementById('rep-location').value;
+  const empId=document.getElementById('rep-employee').value;
+  const from=document.getElementById('rep-from').value;
+  const to=document.getElementById('rep-to').value;
+  if(!locId||!from||!to){content.innerHTML='<div class="spinner">Bitte Filter wählen.</div>';return;}
+  let q=db.from('calls').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31');
+  if(empId)q=q.eq('employee_id',empId);
+  const{data:rows,error}=await q.order('date',{ascending:false});
+  if(error||!rows||rows.length===0){content.innerHTML='<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Anrufe gefunden.</div>';return;}
+  const tot={aus:0,err:0,geb:0,callin:0,vnm:0,moti_d:0,moti_g:0};
+  rows.forEach(r=>{tot.aus+=r.kontakt_ausgehend||0;tot.err+=r.kontakt_erreicht||0;tot.geb+=r.kontakt_gebucht||0;tot.callin+=r.callin_gesamt||0;tot.vnm+=r.vnm_durchgefuehrt||0;tot.moti_d+=r.moti_durchgefuehrt||0;tot.moti_g+=r.moti_gebucht||0;});
+  const pct=(a,b)=>b>0?Math.round(a/b*100)+'%':'–';
+  content.innerHTML=`<div class="card"><div class="card-title">Anrufe Gesamt</div>
+    <div class="info-row"><span class="info-label">Kontakt ausgehend</span><span class="info-value">${tot.aus}</span></div>
+    <div class="info-row"><span class="info-label">Erreicht / Quote</span><span class="info-value">${tot.err} / ${pct(tot.err,tot.aus)}</span></div>
+    <div class="info-row"><span class="info-label">Gebucht</span><span class="info-value">${tot.geb}</span></div>
+    <div class="info-row"><span class="info-label">Call-in</span><span class="info-value">${tot.callin}</span></div>
+    <div class="info-row"><span class="info-label">VNM durchgeführt</span><span class="info-value">${tot.vnm}</span></div>
+    <div class="info-row"><span class="info-label">Moti durchgeführt / gebucht</span><span class="info-value">${tot.moti_d} / ${tot.moti_g}</span></div>
+  </div>`;
+}
+
+async function loadRepTeam() {
+  const content=document.getElementById('rep-content');
+  content.innerHTML='<div class="spinner">Lade …</div>';
+  const locId=document.getElementById('rep-location').value;
+  const from=document.getElementById('rep-from').value;
+  const to=document.getElementById('rep-to').value;
+  if(!locId||!from||!to){content.innerHTML='<div class="spinner">Bitte Filter wählen.</div>';return;}
+  const[{data:reports},{data:calls}]=await Promise.all([
+    db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31'),
+    db.from('calls').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31'),
+  ]);
+  if(!reports){content.innerHTML='<div class="spinner">Fehler.</div>';return;}
+  const empMap={};
+  (reports||[]).forEach(r=>{
+    const key=r.employees?.name||r.employee_id;
+    if(!empMap[key])empMap[key]={name:key,umsatz:0,ab:0,all:0,pt:0,calls_aus:0,calls_err:0};
+    empMap[key].umsatz+=PRODUCTS.reduce((s,p)=>s+(r[`${p}_umsatz`]||0),0);
+    PRODUCTS.forEach(p=>{const v=r[`${p}_ergebnis`];if(v==='abschluss'||v==='folge_abschluss')empMap[key].ab++;if(v&&v!=='')empMap[key].all++;});
+    if(r.pt_stattgefunden)empMap[key].pt++;
+  });
+  (calls||[]).forEach(c=>{const key=c.employees?.name||c.employee_id;if(!empMap[key])return;empMap[key].calls_aus+=c.kontakt_ausgehend||0;empMap[key].calls_err+=c.kontakt_erreicht||0;});
+  const emps=Object.values(empMap).sort((a,b)=>b.umsatz-a.umsatz);
+  if(emps.length===0){content.innerHTML='<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Daten.</div>';return;}
+  const pct=(a,b)=>b>0?Math.round(a/b*100)+'%':'–';
+  let html=`<div class="card"><div class="card-title">Team-Übersicht</div>`;
+  emps.forEach(em=>{html+=`<div class="entry-item"><div><div class="entry-name">${em.name}</div><div class="entry-meta">Quote: ${pct(em.ab,em.all)} · PT: ${em.pt} · Kt: ${em.calls_aus}/${em.calls_err}</div></div>${em.umsatz>0?`<div class="entry-badge">${em.umsatz.toFixed(2)} €</div>`:''}</div>`;});
+  content.innerHTML=html+'</div>';
+}
+
+async function loadRepBudget() {
+  const content=document.getElementById('rep-content');
+  content.innerHTML='<div class="spinner">Lade …</div>';
+  const locId=document.getElementById('rep-location').value;
+  const from=document.getElementById('rep-from').value;
+  const to=document.getElementById('rep-to').value;
+  if(!locId||!from||!to){content.innerHTML='<div class="spinner">Bitte Filter wählen.</div>';return;}
+  const[fromY,fromM]=from.split('-').map(Number);
+  const[toY,toM]=to.split('-').map(Number);
+  const{data:budgets}=await db.from('budgets').select('kpi,soll,ist,year,month').eq('location_id',locId);
+  const inRange=b=>{const bDate=b.year*100+b.month;return bDate>=fromY*100+fromM&&bDate<=toY*100+toM;};
+  const ranged=(budgets||[]).filter(inRange);
+  const kpiOrder=['Mitglieder','Mitgliedschaftsumsatz','Umsatzerlöse','Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten','Betriebsergebnis'];
+  const isKosten=new Set(['Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten']);
+  const agg={};kpiOrder.forEach(k=>{agg[k]={soll:0,ist:0};});
+  ranged.forEach(b=>{if(agg[b.kpi]){agg[b.kpi].soll+=b.soll||0;agg[b.kpi].ist+=b.ist||0;}});
+  let html=`<div class="card"><div class="card-title">Soll / Ist</div>`;
+  kpiOrder.forEach(kpi=>{if(!agg[kpi])return;html+=ampelRow(kpi,agg[kpi].soll,agg[kpi].ist,isKosten.has(kpi),kpi==='Mitglieder');});
+  html+=`<div style="font-size:11px;color:var(--muted);margin-top:10px;">🟢 ≥ 90% &nbsp; 🟡 70–90% &nbsp; 🔴 &lt; 70%</div></div>`;
+  content.innerHTML=html;
+}
+
+function printFriedaReport() {
+  const locSel=document.getElementById('rep-location');
+  const locName=locSel.options[locSel.selectedIndex]?.text||'';
+  const empSel=document.getElementById('rep-employee');
+  const empName=empSel.value?(empSel.options[empSel.selectedIndex]?.text||''):'Alle';
+  const from=document.getElementById('rep-from').value;
+  const to=document.getElementById('rep-to').value;
+  const content=document.getElementById('rep-content').innerHTML;
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Frieda Report</title><style>
+    body{font-family:-apple-system,sans-serif;max-width:800px;margin:0 auto;padding:20px;color:#1a1a1a;}
+    h1{color:#b5465a;font-size:22px;margin-bottom:4px;}
+    .meta{color:#6b7280;font-size:13px;margin-bottom:20px;}
+    .card{border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-bottom:16px;}
+    .card-title{font-size:13px;font-weight:700;color:#b5465a;text-transform:uppercase;margin-bottom:12px;}
+    .entry-item{border-bottom:1px solid #e5e7eb;padding:8px 0;display:flex;justify-content:space-between;}
+    .entry-name{font-weight:600;}.entry-meta{font-size:12px;color:#6b7280;}
+    .entry-badge{background:#f9eaed;color:#b5465a;border-radius:20px;padding:2px 8px;font-size:12px;font-weight:600;}
+    .info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e5e7eb;font-size:14px;}
+    .info-label{color:#6b7280;}.info-value{font-weight:600;}
+    .budget-row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #e5e7eb;font-size:13px;}
+    .budget-label{flex:1;color:#6b7280;}.budget-soll{width:80px;text-align:right;color:#6b7280;font-size:12px;}.budget-ist{width:80px;text-align:right;font-weight:600;}
+    .ampel{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;}
+    .ampel-gruen{background:#16a34a;}.ampel-gelb{background:#ca8a04;}.ampel-rot{background:#dc2626;}.ampel-grau{background:#9ca3af;}
+    .spinner{display:none;}
+    @media print{@page{margin:15mm;}}
+  </style></head><body>
+    <h1>🌸 Frieda Report</h1>
+    <div class="meta">Standort: ${locName} · Mitarbeiterin: ${empName} · Zeitraum: ${from} bis ${to}</div>
+    ${content}
+    <div style="margin-top:20px;font-size:11px;color:#9ca3af;">Erstellt am ${new Date().toLocaleDateString('de-DE')}</div>
+  </body></html>`);
+  win.document.close();
+  win.print();
+}
+
+async function syncUmsatzToZieltableau(locId, dateStr) {
+  const [y,m]=dateStr.slice(0,7).split('-').map(Number);
+  const from=`${y}-${String(m).padStart(2,'0')}-01`;
+  const to=new Date(y,m,0).toISOString().split('T')[0];
+  const{data:reps}=await db.from('reports').select(PRODUCTS.map(p=>`${p}_umsatz`).join(',')).eq('location_id',locId).gte('date',from).lte('date',to);
+  const zusatz=(reps||[]).reduce((s,r)=>s+PRODUCTS.reduce((ss,p)=>ss+(r[`${p}_umsatz`]||0),0),0);
+  const{data:mitgl}=await db.from('budgets').select('ist').eq('location_id',locId).eq('year',y).eq('month',m).eq('kpi','Mitgliedschaftsumsatz').single();
+  const total=zusatz+(mitgl?.ist||0);
+  await db.from('budgets').upsert([
+    {location_id:locId,year:y,month:m,kpi:'Umsatzerlöse',ist:total},
+    {location_id:locId,year:y,month:m,kpi:'Gesamtleistung',ist:total},
+  ],{onConflict:'location_id,year,month,kpi'});
+}
+
+// ============================================================
+// Zieltableau
+// ============================================================
+const ZT_KPIS = ['Mitglieder','Mitgliedschaftsumsatz','Umsatzerlöse','Gesamtleistung','Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten','Betriebsergebnis'];
+const ZT_KOSTEN = new Set(['Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten']);
+const ZT_MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+
+function loadZieltableau() {
+  navigate('screen-zieltableau');
+  const locSel = document.getElementById('zt-location');
+  locSel.innerHTML = '';
+  (_locsCache || []).forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id; opt.textContent = l.name;
+    locSel.appendChild(opt);
+  });
+  const yrSel = document.getElementById('zt-year');
+  yrSel.innerHTML = '';
+  const curY = new Date().getFullYear();
+  for (let y = curY - 1; y <= curY + 1; y++) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    if (y === curY) opt.selected = true;
+    yrSel.appendChild(opt);
+  }
+  renderZieltableau();
+}
+
+async function renderZieltableau() {
+  const locId = document.getElementById('zt-location').value;
+  const year  = parseInt(document.getElementById('zt-year').value);
+  const content = document.getElementById('zt-content');
+  if (!locId) { content.innerHTML = '<div class="spinner">Standort wählen …</div>'; return; }
+  content.innerHTML = '<div class="spinner">Lade …</div>';
+
+  const { data: budgets } = await db.from('budgets')
+    .select('kpi,soll,ist,year,month')
+    .eq('location_id', locId).eq('year', year);
+
+  const nowM = new Date().getMonth() + 1;
+  const nowY = new Date().getFullYear();
+  const maxM = year < nowY ? 12 : (year === nowY ? nowM : 0);
+
+  // Build map kpi → month → {soll, ist}
+  const map = {};
+  ZT_KPIS.forEach(k => { map[k] = {}; for(let m=1;m<=12;m++) map[k][m]={soll:0,ist:null}; });
+  (budgets||[]).forEach(b => { if(map[b.kpi]) { map[b.kpi][b.month].soll=b.soll||0; if(b.ist!=null) map[b.kpi][b.month].ist=b.ist; } });
+
+  const fmtN = (v, isMitgl) => v == null ? '–' : (isMitgl ? Math.round(v).toLocaleString('de-DE') : Math.round(v).toLocaleString('de-DE') + ' €');
+  const cellBg = (soll, ist, kosten) => {
+    if (ist == null || soll === 0) return '';
+    const pct = ist / soll;
+    if (kosten) return pct <= 1.0 ? 'background:#dcfce7' : pct <= 1.15 ? 'background:#fef9c3' : 'background:#fee2e2';
+    return pct >= 0.9 ? 'background:#dcfce7' : pct >= 0.7 ? 'background:#fef9c3' : 'background:#fee2e2';
+  };
+
+  let html = '<div class="zt-wrap"><table class="zt-table"><thead><tr><th>KPI</th>';
+  for (let m=1;m<=12;m++) {
+    const cur = year===nowY && m===nowM;
+    html += `<th${cur?' class="zt-current"':''}>${ZT_MONTHS[m-1]}</th>`;
+  }
+  html += '<th class="zt-ytd">YTD</th></tr></thead><tbody>';
+
+  ZT_KPIS.forEach(kpi => {
+    const kosten = ZT_KOSTEN.has(kpi);
+    const isMitgl = kpi === 'Mitglieder';
+    let ytdS=0, ytdI=0, ytdHas=false;
+    html += `<tr><td class="zt-kpi">${kpi}</td>`;
+    for (let m=1;m<=12;m++) {
+      const {soll,ist} = map[kpi][m];
+      const cur = year===nowY && m===nowM;
+      const bg = cellBg(soll,ist,kosten);
+      if (m<=maxM) { ytdS+=soll; if(ist!=null){ytdI+=ist;ytdHas=true;} }
+      html += `<td${cur?' class="zt-current"':''} style="${bg}"><div class="zt-soll">${fmtN(soll,isMitgl)}</div><div class="zt-ist">${fmtN(ist,isMitgl)}</div></td>`;
+    }
+    const ytdBg = ytdHas ? cellBg(ytdS,ytdI,kosten) : '';
+    html += `<td class="zt-ytd" style="${ytdBg}"><div class="zt-soll">${ytdS?fmtN(ytdS,isMitgl):'–'}</div><div class="zt-ist">${ytdHas?fmtN(ytdI,isMitgl):'–'}</div></td></tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:10px;padding:0 4px;">🟢 Soll erreicht &nbsp; 🟡 70–90% &nbsp; 🔴 &lt; 70% &nbsp;|&nbsp; Soll oben (grau) · Ist unten (fett)</div>';
+  content.innerHTML = html;
+}
+
+function printZieltableau() {
+  const locSel = document.getElementById('zt-location');
+  const locName = locSel.options[locSel.selectedIndex]?.text || '';
+  const year = document.getElementById('zt-year').value;
+  const tableHtml = document.getElementById('zt-content').innerHTML;
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Zieltableau ${year}</title><style>
+    body{font-family:-apple-system,sans-serif;padding:20px;color:#1a1a1a;}
+    h1{color:#b5465a;font-size:20px;margin-bottom:4px;}
+    .meta{color:#6b7280;font-size:13px;margin-bottom:20px;}
+    .zt-wrap{overflow-x:auto;}
+    table{border-collapse:collapse;font-size:10px;white-space:nowrap;}
+    thead th{background:#b5465a;color:white;padding:6px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.2);}
+    thead th:first-child{text-align:left;min-width:130px;}
+    thead th.zt-current{background:#8f3547;}
+    thead th.zt-ytd{background:#374151;border-left:2px solid white;}
+    tbody td{padding:4px 7px;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;text-align:center;}
+    tbody td.zt-kpi{text-align:left;font-weight:600;font-size:10px;background:white;min-width:130px;border-right:2px solid #e5e7eb;}
+    tbody td.zt-current{border-left:1px solid #b5465a;border-right:1px solid #b5465a;}
+    tbody td.zt-ytd{border-left:2px solid #374151;}
+    .zt-soll{font-size:9px;color:#6b7280;line-height:1.2;}
+    .zt-ist{font-size:11px;font-weight:700;line-height:1.4;}
+    .spinner{display:none;}
+    @media print{@page{size:landscape;margin:10mm;}}
+  </style></head><body>
+  <h1>🎯 Zieltableau ${year}</h1>
+  <div class="meta">Standort: ${locName} · Erstellt: ${new Date().toLocaleDateString('de-DE')}</div>
+  ${tableHtml}
+  </body></html>`);
+  win.document.close(); win.print();
 }
 
 // Register service worker
