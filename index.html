@@ -301,6 +301,10 @@
         <div class="menu-desc">Soll/Ist Monatsband – komplettes Jahr</div>
       </div>
     </button>
+  </div>
+
+  <div id="menu-controller-section" style="display:none;">
+    <div class="section-divider">Controlling</div>
     <button class="menu-btn" onclick="loadControlling()">
       <span class="menu-icon">📈</span>
       <div>
@@ -713,7 +717,7 @@ async function loadEmployees() {
   sel.innerHTML = '<option value="">– bitte auswählen –</option>';
   (data || []).filter(e => e.active !== false).forEach(e => {
     const opt = document.createElement('option');
-    opt.value = JSON.stringify({ id: e.id, name: e.name, location: e.locations?.name, location_id: e.location_id, is_manager: e.is_manager });
+    opt.value = JSON.stringify({ id: e.id, name: e.name, location: e.locations?.name, location_id: e.location_id, is_manager: e.is_manager, is_controller: e.is_controller });
     opt.textContent = `${e.name} (${e.locations?.name || '–'})`;
     sel.appendChild(opt);
   });
@@ -805,6 +809,7 @@ async function doLogin() {
   currentLocationId = locSel.value || emp.location_id;
   currentLocation = locSel.options[locSel.selectedIndex]?.text || emp.location || '–';
   document.getElementById('menu-manager-section').style.display = emp.is_manager ? 'block' : 'none';
+  document.getElementById('menu-controller-section').style.display = (emp.is_manager || emp.is_controller) ? 'block' : 'none';
   document.getElementById('menu-date').textContent = new Date().toLocaleDateString('de-DE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   _pin = '';
   updatePinDots();
