@@ -1547,20 +1547,20 @@ async function renderControlling() {
   content.innerHTML = '<div class="spinner">Lade …</div>';
 
   // Load reports (product Abschlüsse)
-  const [{ data: reports }, { data: abschl }] = await Promise.all([
-    db.from('reports')
-      .select('employee_id, employees(name), ' + PRODUCTS.map(p => `${p}_ergebnis,${p}_umsatz`).join(','))
-      .eq('location_id', locId)
-      .gte('date', from + '-01')
-      .lte('date', to + '-31'),
-    db.from('abschluesse')
-      .select('employee_id, employees(name), umsatz')
-      .eq('location_id', locId)
-      .gte('date', from + '-01')
-      .lte('date', to + '-31'),
-  ]);
+  const { data: reports, error: repErr } = await db.from('reports')
+    .select('employee_id, employees(name), ' + PRODUCTS.map(p => `${p}_ergebnis,${p}_umsatz`).join(','))
+    .eq('location_id', locId)
+    .gte('date', from + '-01')
+    .lte('date', to + '-31');
 
-  if (!reports) { content.innerHTML = '<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Fehler beim Laden.</div>'; return; }
+  if (repErr) { content.innerHTML = `<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Fehler: ${repErr.message}</div>`; console.error(repErr); return; }
+
+  const { data: abschl } = await db.from('abschluesse')
+    .select('employee_id, employees(name), umsatz')
+    .eq('location_id', locId)
+    .gte('date', from + '-01')
+    .lte('date', to + '-31')
+    .catch(() => ({ data: null }));
 
   // Aggregate per employee
   const empMap = {};
