@@ -161,6 +161,23 @@
     .btn-sm-primary  { background: var(--primary); color: white; }
     .btn-sm-danger   { background: #fee2e2; color: #991b1b; }
     .btn-sm-success  { background: #dcfce7; color: #166534; }
+    /* Ziele */
+    .ziel-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 20px; margin-bottom: 14px; }
+    .ziel-period { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+    .ziel-row { margin-bottom: 12px; }
+    .ziel-row-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; font-size: 13px; }
+    .ziel-label { color: var(--muted); }
+    .ziel-values { font-weight: 700; font-size: 13px; }
+    .ziel-values .ist { color: var(--text); }
+    .ziel-values .sep { color: var(--muted); font-weight: 400; margin: 0 3px; }
+    .ziel-values .ziel { color: var(--muted); font-weight: 400; }
+    .ziel-pct { font-size: 11px; color: var(--muted); }
+    .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+    .fill-green  { background: #16a34a; }
+    .fill-yellow { background: #ca8a04; }
+    .fill-red    { background: #dc2626; }
+    .fill-grey   { background: #9ca3af; }
     /* Zieltableau */
     .zt-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -20px; padding: 0 0 8px; }
     .zt-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; min-width: 100%; }
@@ -264,6 +281,14 @@
     </div>
   </button>
 
+  <button class="menu-btn" onclick="loadZiele()">
+    <span class="menu-icon">🎯</span>
+    <div>
+      <div class="menu-label">Meine Ziele</div>
+      <div class="menu-desc">Tag · Woche · Monat – Umsatz &amp; Mitglieder</div>
+    </div>
+  </button>
+
   <div id="menu-manager-section" style="display:none;">
     <div class="section-divider">Management</div>
     <button class="menu-btn" onclick="navigate('screen-dashboard')">
@@ -310,6 +335,13 @@
       <div>
         <div class="menu-label">Controlling – Abschlussquoten</div>
         <div class="menu-desc">Quote pro Mitarbeiterin &amp; Gesamt</div>
+      </div>
+    </button>
+    <button class="menu-btn" onclick="loadZieleSetzen()">
+      <span class="menu-icon">⚙️</span>
+      <div>
+        <div class="menu-label">Ziele setzen</div>
+        <div class="menu-desc">Tages-, Wochen- und Monatsziele definieren</div>
       </div>
     </button>
   </div>
@@ -594,6 +626,22 @@
   <div id="zt-content"><div class="spinner">Standort wählen …</div></div>
 </div>
 
+<!-- ======================== ZIELE ======================== -->
+<div class="screen" id="screen-ziele">
+  <div id="ziele-content"><div class="spinner">Lade …</div></div>
+  <div style="height:30px;"></div>
+</div>
+
+<!-- ======================== ZIELE SETZEN ======================== -->
+<div class="screen" id="screen-ziele-setzen">
+  <div class="card">
+    <div class="card-title">Standort</div>
+    <select id="zs-location" onchange="loadZieleSetzenForm()"></select>
+  </div>
+  <div id="ziele-setzen-form"><div class="spinner">Lade …</div></div>
+  <div style="height:30px;"></div>
+</div>
+
 <!-- ======================== ABSCHLÜSSE ======================== -->
 <div class="screen" id="screen-abschluesse">
   <form id="form-abschluss" onsubmit="submitAbschluss(event)">
@@ -683,8 +731,10 @@ function updateHeader(screenId) {
     'screen-admin':        'Mitarbeiterverwaltung',
     'screen-report':       'Report drucken',
     'screen-zieltableau':  'Zieltableau',
-    'screen-abschluesse':  'Abschlüsse',
-    'screen-controlling':  'Abschlussquoten',
+    'screen-abschluesse':   'Abschlüsse',
+    'screen-controlling':   'Abschlussquoten',
+    'screen-ziele':         'Meine Ziele',
+    'screen-ziele-setzen':  'Ziele setzen',
   };
   document.getElementById('header-title').textContent = titles[screenId] || 'Frieda Report';
   const sub = currentEmployee ? `${currentEmployee.name} · ${currentLocation}` : '';
@@ -1469,6 +1519,212 @@ async function syncUmsatzToZieltableau(locId, dateStr) {
     {location_id:locId,year:y,month:m,kpi:'Umsatzerlöse',ist:total},
     {location_id:locId,year:y,month:m,kpi:'Gesamtleistung',ist:total},
   ],{onConflict:'location_id,year,month,kpi'});
+}
+
+// ============================================================
+// Ziele – Hilfsfunktionen
+// ============================================================
+function getISOWeekStr(d) {
+  const date = new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 4 - (date.getDay() || 7));
+  const y = date.getFullYear();
+  const jan4 = new Date(y, 0, 4);
+  const week = Math.ceil((((date - jan4) / 86400000) + 1) / 7);
+  return `${y}-W${String(week).padStart(2,'0')}`;
+}
+function getWeekRange(weekStr) {
+  const [yr, w] = weekStr.split('-W');
+  const jan4 = new Date(parseInt(yr), 0, 4);
+  const mon = new Date(jan4);
+  mon.setDate(jan4.getDate() - (jan4.getDay() || 7) + 1 + (parseInt(w) - 1) * 7);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  return { from: mon.toISOString().split('T')[0], to: sun.toISOString().split('T')[0] };
+}
+
+// ============================================================
+// Ziele anzeigen (alle MA)
+// ============================================================
+async function loadZiele() {
+  navigate('screen-ziele');
+  await renderZiele();
+}
+
+async function renderZiele() {
+  const content = document.getElementById('ziele-content');
+  content.innerHTML = '<div class="spinner">Lade …</div>';
+  const locId = currentLocationId;
+  if (!locId) { content.innerHTML = '<div class="spinner">Kein Standort.</div>'; return; }
+
+  const today     = new Date().toISOString().split('T')[0];
+  const weekStr   = getISOWeekStr(new Date());
+  const weekRange = getWeekRange(weekStr);
+  const monthStr  = today.slice(0,7);
+  const [my, mm]  = monthStr.split('-').map(Number);
+  const monthEnd  = new Date(my, mm, 0).toISOString().split('T')[0];
+  const monthStart= `${monthStr}-01`;
+  const kw        = weekStr.split('-W')[1];
+
+  // Ziele laden
+  const { data: ziele } = await db.from('umsatz_ziele')
+    .select('type, period, ziel, mitglieder_ziel')
+    .eq('location_id', locId)
+    .in('period', [today, weekStr, monthStr]);
+
+  const zMap = {};
+  (ziele || []).forEach(z => { zMap[z.type + '_' + z.period] = z; });
+  const tagZ   = zMap[`tag_${today}`]   || {};
+  const wocheZ = zMap[`woche_${weekStr}`] || {};
+  const monatZ = zMap[`monat_${monthStr}`] || {};
+
+  // IST Umsatz (reports + abschluesse)
+  const [{ data: rToday }, { data: rWeek }, { data: rMonth },
+         { data: aToday }, { data: aWeek },  { data: aMonth }] = await Promise.all([
+    db.from('reports').select(PRODUCTS.map(p=>`${p}_umsatz`).join(',')).eq('location_id',locId).eq('date',today),
+    db.from('reports').select(PRODUCTS.map(p=>`${p}_umsatz`).join(',')).eq('location_id',locId).gte('date',weekRange.from).lte('date',weekRange.to),
+    db.from('reports').select(PRODUCTS.map(p=>`${p}_umsatz`).join(',')).eq('location_id',locId).gte('date',monthStart).lte('date',monthEnd),
+    db.from('abschluesse').select('umsatz').eq('location_id',locId).eq('date',today),
+    db.from('abschluesse').select('umsatz').eq('location_id',locId).gte('date',weekRange.from).lte('date',weekRange.to),
+    db.from('abschluesse').select('umsatz, date').eq('location_id',locId).gte('date',monthStart).lte('date',monthEnd),
+  ]);
+
+  const sumU = (rows) => (rows||[]).reduce((s,r) => s + PRODUCTS.reduce((ss,p)=>ss+(r[`${p}_umsatz`]||0),0), 0);
+  const sumA = (rows) => (rows||[]).reduce((s,r) => s + (r.umsatz||0), 0);
+
+  const istU = { tag: sumU(rToday)+sumA(aToday), woche: sumU(rWeek)+sumA(aWeek), monat: sumU(rMonth)+sumA(aMonth) };
+  const istM = { tag: (aToday||[]).length, woche: (aWeek||[]).length, monat: (aMonth||[]).length };
+
+  const eur  = v => v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+  const fmtZ = v => v != null ? eur(v) : '–';
+
+  function zieleCard(title, uIst, uZiel, mIst, mZiel) {
+    const uPct  = uZiel ? Math.min(Math.round(uIst/uZiel*100),100) : null;
+    const mPct  = mZiel ? Math.min(Math.round(mIst/mZiel*100),100) : null;
+    const cls   = pct => !pct ? 'fill-grey' : pct>=90?'fill-green':pct>=60?'fill-yellow':'fill-red';
+    const bar   = (pct,label) => pct!=null ? `
+      <div class="progress-bar"><div class="progress-fill ${cls(pct)}" style="width:${pct}%"></div></div>
+      <div class="ziel-pct" style="text-align:right;margin-top:3px;">${pct}% von Ziel ${label}</div>` : '';
+    return `<div class="ziel-card">
+      <div class="ziel-period">${title}</div>
+      <div class="ziel-row">
+        <div class="ziel-row-header">
+          <span class="ziel-label">💰 Umsatz</span>
+          <span class="ziel-values"><span class="ist">${eur(uIst)}</span><span class="sep">/</span><span class="ziel">${fmtZ(uZiel)}</span></span>
+        </div>
+        ${uZiel ? `<div class="progress-bar"><div class="progress-fill ${cls(uPct)}" style="width:${uPct}%"></div></div><div class="ziel-pct" style="text-align:right;margin-top:3px;">${uPct}%</div>` : '<div style="font-size:11px;color:var(--muted);">Kein Ziel gesetzt</div>'}
+      </div>
+      <div class="ziel-row">
+        <div class="ziel-row-header">
+          <span class="ziel-label">🤝 Mitglieder</span>
+          <span class="ziel-values"><span class="ist">${mIst}</span><span class="sep">/</span><span class="ziel">${mZiel ?? '–'}</span></span>
+        </div>
+        ${mZiel ? `<div class="progress-bar"><div class="progress-fill ${cls(mPct)}" style="width:${mPct}%"></div></div><div class="ziel-pct" style="text-align:right;margin-top:3px;">${mPct}%</div>` : '<div style="font-size:11px;color:var(--muted);">Kein Ziel gesetzt</div>'}
+      </div>
+    </div>`;
+  }
+
+  const locName = currentLocation;
+  const monthName = new Date(my, mm-1).toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+  const weekFrom = weekRange.from.slice(5).split('-').reverse().join('.');
+  const weekTo   = weekRange.to.slice(5).split('-').reverse().join('.');
+
+  content.innerHTML =
+    `<div style="font-size:13px;color:var(--muted);margin-bottom:12px;">📍 ${locName}</div>` +
+    zieleCard(`📅 Heute – ${new Date(today).toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'})}`,
+      istU.tag, tagZ.ziel, istM.tag, tagZ.mitglieder_ziel) +
+    zieleCard(`📅 Diese Woche – KW ${kw} (${weekFrom}–${weekTo})`,
+      istU.woche, wocheZ.ziel, istM.woche, wocheZ.mitglieder_ziel) +
+    zieleCard(`📅 ${monthName}`,
+      istU.monat, monatZ.ziel, istM.monat, monatZ.mitglieder_ziel);
+}
+
+// ============================================================
+// Ziele setzen (Controller / Manager)
+// ============================================================
+function loadZieleSetzen() {
+  navigate('screen-ziele-setzen');
+  const locSel = document.getElementById('zs-location');
+  locSel.innerHTML = '';
+  (_locsCache || []).forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id; opt.textContent = l.name;
+    if (l.id === currentLocationId) opt.selected = true;
+    locSel.appendChild(opt);
+  });
+  loadZieleSetzenForm();
+}
+
+async function loadZieleSetzenForm() {
+  const locId  = document.getElementById('zs-location').value;
+  const form   = document.getElementById('ziele-setzen-form');
+  if (!locId) return;
+  form.innerHTML = '<div class="spinner">Lade …</div>';
+
+  const today    = new Date().toISOString().split('T')[0];
+  const weekStr  = getISOWeekStr(new Date());
+  const monthStr = today.slice(0,7);
+  const kw       = weekStr.split('-W')[1];
+  const weekRange = getWeekRange(weekStr);
+  const [my, mm] = monthStr.split('-').map(Number);
+  const monthName = new Date(my, mm-1).toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+
+  const { data: ziele } = await db.from('umsatz_ziele')
+    .select('type, period, ziel, mitglieder_ziel')
+    .eq('location_id', locId)
+    .in('period', [today, weekStr, monthStr]);
+
+  const zMap = {};
+  (ziele || []).forEach(z => { zMap[z.type + '_' + z.period] = z; });
+  const tagZ   = zMap[`tag_${today}`]     || {};
+  const wocheZ = zMap[`woche_${weekStr}`] || {};
+  const monatZ = zMap[`monat_${monthStr}`] || {};
+
+  const section = (label, prefix, uVal, mVal) => `
+    <div class="card">
+      <div class="card-title">${label}</div>
+      <label>Umsatz-Ziel (€)</label>
+      <input type="number" step="0.01" min="0" id="zs-u-${prefix}" value="${uVal||''}" placeholder="0,00" />
+      <label>Mitglieder-Ziel (Anzahl)</label>
+      <input type="number" min="0" id="zs-m-${prefix}" value="${mVal||''}" placeholder="0" />
+    </div>`;
+
+  form.innerHTML =
+    section(`📅 Heute – ${new Date(today).toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'})}`,
+      'tag', tagZ.ziel, tagZ.mitglieder_ziel) +
+    section(`📅 Diese Woche – KW ${kw}`, 'woche', wocheZ.ziel, wocheZ.mitglieder_ziel) +
+    section(`📅 ${monthName}`, 'monat', monatZ.ziel, monatZ.mitglieder_ziel) +
+    `<button class="btn btn-primary" onclick="saveZiele()">💾 Ziele speichern</button><div style="height:30px;"></div>`;
+
+  // Store periods for save
+  form.dataset.today    = today;
+  form.dataset.weekStr  = weekStr;
+  form.dataset.monthStr = monthStr;
+}
+
+async function saveZiele() {
+  const locId   = document.getElementById('zs-location').value;
+  const form    = document.getElementById('ziele-setzen-form');
+  const today   = form.dataset.today;
+  const weekStr = form.dataset.weekStr;
+  const monthStr= form.dataset.monthStr;
+
+  const rows = [
+    { location_id: locId, type: 'tag',   period: today,
+      ziel: parseFloat(document.getElementById('zs-u-tag').value)||null,
+      mitglieder_ziel: parseInt(document.getElementById('zs-m-tag').value)||null },
+    { location_id: locId, type: 'woche', period: weekStr,
+      ziel: parseFloat(document.getElementById('zs-u-woche').value)||null,
+      mitglieder_ziel: parseInt(document.getElementById('zs-m-woche').value)||null },
+    { location_id: locId, type: 'monat', period: monthStr,
+      ziel: parseFloat(document.getElementById('zs-u-monat').value)||null,
+      mitglieder_ziel: parseInt(document.getElementById('zs-m-monat').value)||null },
+  ].filter(r => r.ziel != null || r.mitglieder_ziel != null);
+
+  if (rows.length === 0) { showToast('Bitte mindestens ein Ziel eingeben'); return; }
+  const { error } = await db.from('umsatz_ziele').upsert(rows, { onConflict: 'location_id,type,period' });
+  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
+  showToast('✅ Ziele gespeichert!');
+  goBack();
 }
 
 // ============================================================
