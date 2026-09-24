@@ -1320,7 +1320,9 @@ async function loadRepEntries() {
     empSel.dataset.locId=locId;
   }
 
-  let q=db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31');
+  const [,toM1]=to.split('-').map(Number);const toY1=parseInt(to.split('-')[0]);
+  const toEnd1=new Date(toY1,toM1,0).toISOString().split('T')[0];
+  let q=db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',toEnd1);
   if(empId)q=q.eq('employee_id',empId);
   const{data:rows,error}=await q.order('date',{ascending:false});
   if(error||!rows){content.innerHTML='<div class="spinner">Fehler beim Laden.</div>';return;}
@@ -1347,7 +1349,9 @@ async function loadRepCalls() {
   const from=document.getElementById('rep-from').value;
   const to=document.getElementById('rep-to').value;
   if(!locId||!from||!to){content.innerHTML='<div class="spinner">Bitte Filter wählen.</div>';return;}
-  let q=db.from('calls').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31');
+  const [,toM2]=to.split('-').map(Number);const toY2=parseInt(to.split('-')[0]);
+  const toEnd2=new Date(toY2,toM2,0).toISOString().split('T')[0];
+  let q=db.from('calls').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',toEnd2);
   if(empId)q=q.eq('employee_id',empId);
   const{data:rows,error}=await q.order('date',{ascending:false});
   if(error||!rows||rows.length===0){content.innerHTML='<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Anrufe gefunden.</div>';return;}
@@ -1371,9 +1375,11 @@ async function loadRepTeam() {
   const from=document.getElementById('rep-from').value;
   const to=document.getElementById('rep-to').value;
   if(!locId||!from||!to){content.innerHTML='<div class="spinner">Bitte Filter wählen.</div>';return;}
+  const [,toM3]=to.split('-').map(Number);const toY3=parseInt(to.split('-')[0]);
+  const toEnd3=new Date(toY3,toM3,0).toISOString().split('T')[0];
   const[{data:reports},{data:calls}]=await Promise.all([
-    db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31'),
-    db.from('calls').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31'),
+    db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',toEnd3),
+    db.from('calls').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',toEnd3),
   ]);
   if(!reports){content.innerHTML='<div class="spinner">Fehler.</div>';return;}
   const empMap={};
@@ -1547,20 +1553,24 @@ async function renderControlling() {
   content.innerHTML = '<div class="spinner">Lade …</div>';
 
   // Load reports (product Abschlüsse)
+  const [fromY, fromM] = from.split('-').map(Number);
+  const [toY, toM]     = to.split('-').map(Number);
+  const fromDate = `${from}-01`;
+  const toDate   = new Date(toY, toM, 0).toISOString().split('T')[0];
+
   const { data: reports, error: repErr } = await db.from('reports')
     .select('employee_id, employees(name), ' + PRODUCTS.map(p => `${p}_ergebnis,${p}_umsatz`).join(','))
     .eq('location_id', locId)
-    .gte('date', from + '-01')
-    .lte('date', to + '-31');
+    .gte('date', fromDate)
+    .lte('date', toDate);
 
   if (repErr) { content.innerHTML = `<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Fehler: ${repErr.message}</div>`; console.error(repErr); return; }
 
   const { data: abschl } = await db.from('abschluesse')
     .select('employee_id, employees(name), umsatz')
     .eq('location_id', locId)
-    .gte('date', from + '-01')
-    .lte('date', to + '-31')
-    .catch(() => ({ data: null }));
+    .gte('date', fromDate)
+    .lte('date', toDate);
 
   // Aggregate per employee
   const empMap = {};
