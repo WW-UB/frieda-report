@@ -198,8 +198,8 @@
     <select id="select-employee" onchange="onEmployeeChange()">
       <option value="">– bitte auswählen –</option>
     </select>
-    <label>Standort</label>
-    <input type="text" id="display-location" readonly style="background:#f3f4f6;color:var(--muted);" />
+    <label>Standort (aktiv)</label>
+    <select id="select-location"></select>
     <button class="btn btn-primary" onclick="showPinPad()">Weiter →</button>
   </div>
   <div class="card" id="login-step-2" style="display:none;">
@@ -256,6 +256,14 @@
     </div>
   </button>
 
+  <button class="menu-btn" onclick="loadAbschluesse()">
+    <span class="menu-icon">🤝</span>
+    <div>
+      <div class="menu-label">Abschlüsse</div>
+      <div class="menu-desc">Neue Mitgliedschaft eintragen &amp; Liste</div>
+    </div>
+  </button>
+
   <div id="menu-manager-section" style="display:none;">
     <div class="section-divider">Management</div>
     <button class="menu-btn" onclick="navigate('screen-dashboard')">
@@ -291,6 +299,13 @@
       <div>
         <div class="menu-label">Zieltableau</div>
         <div class="menu-desc">Soll/Ist Monatsband – komplettes Jahr</div>
+      </div>
+    </button>
+    <button class="menu-btn" onclick="loadControlling()">
+      <span class="menu-icon">📈</span>
+      <div>
+        <div class="menu-label">Controlling – Abschlussquoten</div>
+        <div class="menu-desc">Quote pro Mitarbeiterin &amp; Gesamt</div>
       </div>
     </button>
   </div>
@@ -575,6 +590,46 @@
   <div id="zt-content"><div class="spinner">Standort wählen …</div></div>
 </div>
 
+<!-- ======================== ABSCHLÜSSE ======================== -->
+<div class="screen" id="screen-abschluesse">
+  <form id="form-abschluss" onsubmit="submitAbschluss(event)">
+    <div class="card">
+      <div class="card-title">Neuer Abschluss</div>
+      <label>Datum Abschluss</label>
+      <input type="date" id="ab-date" required />
+      <label>Startdatum Mitgliedschaft</label>
+      <input type="date" id="ab-start-date" />
+      <label>Umsatz (€)</label>
+      <input type="number" step="0.01" min="0" id="ab-umsatz" placeholder="0,00" />
+      <label>Notiz (optional)</label>
+      <textarea id="ab-notiz" placeholder="z.B. Mitgliedschaftsart, Dauer …" style="min-height:60px;"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">💾 Abschluss speichern</button>
+    <button type="button" class="btn btn-secondary" onclick="goBack()">Abbrechen</button>
+    <div style="height:20px;"></div>
+  </form>
+  <div class="card">
+    <div class="card-title">Meine letzten Abschlüsse</div>
+    <div id="ab-list"><div class="spinner">Lade …</div></div>
+  </div>
+  <div style="height:30px;"></div>
+</div>
+
+<!-- ======================== CONTROLLING ======================== -->
+<div class="screen" id="screen-controlling">
+  <div class="card">
+    <div class="card-title">Filter</div>
+    <label>Standort</label>
+    <select id="ctrl-location" onchange="renderControlling()"></select>
+    <div style="display:flex;gap:10px;">
+      <div style="flex:1;"><label>Von</label><input type="month" id="ctrl-from" onchange="renderControlling()" style="margin-bottom:0;" /></div>
+      <div style="flex:1;"><label>Bis</label><input type="month" id="ctrl-to" onchange="renderControlling()" style="margin-bottom:0;" /></div>
+    </div>
+  </div>
+  <div id="ctrl-content"><div class="spinner">Filter wählen …</div></div>
+  <div style="height:30px;"></div>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -587,9 +642,10 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const PRODUCTS = ['shaper','chair','acp','boots','fitness','reha'];
 const PROD_LABELS = {shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Ballancer',fitness:'Fitness',reha:'Reha'};
 
-let currentEmployee = null;
-let currentLocation = null;
-let screenHistory   = [];
+let currentEmployee   = null;
+let currentLocation   = null;
+let currentLocationId = null;
+let screenHistory     = [];
 
 // ============================================================
 // Navigation
@@ -623,6 +679,8 @@ function updateHeader(screenId) {
     'screen-admin':        'Mitarbeiterverwaltung',
     'screen-report':       'Report drucken',
     'screen-zieltableau':  'Zieltableau',
+    'screen-abschluesse':  'Abschlüsse',
+    'screen-controlling':  'Abschlussquoten',
   };
   document.getElementById('header-title').textContent = titles[screenId] || 'Frieda Report';
   const sub = currentEmployee ? `${currentEmployee.name} · ${currentLocation}` : '';
@@ -680,9 +738,17 @@ async function loadEmployees() {
 
 function onEmployeeChange() {
   const val = document.getElementById('select-employee').value;
-  if (!val) { document.getElementById('display-location').value = ''; return; }
+  const locSel = document.getElementById('select-location');
+  locSel.innerHTML = '';
+  if (!val) return;
   const emp = JSON.parse(val);
-  document.getElementById('display-location').value = emp.location || '–';
+  (_locsCache || []).forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id;
+    opt.textContent = l.name;
+    if (l.id === emp.location_id) opt.selected = true;
+    locSel.appendChild(opt);
+  });
 }
 
 // ---- PIN Pad ----
@@ -735,7 +801,9 @@ async function doLogin() {
     showPinError('Falscher PIN'); return;
   }
   currentEmployee = emp;
-  currentLocation = emp.location;
+  const locSel = document.getElementById('select-location');
+  currentLocationId = locSel.value || emp.location_id;
+  currentLocation = locSel.options[locSel.selectedIndex]?.text || emp.location || '–';
   document.getElementById('menu-manager-section').style.display = emp.is_manager ? 'block' : 'none';
   document.getElementById('menu-date').textContent = new Date().toLocaleDateString('de-DE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   _pin = '';
@@ -757,7 +825,7 @@ function showPinError(msg) {
 }
 
 function doLogout() {
-  currentEmployee = null; currentLocation = null; screenHistory = [];
+  currentEmployee = null; currentLocation = null; currentLocationId = null; screenHistory = [];
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-login').classList.add('active');
   updateHeader('screen-login');
@@ -779,7 +847,7 @@ async function submitEntry(e) {
   const row = {
     date:          document.getElementById('entry-date').value,
     employee_id:   currentEmployee.id,
-    location_id:   currentEmployee.location_id,
+    location_id:   currentLocationId,
     customer_name: document.getElementById('entry-customer').value || null,
     pt_im_kalender:         document.getElementById('pt-kalender').checked,
     pt_stattgefunden:       document.getElementById('pt-statt').checked,
@@ -796,7 +864,7 @@ async function submitEntry(e) {
   const { error } = await db.from('reports').insert([row]);
   if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
   showToast('✅ Eintrag gespeichert!');
-  await syncUmsatzToZieltableau(currentEmployee.location_id, document.getElementById('entry-date').value);
+  await syncUmsatzToZieltableau(currentLocationId, document.getElementById('entry-date').value);
   e.target.reset();
   document.getElementById('entry-date').value = new Date().toISOString().split('T')[0];
   PRODUCTS.forEach(p => {
@@ -815,7 +883,7 @@ async function submitCalls(e) {
   const row = {
     date,
     employee_id:        currentEmployee.id,
-    location_id:        currentEmployee.location_id,
+    location_id:        currentLocationId,
     kontakt_ausgehend:  parseInt(document.getElementById('c-ausgehend').value) || 0,
     kontakt_erreicht:   parseInt(document.getElementById('c-erreicht').value) || 0,
     kontakt_gebucht:    parseInt(document.getElementById('c-gebucht').value) || 0,
@@ -1390,6 +1458,193 @@ async function syncUmsatzToZieltableau(locId, dateStr) {
     {location_id:locId,year:y,month:m,kpi:'Umsatzerlöse',ist:total},
     {location_id:locId,year:y,month:m,kpi:'Gesamtleistung',ist:total},
   ],{onConflict:'location_id,year,month,kpi'});
+}
+
+// ============================================================
+// Abschlüsse
+// ============================================================
+async function loadAbschluesse() {
+  navigate('screen-abschluesse');
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('ab-date').value = today;
+  document.getElementById('ab-start-date').value = '';
+  document.getElementById('ab-umsatz').value = '';
+  document.getElementById('ab-notiz').value = '';
+  await refreshAbschlussListe();
+}
+
+async function refreshAbschlussListe() {
+  const list = document.getElementById('ab-list');
+  list.innerHTML = '<div class="spinner">Lade …</div>';
+  const { data, error } = await db.from('abschluesse')
+    .select('*, employees(name)')
+    .eq('employee_id', currentEmployee.id)
+    .order('date', { ascending: false })
+    .limit(30);
+  if (error || !data || data.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:14px;">Noch keine Abschlüsse eingetragen.</div>';
+    return;
+  }
+  const fmt = v => v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '–';
+  list.innerHTML = data.map(a => `
+    <div class="entry-item">
+      <div>
+        <div class="entry-name">${a.date}</div>
+        <div class="entry-meta">Start: ${a.start_date || '–'} · ${a.notizen || ''}</div>
+      </div>
+      ${a.umsatz ? `<div class="entry-badge">${fmt(a.umsatz)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+async function submitAbschluss(e) {
+  e.preventDefault();
+  const row = {
+    date:        document.getElementById('ab-date').value,
+    start_date:  document.getElementById('ab-start-date').value || null,
+    umsatz:      parseFloat(document.getElementById('ab-umsatz').value) || null,
+    notizen:     document.getElementById('ab-notiz').value || null,
+    employee_id: currentEmployee.id,
+    location_id: currentLocationId,
+  };
+  const { error } = await db.from('abschluesse').insert([row]);
+  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
+  showToast('✅ Abschluss gespeichert!');
+  e.target.reset();
+  document.getElementById('ab-date').value = new Date().toISOString().split('T')[0];
+  await refreshAbschlussListe();
+}
+
+// ============================================================
+// Controlling – Abschlussquoten
+// ============================================================
+function loadControlling() {
+  navigate('screen-controlling');
+  const locSel = document.getElementById('ctrl-location');
+  locSel.innerHTML = '';
+  (_locsCache || []).forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id; opt.textContent = l.name;
+    locSel.appendChild(opt);
+  });
+  const ym = new Date().toISOString().slice(0, 7);
+  document.getElementById('ctrl-from').value = ym;
+  document.getElementById('ctrl-to').value = ym;
+  renderControlling();
+}
+
+async function renderControlling() {
+  const locId = document.getElementById('ctrl-location').value;
+  const from  = document.getElementById('ctrl-from').value;
+  const to    = document.getElementById('ctrl-to').value;
+  const content = document.getElementById('ctrl-content');
+  if (!locId || !from || !to) { content.innerHTML = '<div class="spinner">Filter wählen …</div>'; return; }
+  content.innerHTML = '<div class="spinner">Lade …</div>';
+
+  // Load reports (product Abschlüsse)
+  const [{ data: reports }, { data: abschl }] = await Promise.all([
+    db.from('reports')
+      .select('employee_id, employees(name), ' + PRODUCTS.map(p => `${p}_ergebnis,${p}_umsatz`).join(','))
+      .eq('location_id', locId)
+      .gte('date', from + '-01')
+      .lte('date', to + '-31'),
+    db.from('abschluesse')
+      .select('employee_id, employees(name), umsatz')
+      .eq('location_id', locId)
+      .gte('date', from + '-01')
+      .lte('date', to + '-31'),
+  ]);
+
+  if (!reports) { content.innerHTML = '<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Fehler beim Laden.</div>'; return; }
+
+  // Aggregate per employee
+  const empMap = {};
+  (reports || []).forEach(r => {
+    const key = r.employees?.name || r.employee_id;
+    if (!empMap[key]) empMap[key] = { name: key, total: 0, abschluss: 0, umsatz: 0, mitglieder: 0, mitglUmsatz: 0 };
+    const hasDecision = PRODUCTS.some(p => r[`${p}_ergebnis`]);
+    if (hasDecision) empMap[key].total++;
+    const hasAb = PRODUCTS.some(p => r[`${p}_ergebnis`] === 'abschluss' || r[`${p}_ergebnis`] === 'folge_abschluss');
+    if (hasAb) empMap[key].abschluss++;
+    empMap[key].umsatz += PRODUCTS.reduce((s, p) => s + (r[`${p}_umsatz`] || 0), 0);
+  });
+  (abschl || []).forEach(a => {
+    const key = a.employees?.name || a.employee_id;
+    if (!empMap[key]) empMap[key] = { name: key, total: 0, abschluss: 0, umsatz: 0, mitglieder: 0, mitglUmsatz: 0 };
+    empMap[key].mitglieder++;
+    empMap[key].mitglUmsatz += a.umsatz || 0;
+  });
+
+  const emps = Object.values(empMap).sort((a, b) => a.name.localeCompare(b.name));
+  if (emps.length === 0) {
+    content.innerHTML = '<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Daten für diesen Zeitraum.</div>';
+    return;
+  }
+
+  const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '–';
+  const eur = v => v > 0 ? v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '–';
+
+  const totals = emps.reduce((t, e) => {
+    t.total += e.total; t.abschluss += e.abschluss;
+    t.umsatz += e.umsatz; t.mitglieder += e.mitglieder; t.mitglUmsatz += e.mitglUmsatz;
+    return t;
+  }, { total: 0, abschluss: 0, umsatz: 0, mitglieder: 0, mitglUmsatz: 0 });
+
+  const quoteColor = q => !q || q === '–' ? '' : (parseInt(q) >= 70 ? 'color:#16a34a;' : parseInt(q) >= 50 ? 'color:#ca8a04;' : 'color:#dc2626;');
+
+  let html = `<div class="card"><div class="card-title">Abschlussquoten – Produkte</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Basis: Kundeneinträge mit Produktentscheidung</div>
+    <div class="overview-scroll"><table class="overview-table">
+      <thead><tr>
+        <th>Mitarbeiterin</th>
+        <th>Einträge</th>
+        <th>Abschlüsse</th>
+        <th>Quote</th>
+        <th>Umsatz</th>
+      </tr></thead>
+      <tbody>
+        ${emps.map(em => {
+          const q = pct(em.abschluss, em.total);
+          return `<tr>
+            <td style="text-align:left;">${em.name}</td>
+            <td>${em.total}</td>
+            <td>${em.abschluss}</td>
+            <td style="font-weight:700;${quoteColor(q)}">${q}</td>
+            <td class="umsatz-val">${eur(em.umsatz)}</td>
+          </tr>`;
+        }).join('')}
+        <tr class="total-row">
+          <td style="text-align:left;">Gesamt</td>
+          <td>${totals.total}</td>
+          <td>${totals.abschluss}</td>
+          <td style="font-weight:700;${quoteColor(pct(totals.abschluss,totals.total))}">${pct(totals.abschluss, totals.total)}</td>
+          <td class="umsatz-val">${eur(totals.umsatz)}</td>
+        </tr>
+      </tbody>
+    </table></div>
+  </div>`;
+
+  if (totals.mitglieder > 0) {
+    html += `<div class="card"><div class="card-title">Mitgliedschaftsabschlüsse</div>
+      <div class="overview-scroll"><table class="overview-table">
+        <thead><tr><th>Mitarbeiterin</th><th>Anzahl</th><th>Umsatz</th></tr></thead>
+        <tbody>
+          ${emps.filter(e => e.mitglieder > 0).map(em => `<tr>
+            <td style="text-align:left;">${em.name}</td>
+            <td>${em.mitglieder}</td>
+            <td class="umsatz-val">${eur(em.mitglUmsatz)}</td>
+          </tr>`).join('')}
+          <tr class="total-row">
+            <td style="text-align:left;">Gesamt</td>
+            <td>${totals.mitglieder}</td>
+            <td class="umsatz-val">${eur(totals.mitglUmsatz)}</td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>`;
+  }
+
+  content.innerHTML = html;
 }
 
 // ============================================================
