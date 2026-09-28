@@ -910,9 +910,15 @@ async function submitEntry(e) {
     kein_abschluss_grund:   document.getElementById('entry-grund').value || null,
     anruftermin_festgelegt: document.getElementById('entry-anruftermin').checked,
   };
+  row.pt_kal_count   = row.pt_im_kalender ? 1 : 0;
+  row.pt_statt_count = row.pt_stattgefunden ? 1 : 0;
+  row.pt_nicht_count = row.pt_nicht_stattgefunden ? 1 : 0;
   PRODUCTS.forEach(p => {
     const val = document.querySelector(`input[name="${p}"]:checked`)?.value || null;
     row[`${p}_ergebnis`] = val;
+    row[`${p}_ab`]    = val === 'abschluss' ? 1 : 0;
+    row[`${p}_nein`]  = val === 'nicht_abschluss' ? 1 : 0;
+    row[`${p}_folge`] = val === 'folge_abschluss' ? 1 : 0;
     row[`${p}_umsatz`]   = (val === 'abschluss' || val === 'folge_abschluss')
       ? (parseFloat(document.getElementById(`umsatz-${p}-val`)?.value) || null) : null;
   });
@@ -1789,9 +1795,15 @@ function loadControlling() {
   navigate('screen-controlling');
   const locSel = document.getElementById('ctrl-location');
   locSel.innerHTML = '';
+  if (currentEmployee?.is_manager || currentEmployee?.is_controller) {
+    const all = document.createElement('option');
+    all.value = 'all'; all.textContent = 'Alle Standorte';
+    locSel.appendChild(all);
+  }
   (_locsCache || []).forEach(l => {
     const opt = document.createElement('option');
     opt.value = l.id; opt.textContent = l.name;
+    if (!currentEmployee?.is_manager && !currentEmployee?.is_controller && l.id === currentLocationId) opt.selected = true;
     locSel.appendChild(opt);
   });
   const ym = new Date().toISOString().slice(0, 7);
@@ -1808,42 +1820,64 @@ async function renderControlling() {
   if (!locId || !from || !to) { content.innerHTML = '<div class="spinner">Filter wählen …</div>'; return; }
   content.innerHTML = '<div class="spinner">Lade …</div>';
 
-  // Load reports (product Abschlüsse)
-  const [fromY, fromM] = from.split('-').map(Number);
-  const [toY, toM]     = to.split('-').map(Number);
+  const [toY, toM] = to.split('-').map(Number);
   const fromDate = `${from}-01`;
   const toDate   = new Date(toY, toM, 0).toISOString().split('T')[0];
 
-  const { data: reports, error: repErr } = await db.from('reports')
-    .select('employee_id, employees(name), ' + PRODUCTS.map(p => `${p}_ergebnis,${p}_umsatz`).join(','))
-    .eq('location_id', locId)
-    .gte('date', fromDate)
-    .lte('date', toDate);
+  // --- Reports (mit Zählern) ---
+  const repCols = 'employee_id,employees(name),pt_kal_count,pt_statt_count,' +
+    PRODUCTS.map(p => `${p}_ab,${p}_nein,${p}_folge,${p}_umsatz`).join(',');
+  let repQ = db.from('reports').select(repCols).gte('date', fromDate).lte('date', toDate);
+  if (locId !== 'all') repQ = repQ.eq('location_id', locId);
+  const { data: reports, error: repErr } = await repQ;
+  if (repErr) { content.innerHTML = `<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Fehler: ${repErr.message}</div>`; return; }
 
-  if (repErr) { content.innerHTML = `<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Fehler: ${repErr.message}</div>`; console.error(repErr); return; }
+  // --- Calls ---
+  let callQ = db.from('calls')
+    .select('employee_id,employees(name),kontakt_ausgehend,kontakt_erreicht,kontakt_gebucht,moti_durchgefuehrt,moti_erreicht,moti_gebucht')
+    .gte('date', fromDate).lte('date', toDate);
+  if (locId !== 'all') callQ = callQ.eq('location_id', locId);
+  const { data: callRows } = await callQ;
 
-  const { data: abschl } = await db.from('abschluesse')
-    .select('employee_id, employees(name), umsatz')
-    .eq('location_id', locId)
-    .gte('date', fromDate)
-    .lte('date', toDate);
+  // --- Mitgliedschaftsabschlüsse ---
+  let abQ = db.from('abschluesse').select('employee_id,employees(name),umsatz').gte('date', fromDate).lte('date', toDate);
+  if (locId !== 'all') abQ = abQ.eq('location_id', locId);
+  const { data: abschl } = await abQ;
 
-  // Aggregate per employee
+  // --- Aggregation ---
   const empMap = {};
+  const emp0 = () => ({
+    pt_kal: 0, pt_statt: 0,
+    ...Object.fromEntries(PRODUCTS.flatMap(p => [[`${p}_ab`,0],[`${p}_nein`,0],[`${p}_folge`,0],[`${p}_umsatz`,0]])),
+    aus: 0, err: 0, geb: 0, moti_d: 0, moti_e: 0, moti_g: 0,
+    mitglieder: 0, mitglUmsatz: 0
+  });
+  const get = key => { if (!empMap[key]) empMap[key] = { name: key, ...emp0() }; return empMap[key]; };
+
   (reports || []).forEach(r => {
-    const key = r.employees?.name || r.employee_id;
-    if (!empMap[key]) empMap[key] = { name: key, total: 0, abschluss: 0, umsatz: 0, mitglieder: 0, mitglUmsatz: 0 };
-    const hasDecision = PRODUCTS.some(p => r[`${p}_ergebnis`]);
-    if (hasDecision) empMap[key].total++;
-    const hasAb = PRODUCTS.some(p => r[`${p}_ergebnis`] === 'abschluss' || r[`${p}_ergebnis`] === 'folge_abschluss');
-    if (hasAb) empMap[key].abschluss++;
-    empMap[key].umsatz += PRODUCTS.reduce((s, p) => s + (r[`${p}_umsatz`] || 0), 0);
+    const e = get(r.employees?.name || r.employee_id);
+    e.pt_kal   += r.pt_kal_count || 0;
+    e.pt_statt += r.pt_statt_count || 0;
+    PRODUCTS.forEach(p => {
+      e[`${p}_ab`]    += r[`${p}_ab`]    || 0;
+      e[`${p}_nein`]  += r[`${p}_nein`]  || 0;
+      e[`${p}_folge`] += r[`${p}_folge`] || 0;
+      e[`${p}_umsatz`]+= r[`${p}_umsatz`]|| 0;
+    });
+  });
+  (callRows || []).forEach(c => {
+    const e = get(c.employees?.name || c.employee_id);
+    e.aus    += c.kontakt_ausgehend    || 0;
+    e.err    += c.kontakt_erreicht     || 0;
+    e.geb    += c.kontakt_gebucht      || 0;
+    e.moti_d += c.moti_durchgefuehrt   || 0;
+    e.moti_e += c.moti_erreicht        || 0;
+    e.moti_g += c.moti_gebucht         || 0;
   });
   (abschl || []).forEach(a => {
-    const key = a.employees?.name || a.employee_id;
-    if (!empMap[key]) empMap[key] = { name: key, total: 0, abschluss: 0, umsatz: 0, mitglieder: 0, mitglUmsatz: 0 };
-    empMap[key].mitglieder++;
-    empMap[key].mitglUmsatz += a.umsatz || 0;
+    const e = get(a.employees?.name || a.employee_id);
+    e.mitglieder++;
+    e.mitglUmsatz += a.umsatz || 0;
   });
 
   const emps = Object.values(empMap).sort((a, b) => a.name.localeCompare(b.name));
@@ -1853,62 +1887,112 @@ async function renderControlling() {
   }
 
   const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '–';
-  const eur = v => v > 0 ? v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '–';
+  const num  = (a, b) => b > 0 ? `${a}/${b}` : '–';
+  const eur  = v => v > 0 ? v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '–';
+  const qCol = q => !q || q === '–' ? '' : (parseInt(q) >= 70 ? 'color:#16a34a;' : parseInt(q) >= 50 ? 'color:#ca8a04;' : 'color:#dc2626;');
+  const pctCell = (a, b) => { const q = pct(a,b); return `<td><div style="font-weight:700;font-size:13px;${qCol(q)}">${q}</div><div style="font-size:10px;color:var(--muted)">${num(a,b)}</div></td>`; };
 
-  const totals = emps.reduce((t, e) => {
-    t.total += e.total; t.abschluss += e.abschluss;
-    t.umsatz += e.umsatz; t.mitglieder += e.mitglieder; t.mitglUmsatz += e.mitglUmsatz;
+  // Totals
+  const tot = emps.reduce((t, e) => {
+    t.pt_kal += e.pt_kal; t.pt_statt += e.pt_statt;
+    PRODUCTS.forEach(p => { t[`${p}_ab`]+=e[`${p}_ab`]; t[`${p}_nein`]+=e[`${p}_nein`]; t[`${p}_folge`]+=e[`${p}_folge`]; t[`${p}_umsatz`]+=e[`${p}_umsatz`]; });
+    t.aus+=e.aus; t.err+=e.err; t.geb+=e.geb; t.moti_d+=e.moti_d; t.moti_e+=e.moti_e; t.moti_g+=e.moti_g;
+    t.mitglieder+=e.mitglieder; t.mitglUmsatz+=e.mitglUmsatz;
     return t;
-  }, { total: 0, abschluss: 0, umsatz: 0, mitglieder: 0, mitglUmsatz: 0 });
+  }, { pt_kal:0, pt_statt:0, ...Object.fromEntries(PRODUCTS.flatMap(p=>[[`${p}_ab`,0],[`${p}_nein`,0],[`${p}_folge`,0],[`${p}_umsatz`,0]])), aus:0,err:0,geb:0,moti_d:0,moti_e:0,moti_g:0,mitglieder:0,mitglUmsatz:0 });
 
-  const quoteColor = q => !q || q === '–' ? '' : (parseInt(q) >= 70 ? 'color:#16a34a;' : parseInt(q) >= 50 ? 'color:#ca8a04;' : 'color:#dc2626;');
+  const totUmsatz = PRODUCTS.reduce((s,p)=>s+tot[`${p}_umsatz`],0);
+  const totAb     = PRODUCTS.reduce((s,p)=>s+tot[`${p}_ab`]+tot[`${p}_folge`],0);
+  const totAll    = PRODUCTS.reduce((s,p)=>s+tot[`${p}_ab`]+tot[`${p}_nein`]+tot[`${p}_folge`],0);
 
-  let html = `<div class="card"><div class="card-title">Abschlussquoten – Produkte</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Basis: Kundeneinträge mit Produktentscheidung</div>
+  const prodLabels = { shaper:'Shaper', chair:'Chair', acp:'ACP', boots:'Boots', fitness:'Fitness', reha:'Reha' };
+
+  // ---- TABLE 1: Probetrainings + Produkte ----
+  let html = `<div class="card">
+    <div class="card-title">Probetrainings &amp; Abschlussquoten</div>
     <div class="overview-scroll"><table class="overview-table">
       <thead><tr>
-        <th>Mitarbeiterin</th>
-        <th>Einträge</th>
-        <th>Abschlüsse</th>
-        <th>Quote</th>
+        <th style="text-align:left;">Mitarbeiterin</th>
+        <th>PT<br><span style="font-size:9px;font-weight:400">Erscheinung</span></th>
+        ${PRODUCTS.map(p=>`<th>${prodLabels[p]}<br><span style="font-size:9px;font-weight:400">Quote</span></th>`).join('')}
+        <th>Gesamt<br><span style="font-size:9px;font-weight:400">Quote</span></th>
         <th>Umsatz</th>
       </tr></thead>
       <tbody>
-        ${emps.map(em => {
-          const q = pct(em.abschluss, em.total);
+        ${emps.map(e => {
+          const empAb  = PRODUCTS.reduce((s,p)=>s+e[`${p}_ab`]+e[`${p}_folge`],0);
+          const empAll = PRODUCTS.reduce((s,p)=>s+e[`${p}_ab`]+e[`${p}_nein`]+e[`${p}_folge`],0);
+          const empUms = PRODUCTS.reduce((s,p)=>s+e[`${p}_umsatz`],0);
           return `<tr>
-            <td style="text-align:left;">${em.name}</td>
-            <td>${em.total}</td>
-            <td>${em.abschluss}</td>
-            <td style="font-weight:700;${quoteColor(q)}">${q}</td>
-            <td class="umsatz-val">${eur(em.umsatz)}</td>
+            <td style="text-align:left;">${e.name}</td>
+            ${pctCell(e.pt_statt, e.pt_kal)}
+            ${PRODUCTS.map(p => pctCell(e[`${p}_ab`]+e[`${p}_folge`], e[`${p}_ab`]+e[`${p}_nein`]+e[`${p}_folge`])).join('')}
+            ${pctCell(empAb, empAll)}
+            <td class="umsatz-val">${eur(empUms)}</td>
           </tr>`;
         }).join('')}
         <tr class="total-row">
           <td style="text-align:left;">Gesamt</td>
-          <td>${totals.total}</td>
-          <td>${totals.abschluss}</td>
-          <td style="font-weight:700;${quoteColor(pct(totals.abschluss,totals.total))}">${pct(totals.abschluss, totals.total)}</td>
-          <td class="umsatz-val">${eur(totals.umsatz)}</td>
+          ${pctCell(tot.pt_statt, tot.pt_kal)}
+          ${PRODUCTS.map(p => pctCell(tot[`${p}_ab`]+tot[`${p}_folge`], tot[`${p}_ab`]+tot[`${p}_nein`]+tot[`${p}_folge`])).join('')}
+          ${pctCell(totAb, totAll)}
+          <td class="umsatz-val">${eur(totUmsatz)}</td>
         </tr>
       </tbody>
     </table></div>
   </div>`;
 
-  if (totals.mitglieder > 0) {
-    html += `<div class="card"><div class="card-title">Mitgliedschaftsabschlüsse</div>
+  // ---- TABLE 2: Anrufe ----
+  const hasCallData = emps.some(e => e.aus > 0 || e.moti_d > 0);
+  if (hasCallData) {
+    html += `<div class="card">
+      <div class="card-title">Anrufe</div>
       <div class="overview-scroll"><table class="overview-table">
-        <thead><tr><th>Mitarbeiterin</th><th>Anzahl</th><th>Umsatz</th></tr></thead>
+        <thead><tr>
+          <th style="text-align:left;">Mitarbeiterin</th>
+          <th>Ausgehend</th>
+          <th>Erreicht<br><span style="font-size:9px;font-weight:400">Quote</span></th>
+          <th>Gebucht<br><span style="font-size:9px;font-weight:400">Quote</span></th>
+          <th>Moti<br><span style="font-size:9px;font-weight:400">Durchgef.</span></th>
+          <th>Moti<br><span style="font-size:9px;font-weight:400">Gebucht</span></th>
+        </tr></thead>
         <tbody>
-          ${emps.filter(e => e.mitglieder > 0).map(em => `<tr>
-            <td style="text-align:left;">${em.name}</td>
-            <td>${em.mitglieder}</td>
-            <td class="umsatz-val">${eur(em.mitglUmsatz)}</td>
+          ${emps.filter(e=>e.aus>0||e.moti_d>0).map(e=>`<tr>
+            <td style="text-align:left;">${e.name}</td>
+            <td>${e.aus||'–'}</td>
+            ${pctCell(e.err, e.aus)}
+            ${pctCell(e.geb, e.aus)}
+            <td>${e.moti_d||'–'}</td>
+            ${pctCell(e.moti_g, e.moti_d)}
           </tr>`).join('')}
           <tr class="total-row">
             <td style="text-align:left;">Gesamt</td>
-            <td>${totals.mitglieder}</td>
-            <td class="umsatz-val">${eur(totals.mitglUmsatz)}</td>
+            <td>${tot.aus||'–'}</td>
+            ${pctCell(tot.err, tot.aus)}
+            ${pctCell(tot.geb, tot.aus)}
+            <td>${tot.moti_d||'–'}</td>
+            ${pctCell(tot.moti_g, tot.moti_d)}
+          </tr>
+        </tbody>
+      </table></div>
+    </div>`;
+  }
+
+  // ---- TABLE 3: Mitgliedschaftsabschlüsse ----
+  if (tot.mitglieder > 0) {
+    html += `<div class="card"><div class="card-title">Mitgliedschaftsabschlüsse</div>
+      <div class="overview-scroll"><table class="overview-table">
+        <thead><tr><th style="text-align:left;">Mitarbeiterin</th><th>Anzahl</th><th>Umsatz</th></tr></thead>
+        <tbody>
+          ${emps.filter(e=>e.mitglieder>0).map(e=>`<tr>
+            <td style="text-align:left;">${e.name}</td>
+            <td>${e.mitglieder}</td>
+            <td class="umsatz-val">${eur(e.mitglUmsatz)}</td>
+          </tr>`).join('')}
+          <tr class="total-row">
+            <td style="text-align:left;">Gesamt</td>
+            <td>${tot.mitglieder}</td>
+            <td class="umsatz-val">${eur(tot.mitglUmsatz)}</td>
           </tr>
         </tbody>
       </table></div>
