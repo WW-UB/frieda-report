@@ -161,6 +161,36 @@
     .btn-sm-primary  { background: var(--primary); color: white; }
     .btn-sm-danger   { background: #fee2e2; color: #991b1b; }
     .btn-sm-success  { background: #dcfce7; color: #166534; }
+    /* Ziele */
+    .ziel-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 20px; margin-bottom: 14px; }
+    .ziel-period { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+    .ziel-row { margin-bottom: 12px; }
+    .ziel-row-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; font-size: 13px; }
+    .ziel-label { color: var(--muted); }
+    .ziel-values { font-weight: 700; font-size: 13px; }
+    .ziel-values .ist { color: var(--text); }
+    .ziel-values .sep { color: var(--muted); font-weight: 400; margin: 0 3px; }
+    .ziel-values .ziel { color: var(--muted); font-weight: 400; }
+    .ziel-pct { font-size: 11px; color: var(--muted); }
+    .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+    .fill-green  { background: #16a34a; }
+    .fill-yellow { background: #ca8a04; }
+    .fill-red    { background: #dc2626; }
+    .fill-grey   { background: #9ca3af; }
+    /* Zieltableau */
+    .zt-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -20px; padding: 0 0 8px; }
+    .zt-table { border-collapse: collapse; font-size: 11px; white-space: nowrap; min-width: 100%; }
+    .zt-table thead th { background: var(--primary); color: white; padding: 7px 8px; text-align: center; font-weight: 700; border-right: 1px solid rgba(255,255,255,0.2); position: sticky; top: 0; z-index: 2; }
+    .zt-table thead th:first-child { text-align: left; min-width: 120px; position: sticky; left: 0; z-index: 3; }
+    .zt-table thead th.zt-current { background: var(--primary-dark); }
+    .zt-table thead th.zt-ytd { background: #374151; border-left: 2px solid white; }
+    .zt-table tbody td { padding: 5px 8px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: center; vertical-align: middle; }
+    .zt-table tbody td.zt-kpi { text-align: left; font-weight: 600; font-size: 11px; color: var(--text); background: var(--card); position: sticky; left: 0; z-index: 1; min-width: 120px; border-right: 2px solid var(--border); }
+    .zt-table tbody td.zt-current { border-left: 1px solid var(--primary); border-right: 1px solid var(--primary); }
+    .zt-table tbody td.zt-ytd { border-left: 2px solid #374151; }
+    .zt-soll { font-size: 10px; color: var(--muted); line-height: 1.2; }
+    .zt-ist  { font-size: 12px; font-weight: 700; line-height: 1.4; }
   </style>
 </head>
 <body>
@@ -185,8 +215,8 @@
     <select id="select-employee" onchange="onEmployeeChange()">
       <option value="">– bitte auswählen –</option>
     </select>
-    <label>Standort</label>
-    <input type="text" id="display-location" readonly style="background:#f3f4f6;color:var(--muted);" />
+    <label>Standort (aktiv)</label>
+    <select id="select-location"></select>
     <button class="btn btn-primary" onclick="showPinPad()">Weiter →</button>
   </div>
   <div class="card" id="login-step-2" style="display:none;">
@@ -243,6 +273,22 @@
     </div>
   </button>
 
+  <button class="menu-btn" onclick="loadAbschluesse()">
+    <span class="menu-icon">🤝</span>
+    <div>
+      <div class="menu-label">Abschlüsse</div>
+      <div class="menu-desc">Neue Mitgliedschaft eintragen &amp; Liste</div>
+    </div>
+  </button>
+
+  <button class="menu-btn" onclick="loadZiele()">
+    <span class="menu-icon">🎯</span>
+    <div>
+      <div class="menu-label">Meine Ziele</div>
+      <div class="menu-desc">Tag · Woche · Monat – Umsatz &amp; Mitglieder</div>
+    </div>
+  </button>
+
   <div id="menu-manager-section" style="display:none;">
     <div class="section-divider">Management</div>
     <button class="menu-btn" onclick="navigate('screen-dashboard')">
@@ -271,6 +317,31 @@
       <div>
         <div class="menu-label">Report drucken</div>
         <div class="menu-desc">Gefilterte Auswertung &amp; PDF-Export</div>
+      </div>
+    </button>
+    <button class="menu-btn" onclick="loadZieltableau()">
+      <span class="menu-icon">🎯</span>
+      <div>
+        <div class="menu-label">Zieltableau</div>
+        <div class="menu-desc">Soll/Ist Monatsband – komplettes Jahr</div>
+      </div>
+    </button>
+  </div>
+
+  <div id="menu-controller-section" style="display:none;">
+    <div class="section-divider">Controlling</div>
+    <button class="menu-btn" onclick="loadControlling()">
+      <span class="menu-icon">📈</span>
+      <div>
+        <div class="menu-label">Controlling – Abschlussquoten</div>
+        <div class="menu-desc">Quote pro Mitarbeiterin &amp; Gesamt</div>
+      </div>
+    </button>
+    <button class="menu-btn" onclick="loadZieleSetzen()">
+      <span class="menu-icon">⚙️</span>
+      <div>
+        <div class="menu-label">Ziele setzen</div>
+        <div class="menu-desc">Tages-, Wochen- und Monatsziele definieren</div>
       </div>
     </button>
   </div>
@@ -542,6 +613,75 @@
   <div id="rep-content"><div class="spinner">Filter wählen …</div></div>
 </div>
 
+<!-- ======================== ZIELTABLEAU ======================== -->
+<div class="screen" id="screen-zieltableau">
+  <div class="card">
+    <div class="card-title">Filter</div>
+    <label>Standort</label>
+    <select id="zt-location" onchange="renderZieltableau()"></select>
+    <label>Jahr</label>
+    <select id="zt-year" onchange="renderZieltableau()"></select>
+  </div>
+  <button class="btn btn-primary" style="margin-bottom:14px;" onclick="printZieltableau()">🖨️ Drucken / PDF exportieren</button>
+  <div id="zt-content"><div class="spinner">Standort wählen …</div></div>
+</div>
+
+<!-- ======================== ZIELE ======================== -->
+<div class="screen" id="screen-ziele">
+  <div id="ziele-content"><div class="spinner">Lade …</div></div>
+  <div style="height:30px;"></div>
+</div>
+
+<!-- ======================== ZIELE SETZEN ======================== -->
+<div class="screen" id="screen-ziele-setzen">
+  <div class="card">
+    <div class="card-title">Standort</div>
+    <select id="zs-location" onchange="loadZieleSetzenForm()"></select>
+  </div>
+  <div id="ziele-setzen-form"><div class="spinner">Lade …</div></div>
+  <div style="height:30px;"></div>
+</div>
+
+<!-- ======================== ABSCHLÜSSE ======================== -->
+<div class="screen" id="screen-abschluesse">
+  <form id="form-abschluss" onsubmit="submitAbschluss(event)">
+    <div class="card">
+      <div class="card-title">Neuer Abschluss</div>
+      <label>Datum Abschluss</label>
+      <input type="date" id="ab-date" required />
+      <label>Startdatum Mitgliedschaft</label>
+      <input type="date" id="ab-start-date" />
+      <label>Umsatz (€)</label>
+      <input type="number" step="0.01" min="0" id="ab-umsatz" placeholder="0,00" />
+      <label>Notiz (optional)</label>
+      <textarea id="ab-notiz" placeholder="z.B. Mitgliedschaftsart, Dauer …" style="min-height:60px;"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">💾 Abschluss speichern</button>
+    <button type="button" class="btn btn-secondary" onclick="goBack()">Abbrechen</button>
+    <div style="height:20px;"></div>
+  </form>
+  <div class="card">
+    <div class="card-title">Meine letzten Abschlüsse</div>
+    <div id="ab-list"><div class="spinner">Lade …</div></div>
+  </div>
+  <div style="height:30px;"></div>
+</div>
+
+<!-- ======================== CONTROLLING ======================== -->
+<div class="screen" id="screen-controlling">
+  <div class="card">
+    <div class="card-title">Filter</div>
+    <label>Standort</label>
+    <select id="ctrl-location" onchange="renderControlling()"></select>
+    <div style="display:flex;gap:10px;">
+      <div style="flex:1;"><label>Von</label><input type="month" id="ctrl-from" onchange="renderControlling()" style="margin-bottom:0;" /></div>
+      <div style="flex:1;"><label>Bis</label><input type="month" id="ctrl-to" onchange="renderControlling()" style="margin-bottom:0;" /></div>
+    </div>
+  </div>
+  <div id="ctrl-content"><div class="spinner">Filter wählen …</div></div>
+  <div style="height:30px;"></div>
+</div>
+
 <!-- Toast -->
 <div id="toast"></div>
 
@@ -554,9 +694,10 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const PRODUCTS = ['shaper','chair','acp','boots','fitness','reha'];
 const PROD_LABELS = {shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Ballancer',fitness:'Fitness',reha:'Reha'};
 
-let currentEmployee = null;
-let currentLocation = null;
-let screenHistory   = [];
+let currentEmployee   = null;
+let currentLocation   = null;
+let currentLocationId = null;
+let screenHistory     = [];
 
 // ============================================================
 // Navigation
@@ -589,6 +730,11 @@ function updateHeader(screenId) {
     'screen-budget-entry': 'Budget IST eintragen',
     'screen-admin':        'Mitarbeiterverwaltung',
     'screen-report':       'Report drucken',
+    'screen-zieltableau':  'Zieltableau',
+    'screen-abschluesse':   'Abschlüsse',
+    'screen-controlling':   'Abschlussquoten',
+    'screen-ziele':         'Meine Ziele',
+    'screen-ziele-setzen':  'Ziele setzen',
   };
   document.getElementById('header-title').textContent = titles[screenId] || 'Frieda Report';
   const sub = currentEmployee ? `${currentEmployee.name} · ${currentLocation}` : '';
@@ -621,7 +767,7 @@ async function loadEmployees() {
   sel.innerHTML = '<option value="">– bitte auswählen –</option>';
   (data || []).filter(e => e.active !== false).forEach(e => {
     const opt = document.createElement('option');
-    opt.value = JSON.stringify({ id: e.id, name: e.name, location: e.locations?.name, location_id: e.location_id, is_manager: e.is_manager });
+    opt.value = JSON.stringify({ id: e.id, name: e.name, location: e.locations?.name, location_id: e.location_id, is_manager: e.is_manager, is_controller: e.is_controller });
     opt.textContent = `${e.name} (${e.locations?.name || '–'})`;
     sel.appendChild(opt);
   });
@@ -646,9 +792,17 @@ async function loadEmployees() {
 
 function onEmployeeChange() {
   const val = document.getElementById('select-employee').value;
-  if (!val) { document.getElementById('display-location').value = ''; return; }
+  const locSel = document.getElementById('select-location');
+  locSel.innerHTML = '';
+  if (!val) return;
   const emp = JSON.parse(val);
-  document.getElementById('display-location').value = emp.location || '–';
+  (_locsCache || []).forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id;
+    opt.textContent = l.name;
+    if (l.id === emp.location_id) opt.selected = true;
+    locSel.appendChild(opt);
+  });
 }
 
 // ---- PIN Pad ----
@@ -701,8 +855,11 @@ async function doLogin() {
     showPinError('Falscher PIN'); return;
   }
   currentEmployee = emp;
-  currentLocation = emp.location;
+  const locSel = document.getElementById('select-location');
+  currentLocationId = locSel.value || emp.location_id;
+  currentLocation = locSel.options[locSel.selectedIndex]?.text || emp.location || '–';
   document.getElementById('menu-manager-section').style.display = emp.is_manager ? 'block' : 'none';
+  document.getElementById('menu-controller-section').style.display = (emp.is_manager || emp.is_controller) ? 'block' : 'none';
   document.getElementById('menu-date').textContent = new Date().toLocaleDateString('de-DE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   _pin = '';
   updatePinDots();
@@ -723,7 +880,7 @@ function showPinError(msg) {
 }
 
 function doLogout() {
-  currentEmployee = null; currentLocation = null; screenHistory = [];
+  currentEmployee = null; currentLocation = null; currentLocationId = null; screenHistory = [];
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-login').classList.add('active');
   updateHeader('screen-login');
@@ -745,7 +902,7 @@ async function submitEntry(e) {
   const row = {
     date:          document.getElementById('entry-date').value,
     employee_id:   currentEmployee.id,
-    location_id:   currentEmployee.location_id,
+    location_id:   currentLocationId,
     customer_name: document.getElementById('entry-customer').value || null,
     pt_im_kalender:         document.getElementById('pt-kalender').checked,
     pt_stattgefunden:       document.getElementById('pt-statt').checked,
@@ -762,7 +919,7 @@ async function submitEntry(e) {
   const { error } = await db.from('reports').insert([row]);
   if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
   showToast('✅ Eintrag gespeichert!');
-  await syncUmsatzToZieltableau(currentEmployee.location_id, document.getElementById('entry-date').value);
+  await syncUmsatzToZieltableau(currentLocationId, document.getElementById('entry-date').value);
   e.target.reset();
   document.getElementById('entry-date').value = new Date().toISOString().split('T')[0];
   PRODUCTS.forEach(p => {
@@ -781,7 +938,7 @@ async function submitCalls(e) {
   const row = {
     date,
     employee_id:        currentEmployee.id,
-    location_id:        currentEmployee.location_id,
+    location_id:        currentLocationId,
     kontakt_ausgehend:  parseInt(document.getElementById('c-ausgehend').value) || 0,
     kontakt_erreicht:   parseInt(document.getElementById('c-erreicht').value) || 0,
     kontakt_gebucht:    parseInt(document.getElementById('c-gebucht').value) || 0,
@@ -1213,7 +1370,9 @@ async function loadRepEntries() {
     empSel.dataset.locId=locId;
   }
 
-  let q=db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31');
+  const [,toM1]=to.split('-').map(Number);const toY1=parseInt(to.split('-')[0]);
+  const toEnd1=new Date(toY1,toM1,0).toISOString().split('T')[0];
+  let q=db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',toEnd1);
   if(empId)q=q.eq('employee_id',empId);
   const{data:rows,error}=await q.order('date',{ascending:false});
   if(error||!rows){content.innerHTML='<div class="spinner">Fehler beim Laden.</div>';return;}
@@ -1240,7 +1399,9 @@ async function loadRepCalls() {
   const from=document.getElementById('rep-from').value;
   const to=document.getElementById('rep-to').value;
   if(!locId||!from||!to){content.innerHTML='<div class="spinner">Bitte Filter wählen.</div>';return;}
-  let q=db.from('calls').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31');
+  const [,toM2]=to.split('-').map(Number);const toY2=parseInt(to.split('-')[0]);
+  const toEnd2=new Date(toY2,toM2,0).toISOString().split('T')[0];
+  let q=db.from('calls').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',toEnd2);
   if(empId)q=q.eq('employee_id',empId);
   const{data:rows,error}=await q.order('date',{ascending:false});
   if(error||!rows||rows.length===0){content.innerHTML='<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Anrufe gefunden.</div>';return;}
@@ -1264,9 +1425,11 @@ async function loadRepTeam() {
   const from=document.getElementById('rep-from').value;
   const to=document.getElementById('rep-to').value;
   if(!locId||!from||!to){content.innerHTML='<div class="spinner">Bitte Filter wählen.</div>';return;}
+  const [,toM3]=to.split('-').map(Number);const toY3=parseInt(to.split('-')[0]);
+  const toEnd3=new Date(toY3,toM3,0).toISOString().split('T')[0];
   const[{data:reports},{data:calls}]=await Promise.all([
-    db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31'),
-    db.from('calls').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',to+'-31'),
+    db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',toEnd3),
+    db.from('calls').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',toEnd3),
   ]);
   if(!reports){content.innerHTML='<div class="spinner">Fehler.</div>';return;}
   const empMap={};
@@ -1356,6 +1519,526 @@ async function syncUmsatzToZieltableau(locId, dateStr) {
     {location_id:locId,year:y,month:m,kpi:'Umsatzerlöse',ist:total},
     {location_id:locId,year:y,month:m,kpi:'Gesamtleistung',ist:total},
   ],{onConflict:'location_id,year,month,kpi'});
+}
+
+// ============================================================
+// Ziele – Hilfsfunktionen
+// ============================================================
+function getISOWeekStr(d) {
+  const date = new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 4 - (date.getDay() || 7));
+  const y = date.getFullYear();
+  const jan4 = new Date(y, 0, 4);
+  const week = Math.ceil((((date - jan4) / 86400000) + 1) / 7);
+  return `${y}-W${String(week).padStart(2,'0')}`;
+}
+function getWeekRange(weekStr) {
+  const [yr, w] = weekStr.split('-W');
+  const jan4 = new Date(parseInt(yr), 0, 4);
+  const mon = new Date(jan4);
+  mon.setDate(jan4.getDate() - (jan4.getDay() || 7) + 1 + (parseInt(w) - 1) * 7);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  return { from: mon.toISOString().split('T')[0], to: sun.toISOString().split('T')[0] };
+}
+
+// ============================================================
+// Ziele anzeigen (alle MA)
+// ============================================================
+async function loadZiele() {
+  navigate('screen-ziele');
+  await renderZiele();
+}
+
+async function renderZiele() {
+  const content = document.getElementById('ziele-content');
+  content.innerHTML = '<div class="spinner">Lade …</div>';
+  const locId = currentLocationId;
+  if (!locId) { content.innerHTML = '<div class="spinner">Kein Standort.</div>'; return; }
+
+  const today     = new Date().toISOString().split('T')[0];
+  const weekStr   = getISOWeekStr(new Date());
+  const weekRange = getWeekRange(weekStr);
+  const monthStr  = today.slice(0,7);
+  const [my, mm]  = monthStr.split('-').map(Number);
+  const monthEnd  = new Date(my, mm, 0).toISOString().split('T')[0];
+  const monthStart= `${monthStr}-01`;
+  const kw        = weekStr.split('-W')[1];
+
+  // Ziele laden
+  const { data: ziele } = await db.from('umsatz_ziele')
+    .select('type, period, ziel, mitglieder_ziel')
+    .eq('location_id', locId)
+    .in('period', [today, weekStr, monthStr]);
+
+  const zMap = {};
+  (ziele || []).forEach(z => { zMap[z.type + '_' + z.period] = z; });
+  const tagZ   = zMap[`tag_${today}`]   || {};
+  const wocheZ = zMap[`woche_${weekStr}`] || {};
+  const monatZ = zMap[`monat_${monthStr}`] || {};
+
+  // IST Umsatz (reports + abschluesse)
+  const [{ data: rToday }, { data: rWeek }, { data: rMonth },
+         { data: aToday }, { data: aWeek },  { data: aMonth }] = await Promise.all([
+    db.from('reports').select(PRODUCTS.map(p=>`${p}_umsatz`).join(',')).eq('location_id',locId).eq('date',today),
+    db.from('reports').select(PRODUCTS.map(p=>`${p}_umsatz`).join(',')).eq('location_id',locId).gte('date',weekRange.from).lte('date',weekRange.to),
+    db.from('reports').select(PRODUCTS.map(p=>`${p}_umsatz`).join(',')).eq('location_id',locId).gte('date',monthStart).lte('date',monthEnd),
+    db.from('abschluesse').select('umsatz').eq('location_id',locId).eq('date',today),
+    db.from('abschluesse').select('umsatz').eq('location_id',locId).gte('date',weekRange.from).lte('date',weekRange.to),
+    db.from('abschluesse').select('umsatz, date').eq('location_id',locId).gte('date',monthStart).lte('date',monthEnd),
+  ]);
+
+  const sumU = (rows) => (rows||[]).reduce((s,r) => s + PRODUCTS.reduce((ss,p)=>ss+(r[`${p}_umsatz`]||0),0), 0);
+  const sumA = (rows) => (rows||[]).reduce((s,r) => s + (r.umsatz||0), 0);
+
+  const istU = { tag: sumU(rToday)+sumA(aToday), woche: sumU(rWeek)+sumA(aWeek), monat: sumU(rMonth)+sumA(aMonth) };
+  const istM = { tag: (aToday||[]).length, woche: (aWeek||[]).length, monat: (aMonth||[]).length };
+
+  const eur  = v => v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+  const fmtZ = v => v != null ? eur(v) : '–';
+
+  function zieleCard(title, uIst, uZiel, mIst, mZiel) {
+    const uPct  = uZiel ? Math.min(Math.round(uIst/uZiel*100),100) : null;
+    const mPct  = mZiel ? Math.min(Math.round(mIst/mZiel*100),100) : null;
+    const cls   = pct => !pct ? 'fill-grey' : pct>=90?'fill-green':pct>=60?'fill-yellow':'fill-red';
+    const bar   = (pct,label) => pct!=null ? `
+      <div class="progress-bar"><div class="progress-fill ${cls(pct)}" style="width:${pct}%"></div></div>
+      <div class="ziel-pct" style="text-align:right;margin-top:3px;">${pct}% von Ziel ${label}</div>` : '';
+    return `<div class="ziel-card">
+      <div class="ziel-period">${title}</div>
+      <div class="ziel-row">
+        <div class="ziel-row-header">
+          <span class="ziel-label">💰 Umsatz</span>
+          <span class="ziel-values"><span class="ist">${eur(uIst)}</span><span class="sep">/</span><span class="ziel">${fmtZ(uZiel)}</span></span>
+        </div>
+        ${uZiel ? `<div class="progress-bar"><div class="progress-fill ${cls(uPct)}" style="width:${uPct}%"></div></div><div class="ziel-pct" style="text-align:right;margin-top:3px;">${uPct}%</div>` : '<div style="font-size:11px;color:var(--muted);">Kein Ziel gesetzt</div>'}
+      </div>
+      <div class="ziel-row">
+        <div class="ziel-row-header">
+          <span class="ziel-label">🤝 Mitglieder</span>
+          <span class="ziel-values"><span class="ist">${mIst}</span><span class="sep">/</span><span class="ziel">${mZiel ?? '–'}</span></span>
+        </div>
+        ${mZiel ? `<div class="progress-bar"><div class="progress-fill ${cls(mPct)}" style="width:${mPct}%"></div></div><div class="ziel-pct" style="text-align:right;margin-top:3px;">${mPct}%</div>` : '<div style="font-size:11px;color:var(--muted);">Kein Ziel gesetzt</div>'}
+      </div>
+    </div>`;
+  }
+
+  const locName = currentLocation;
+  const monthName = new Date(my, mm-1).toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+  const weekFrom = weekRange.from.slice(5).split('-').reverse().join('.');
+  const weekTo   = weekRange.to.slice(5).split('-').reverse().join('.');
+
+  content.innerHTML =
+    `<div style="font-size:13px;color:var(--muted);margin-bottom:12px;">📍 ${locName}</div>` +
+    zieleCard(`📅 Heute – ${new Date(today).toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'})}`,
+      istU.tag, tagZ.ziel, istM.tag, tagZ.mitglieder_ziel) +
+    zieleCard(`📅 Diese Woche – KW ${kw} (${weekFrom}–${weekTo})`,
+      istU.woche, wocheZ.ziel, istM.woche, wocheZ.mitglieder_ziel) +
+    zieleCard(`📅 ${monthName}`,
+      istU.monat, monatZ.ziel, istM.monat, monatZ.mitglieder_ziel);
+}
+
+// ============================================================
+// Ziele setzen (Controller / Manager)
+// ============================================================
+function loadZieleSetzen() {
+  navigate('screen-ziele-setzen');
+  const locSel = document.getElementById('zs-location');
+  locSel.innerHTML = '';
+  (_locsCache || []).forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id; opt.textContent = l.name;
+    if (l.id === currentLocationId) opt.selected = true;
+    locSel.appendChild(opt);
+  });
+  loadZieleSetzenForm();
+}
+
+async function loadZieleSetzenForm() {
+  const locId  = document.getElementById('zs-location').value;
+  const form   = document.getElementById('ziele-setzen-form');
+  if (!locId) return;
+  form.innerHTML = '<div class="spinner">Lade …</div>';
+
+  const today    = new Date().toISOString().split('T')[0];
+  const weekStr  = getISOWeekStr(new Date());
+  const monthStr = today.slice(0,7);
+  const kw       = weekStr.split('-W')[1];
+  const weekRange = getWeekRange(weekStr);
+  const [my, mm] = monthStr.split('-').map(Number);
+  const monthName = new Date(my, mm-1).toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+
+  const { data: ziele } = await db.from('umsatz_ziele')
+    .select('type, period, ziel, mitglieder_ziel')
+    .eq('location_id', locId)
+    .in('period', [today, weekStr, monthStr]);
+
+  const zMap = {};
+  (ziele || []).forEach(z => { zMap[z.type + '_' + z.period] = z; });
+  const tagZ   = zMap[`tag_${today}`]     || {};
+  const wocheZ = zMap[`woche_${weekStr}`] || {};
+  const monatZ = zMap[`monat_${monthStr}`] || {};
+
+  const section = (label, prefix, uVal, mVal) => `
+    <div class="card">
+      <div class="card-title">${label}</div>
+      <label>Umsatz-Ziel (€)</label>
+      <input type="number" step="0.01" min="0" id="zs-u-${prefix}" value="${uVal||''}" placeholder="0,00" />
+      <label>Mitglieder-Ziel (Anzahl)</label>
+      <input type="number" min="0" id="zs-m-${prefix}" value="${mVal||''}" placeholder="0" />
+    </div>`;
+
+  form.innerHTML =
+    section(`📅 Heute – ${new Date(today).toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'})}`,
+      'tag', tagZ.ziel, tagZ.mitglieder_ziel) +
+    section(`📅 Diese Woche – KW ${kw}`, 'woche', wocheZ.ziel, wocheZ.mitglieder_ziel) +
+    section(`📅 ${monthName}`, 'monat', monatZ.ziel, monatZ.mitglieder_ziel) +
+    `<button class="btn btn-primary" onclick="saveZiele()">💾 Ziele speichern</button><div style="height:30px;"></div>`;
+
+  // Store periods for save
+  form.dataset.today    = today;
+  form.dataset.weekStr  = weekStr;
+  form.dataset.monthStr = monthStr;
+}
+
+async function saveZiele() {
+  const locId   = document.getElementById('zs-location').value;
+  const form    = document.getElementById('ziele-setzen-form');
+  const today   = form.dataset.today;
+  const weekStr = form.dataset.weekStr;
+  const monthStr= form.dataset.monthStr;
+
+  const rows = [
+    { location_id: locId, type: 'tag',   period: today,
+      ziel: parseFloat(document.getElementById('zs-u-tag').value)||null,
+      mitglieder_ziel: parseInt(document.getElementById('zs-m-tag').value)||null },
+    { location_id: locId, type: 'woche', period: weekStr,
+      ziel: parseFloat(document.getElementById('zs-u-woche').value)||null,
+      mitglieder_ziel: parseInt(document.getElementById('zs-m-woche').value)||null },
+    { location_id: locId, type: 'monat', period: monthStr,
+      ziel: parseFloat(document.getElementById('zs-u-monat').value)||null,
+      mitglieder_ziel: parseInt(document.getElementById('zs-m-monat').value)||null },
+  ].filter(r => r.ziel != null || r.mitglieder_ziel != null);
+
+  if (rows.length === 0) { showToast('Bitte mindestens ein Ziel eingeben'); return; }
+  const { error } = await db.from('umsatz_ziele').upsert(rows, { onConflict: 'location_id,type,period' });
+  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
+  showToast('✅ Ziele gespeichert!');
+  goBack();
+}
+
+// ============================================================
+// Abschlüsse
+// ============================================================
+async function loadAbschluesse() {
+  navigate('screen-abschluesse');
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('ab-date').value = today;
+  document.getElementById('ab-start-date').value = '';
+  document.getElementById('ab-umsatz').value = '';
+  document.getElementById('ab-notiz').value = '';
+  await refreshAbschlussListe();
+}
+
+async function refreshAbschlussListe() {
+  const list = document.getElementById('ab-list');
+  list.innerHTML = '<div class="spinner">Lade …</div>';
+  const { data, error } = await db.from('abschluesse')
+    .select('*, employees(name)')
+    .eq('employee_id', currentEmployee.id)
+    .order('date', { ascending: false })
+    .limit(30);
+  if (error || !data || data.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:14px;">Noch keine Abschlüsse eingetragen.</div>';
+    return;
+  }
+  const fmt = v => v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '–';
+  list.innerHTML = data.map(a => `
+    <div class="entry-item">
+      <div>
+        <div class="entry-name">${a.date}</div>
+        <div class="entry-meta">Start: ${a.start_date || '–'} · ${a.notizen || ''}</div>
+      </div>
+      ${a.umsatz ? `<div class="entry-badge">${fmt(a.umsatz)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+async function submitAbschluss(e) {
+  e.preventDefault();
+  const row = {
+    date:        document.getElementById('ab-date').value,
+    start_date:  document.getElementById('ab-start-date').value || null,
+    umsatz:      parseFloat(document.getElementById('ab-umsatz').value) || null,
+    notizen:     document.getElementById('ab-notiz').value || null,
+    employee_id: currentEmployee.id,
+    location_id: currentLocationId,
+  };
+  const { error } = await db.from('abschluesse').insert([row]);
+  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
+  showToast('✅ Abschluss gespeichert!');
+  e.target.reset();
+  document.getElementById('ab-date').value = new Date().toISOString().split('T')[0];
+  await refreshAbschlussListe();
+}
+
+// ============================================================
+// Controlling – Abschlussquoten
+// ============================================================
+function loadControlling() {
+  navigate('screen-controlling');
+  const locSel = document.getElementById('ctrl-location');
+  locSel.innerHTML = '';
+  if (currentEmployee?.is_manager || currentEmployee?.is_controller) {
+    const all = document.createElement('option');
+    all.value = 'all'; all.textContent = 'Alle Standorte';
+    locSel.appendChild(all);
+  }
+  (_locsCache || []).forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id; opt.textContent = l.name;
+    if (!currentEmployee?.is_manager && !currentEmployee?.is_controller && l.id === currentLocationId) opt.selected = true;
+    locSel.appendChild(opt);
+  });
+  const ym = new Date().toISOString().slice(0, 7);
+  document.getElementById('ctrl-from').value = ym;
+  document.getElementById('ctrl-to').value = ym;
+  renderControlling();
+}
+
+async function renderControlling() {
+  const locId = document.getElementById('ctrl-location').value;
+  const from  = document.getElementById('ctrl-from').value;
+  const to    = document.getElementById('ctrl-to').value;
+  const content = document.getElementById('ctrl-content');
+  if (!locId || !from || !to) { content.innerHTML = '<div class="spinner">Filter wählen …</div>'; return; }
+  // locId can be 'all' (alle Standorte) or a UUID
+  content.innerHTML = '<div class="spinner">Lade …</div>';
+
+  // Load reports (product Abschlüsse)
+  const [fromY, fromM] = from.split('-').map(Number);
+  const [toY, toM]     = to.split('-').map(Number);
+  const fromDate = `${from}-01`;
+  const toDate   = new Date(toY, toM, 0).toISOString().split('T')[0];
+
+  let repQ = db.from('reports')
+    .select('employee_id, employees(name), ' + PRODUCTS.map(p => `${p}_ergebnis,${p}_umsatz`).join(','))
+    .gte('date', fromDate).lte('date', toDate);
+  if (locId !== 'all') repQ = repQ.eq('location_id', locId);
+  const { data: reports, error: repErr } = await repQ;
+
+  if (repErr) { content.innerHTML = `<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Fehler: ${repErr.message}</div>`; console.error(repErr); return; }
+
+  let abQ = db.from('abschluesse')
+    .select('employee_id, employees(name), umsatz')
+    .gte('date', fromDate).lte('date', toDate);
+  if (locId !== 'all') abQ = abQ.eq('location_id', locId);
+  const { data: abschl } = await abQ;
+
+  // Aggregate per employee
+  const empMap = {};
+  (reports || []).forEach(r => {
+    const key = r.employees?.name || r.employee_id;
+    if (!empMap[key]) empMap[key] = { name: key, total: 0, abschluss: 0, umsatz: 0, mitglieder: 0, mitglUmsatz: 0 };
+    const hasDecision = PRODUCTS.some(p => r[`${p}_ergebnis`]);
+    if (hasDecision) empMap[key].total++;
+    const hasAb = PRODUCTS.some(p => r[`${p}_ergebnis`] === 'abschluss' || r[`${p}_ergebnis`] === 'folge_abschluss');
+    if (hasAb) empMap[key].abschluss++;
+    empMap[key].umsatz += PRODUCTS.reduce((s, p) => s + (r[`${p}_umsatz`] || 0), 0);
+  });
+  (abschl || []).forEach(a => {
+    const key = a.employees?.name || a.employee_id;
+    if (!empMap[key]) empMap[key] = { name: key, total: 0, abschluss: 0, umsatz: 0, mitglieder: 0, mitglUmsatz: 0 };
+    empMap[key].mitglieder++;
+    empMap[key].mitglUmsatz += a.umsatz || 0;
+  });
+
+  const emps = Object.values(empMap).sort((a, b) => a.name.localeCompare(b.name));
+  if (emps.length === 0) {
+    content.innerHTML = '<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Daten für diesen Zeitraum.</div>';
+    return;
+  }
+
+  const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '–';
+  const eur = v => v > 0 ? v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '–';
+
+  const totals = emps.reduce((t, e) => {
+    t.total += e.total; t.abschluss += e.abschluss;
+    t.umsatz += e.umsatz; t.mitglieder += e.mitglieder; t.mitglUmsatz += e.mitglUmsatz;
+    return t;
+  }, { total: 0, abschluss: 0, umsatz: 0, mitglieder: 0, mitglUmsatz: 0 });
+
+  const quoteColor = q => !q || q === '–' ? '' : (parseInt(q) >= 70 ? 'color:#16a34a;' : parseInt(q) >= 50 ? 'color:#ca8a04;' : 'color:#dc2626;');
+
+  let html = `<div class="card"><div class="card-title">Abschlussquoten – Produkte</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Basis: Kundeneinträge mit Produktentscheidung</div>
+    <div class="overview-scroll"><table class="overview-table">
+      <thead><tr>
+        <th>Mitarbeiterin</th>
+        <th>Einträge</th>
+        <th>Abschlüsse</th>
+        <th>Quote</th>
+        <th>Umsatz</th>
+      </tr></thead>
+      <tbody>
+        ${emps.map(em => {
+          const q = pct(em.abschluss, em.total);
+          return `<tr>
+            <td style="text-align:left;">${em.name}</td>
+            <td>${em.total}</td>
+            <td>${em.abschluss}</td>
+            <td style="font-weight:700;${quoteColor(q)}">${q}</td>
+            <td class="umsatz-val">${eur(em.umsatz)}</td>
+          </tr>`;
+        }).join('')}
+        <tr class="total-row">
+          <td style="text-align:left;">Gesamt</td>
+          <td>${totals.total}</td>
+          <td>${totals.abschluss}</td>
+          <td style="font-weight:700;${quoteColor(pct(totals.abschluss,totals.total))}">${pct(totals.abschluss, totals.total)}</td>
+          <td class="umsatz-val">${eur(totals.umsatz)}</td>
+        </tr>
+      </tbody>
+    </table></div>
+  </div>`;
+
+  if (totals.mitglieder > 0) {
+    html += `<div class="card"><div class="card-title">Mitgliedschaftsabschlüsse</div>
+      <div class="overview-scroll"><table class="overview-table">
+        <thead><tr><th>Mitarbeiterin</th><th>Anzahl</th><th>Umsatz</th></tr></thead>
+        <tbody>
+          ${emps.filter(e => e.mitglieder > 0).map(em => `<tr>
+            <td style="text-align:left;">${em.name}</td>
+            <td>${em.mitglieder}</td>
+            <td class="umsatz-val">${eur(em.mitglUmsatz)}</td>
+          </tr>`).join('')}
+          <tr class="total-row">
+            <td style="text-align:left;">Gesamt</td>
+            <td>${totals.mitglieder}</td>
+            <td class="umsatz-val">${eur(totals.mitglUmsatz)}</td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>`;
+  }
+
+  content.innerHTML = html;
+}
+
+// ============================================================
+// Zieltableau
+// ============================================================
+const ZT_KPIS = ['Mitglieder','Mitgliedschaftsumsatz','Umsatzerlöse','Gesamtleistung','Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten','Betriebsergebnis'];
+const ZT_KOSTEN = new Set(['Personalkosten','Raumkosten','Versich./Beiträge','Werbe-/Reisekosten','Abschreibungen','Sonstige Kosten','Gesamtkosten']);
+const ZT_MONTHS = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+
+function loadZieltableau() {
+  navigate('screen-zieltableau');
+  const locSel = document.getElementById('zt-location');
+  locSel.innerHTML = '';
+  (_locsCache || []).forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.id; opt.textContent = l.name;
+    locSel.appendChild(opt);
+  });
+  const yrSel = document.getElementById('zt-year');
+  yrSel.innerHTML = '';
+  const curY = new Date().getFullYear();
+  for (let y = curY - 1; y <= curY + 1; y++) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    if (y === curY) opt.selected = true;
+    yrSel.appendChild(opt);
+  }
+  renderZieltableau();
+}
+
+async function renderZieltableau() {
+  const locId = document.getElementById('zt-location').value;
+  const year  = parseInt(document.getElementById('zt-year').value);
+  const content = document.getElementById('zt-content');
+  if (!locId) { content.innerHTML = '<div class="spinner">Standort wählen …</div>'; return; }
+  content.innerHTML = '<div class="spinner">Lade …</div>';
+
+  const { data: budgets } = await db.from('budgets')
+    .select('kpi,soll,ist,year,month')
+    .eq('location_id', locId).eq('year', year);
+
+  const nowM = new Date().getMonth() + 1;
+  const nowY = new Date().getFullYear();
+  const maxM = year < nowY ? 12 : (year === nowY ? nowM : 0);
+
+  // Build map kpi → month → {soll, ist}
+  const map = {};
+  ZT_KPIS.forEach(k => { map[k] = {}; for(let m=1;m<=12;m++) map[k][m]={soll:0,ist:null}; });
+  (budgets||[]).forEach(b => { if(map[b.kpi]) { map[b.kpi][b.month].soll=b.soll||0; if(b.ist!=null) map[b.kpi][b.month].ist=b.ist; } });
+
+  const fmtN = (v, isMitgl) => v == null ? '–' : (isMitgl ? Math.round(v).toLocaleString('de-DE') : Math.round(v).toLocaleString('de-DE') + ' €');
+  const cellBg = (soll, ist, kosten) => {
+    if (ist == null || soll === 0) return '';
+    const pct = ist / soll;
+    if (kosten) return pct <= 1.0 ? 'background:#dcfce7' : pct <= 1.15 ? 'background:#fef9c3' : 'background:#fee2e2';
+    return pct >= 0.9 ? 'background:#dcfce7' : pct >= 0.7 ? 'background:#fef9c3' : 'background:#fee2e2';
+  };
+
+  let html = '<div class="zt-wrap"><table class="zt-table"><thead><tr><th>KPI</th>';
+  for (let m=1;m<=12;m++) {
+    const cur = year===nowY && m===nowM;
+    html += `<th${cur?' class="zt-current"':''}>${ZT_MONTHS[m-1]}</th>`;
+  }
+  html += '<th class="zt-ytd">YTD</th></tr></thead><tbody>';
+
+  ZT_KPIS.forEach(kpi => {
+    const kosten = ZT_KOSTEN.has(kpi);
+    const isMitgl = kpi === 'Mitglieder';
+    let ytdS=0, ytdI=0, ytdHas=false;
+    html += `<tr><td class="zt-kpi">${kpi}</td>`;
+    for (let m=1;m<=12;m++) {
+      const {soll,ist} = map[kpi][m];
+      const cur = year===nowY && m===nowM;
+      const bg = cellBg(soll,ist,kosten);
+      if (m<=maxM) { ytdS+=soll; if(ist!=null){ytdI+=ist;ytdHas=true;} }
+      html += `<td${cur?' class="zt-current"':''} style="${bg}"><div class="zt-soll">${fmtN(soll,isMitgl)}</div><div class="zt-ist">${fmtN(ist,isMitgl)}</div></td>`;
+    }
+    const ytdBg = ytdHas ? cellBg(ytdS,ytdI,kosten) : '';
+    html += `<td class="zt-ytd" style="${ytdBg}"><div class="zt-soll">${ytdS?fmtN(ytdS,isMitgl):'–'}</div><div class="zt-ist">${ytdHas?fmtN(ytdI,isMitgl):'–'}</div></td></tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:10px;padding:0 4px;">🟢 Soll erreicht &nbsp; 🟡 70–90% &nbsp; 🔴 &lt; 70% &nbsp;|&nbsp; Soll oben (grau) · Ist unten (fett)</div>';
+  content.innerHTML = html;
+}
+
+function printZieltableau() {
+  const locSel = document.getElementById('zt-location');
+  const locName = locSel.options[locSel.selectedIndex]?.text || '';
+  const year = document.getElementById('zt-year').value;
+  const tableHtml = document.getElementById('zt-content').innerHTML;
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Zieltableau ${year}</title><style>
+    body{font-family:-apple-system,sans-serif;padding:20px;color:#1a1a1a;}
+    h1{color:#b5465a;font-size:20px;margin-bottom:4px;}
+    .meta{color:#6b7280;font-size:13px;margin-bottom:20px;}
+    .zt-wrap{overflow-x:auto;}
+    table{border-collapse:collapse;font-size:10px;white-space:nowrap;}
+    thead th{background:#b5465a;color:white;padding:6px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.2);}
+    thead th:first-child{text-align:left;min-width:130px;}
+    thead th.zt-current{background:#8f3547;}
+    thead th.zt-ytd{background:#374151;border-left:2px solid white;}
+    tbody td{padding:4px 7px;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;text-align:center;}
+    tbody td.zt-kpi{text-align:left;font-weight:600;font-size:10px;background:white;min-width:130px;border-right:2px solid #e5e7eb;}
+    tbody td.zt-current{border-left:1px solid #b5465a;border-right:1px solid #b5465a;}
+    tbody td.zt-ytd{border-left:2px solid #374151;}
+    .zt-soll{font-size:9px;color:#6b7280;line-height:1.2;}
+    .zt-ist{font-size:11px;font-weight:700;line-height:1.4;}
+    .spinner{display:none;}
+    @media print{@page{size:landscape;margin:10mm;}}
+  </style></head><body>
+  <h1>🎯 Zieltableau ${year}</h1>
+  <div class="meta">Standort: ${locName} · Erstellt: ${new Date().toLocaleDateString('de-DE')}</div>
+  ${tableHtml}
+  </body></html>`);
+  win.document.close(); win.print();
 }
 
 // Register service worker
