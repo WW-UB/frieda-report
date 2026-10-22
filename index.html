@@ -281,6 +281,14 @@
     </div>
   </button>
 
+  <button class="menu-btn" onclick="loadNichtAbschluesse()">
+    <span class="menu-icon">❌</span>
+    <div>
+      <div class="menu-label">Nicht-Abschlüsse</div>
+      <div class="menu-desc">Kein Abschluss eintragen &amp; Liste</div>
+    </div>
+  </button>
+
   <button class="menu-btn" onclick="loadZiele()">
     <span class="menu-icon">🎯</span>
     <div>
@@ -667,6 +675,38 @@
   <div style="height:30px;"></div>
 </div>
 
+<!-- ======================== NICHT-ABSCHLÜSSE ======================== -->
+<div class="screen" id="screen-nichtabschluesse">
+  <form id="form-nichtabschluss" onsubmit="submitNichtAbschluss(event)">
+    <div class="card">
+      <div class="card-title">Neuer Nicht-Abschluss</div>
+      <label>Datum</label>
+      <input type="date" id="nab-date" required />
+      <label>Kundenname</label>
+      <input type="text" id="nab-customer" placeholder="Vorname Nachname" />
+      <label>Produkt</label>
+      <select id="nab-product">
+        <option value="shaper">Shaper</option>
+        <option value="chair">Chair</option>
+        <option value="acp">ACP</option>
+        <option value="boots">Boots/Ballancer</option>
+        <option value="fitness">Fitness</option>
+        <option value="reha">Reha</option>
+      </select>
+      <label>Grund (optional)</label>
+      <textarea id="nab-grund" placeholder="Warum kein Abschluss?" style="min-height:60px;"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">💾 Nicht-Abschluss speichern</button>
+    <button type="button" class="btn btn-secondary" onclick="goBack()">Abbrechen</button>
+    <div style="height:20px;"></div>
+  </form>
+  <div class="card">
+    <div class="card-title">Meine letzten Nicht-Abschlüsse</div>
+    <div id="nab-list"><div class="spinner">Lade …</div></div>
+  </div>
+  <div style="height:30px;"></div>
+</div>
+
 <!-- ======================== CONTROLLING ======================== -->
 <div class="screen" id="screen-controlling">
   <div class="card">
@@ -731,7 +771,8 @@ function updateHeader(screenId) {
     'screen-admin':        'Mitarbeiterverwaltung',
     'screen-report':       'Report drucken',
     'screen-zieltableau':  'Zieltableau',
-    'screen-abschluesse':   'Abschlüsse',
+    'screen-abschluesse':        'Abschlüsse',
+    'screen-nichtabschluesse':   'Nicht-Abschlüsse',
     'screen-controlling':   'Abschlussquoten',
     'screen-ziele':         'Meine Ziele',
     'screen-ziele-setzen':  'Ziele setzen',
@@ -1190,6 +1231,38 @@ async function loadTeamPanel(from, to, location) {
     </div></div>`;
   });
   html+='</div>';
+
+  // Ranglisten
+  const byAq = emps.filter(em=>{const tAll=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge+em[p].nein,0);return tAll>0;})
+    .sort((a,b)=>{
+      const aAll=PRODUCTS.reduce((s,p)=>s+a[p].ab+a[p].folge+a[p].nein,0);
+      const bAll=PRODUCTS.reduce((s,p)=>s+b[p].ab+b[p].folge+b[p].nein,0);
+      const aAb=PRODUCTS.reduce((s,p)=>s+a[p].ab+a[p].folge,0);
+      const bAb=PRODUCTS.reduce((s,p)=>s+b[p].ab+b[p].folge,0);
+      return (bAb/bAll)-(aAb/aAll);
+    });
+  const byUm = emps.filter(em=>PRODUCTS.reduce((s,p)=>s+em[p].umsatz,0)>0)
+    .sort((a,b)=>PRODUCTS.reduce((s,p)=>s+b[p].umsatz,0)-PRODUCTS.reduce((s,p)=>s+a[p].umsatz,0));
+
+  if(byAq.length>0){
+    html+=`<div class="card" style="margin-top:8px"><div class="card-title">🏆 Rangliste AQ</div><table class="overview-table"><thead><tr><th style="text-align:left">#</th><th>Name</th><th>AQ</th><th>Ab.</th></tr></thead><tbody>`;
+    byAq.forEach((em,i)=>{
+      const tAb=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge,0);
+      const tAll=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge+em[p].nein,0);
+      html+=`<tr><td style="color:var(--muted)">${i+1}</td><td>${em.name}</td><td class="pct-val">${pct(tAb,tAll)}</td><td>${tAb}</td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  }
+  if(byUm.length>0){
+    html+=`<div class="card" style="margin-top:8px"><div class="card-title">💰 Rangliste Umsatz</div><table class="overview-table"><thead><tr><th style="text-align:left">#</th><th>Name</th><th>Umsatz</th><th>Ab.</th></tr></thead><tbody>`;
+    byUm.forEach((em,i)=>{
+      const tU=PRODUCTS.reduce((s,p)=>s+em[p].umsatz,0);
+      const tAb=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge,0);
+      html+=`<tr><td style="color:var(--muted)">${i+1}</td><td>${em.name}</td><td class="umsatz-val">${tU.toFixed(0)}€</td><td>${tAb}</td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  }
+
   panel.innerHTML=html;
 }
 
@@ -1786,6 +1859,60 @@ async function submitAbschluss(e) {
   e.target.reset();
   document.getElementById('ab-date').value = new Date().toISOString().split('T')[0];
   await refreshAbschlussListe();
+}
+
+// ============================================================
+// Nicht-Abschlüsse
+// ============================================================
+async function loadNichtAbschluesse() {
+  navigate('screen-nichtabschluesse');
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('nab-date').value = today;
+  document.getElementById('nab-customer').value = '';
+  document.getElementById('nab-grund').value = '';
+  await refreshNichtAbschlussListe();
+}
+
+async function refreshNichtAbschlussListe() {
+  const list = document.getElementById('nab-list');
+  list.innerHTML = '<div class="spinner">Lade …</div>';
+  const { data, error } = await db.from('nichtabschluesse')
+    .select('*, employees(name)')
+    .eq('employee_id', currentEmployee.id)
+    .order('date', { ascending: false })
+    .limit(30);
+  if (error || !data || data.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:14px;">Noch keine Nicht-Abschlüsse eingetragen.</div>';
+    return;
+  }
+  const prodLabels = {shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Ballancer',fitness:'Fitness',reha:'Reha'};
+  list.innerHTML = data.map(n => `
+    <div class="entry-item">
+      <div>
+        <div class="entry-name">${n.customer_name || '(kein Name)'}</div>
+        <div class="entry-meta">${n.date} · ${prodLabels[n.product]||n.product||'–'}${n.grund ? ' · ' + n.grund : ''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function submitNichtAbschluss(e) {
+  e.preventDefault();
+  const row = {
+    date:          document.getElementById('nab-date').value,
+    customer_name: document.getElementById('nab-customer').value || null,
+    product:       document.getElementById('nab-product').value,
+    grund:         document.getElementById('nab-grund').value || null,
+    employee_id:   currentEmployee.id,
+    location_id:   currentLocationId,
+  };
+  const { error } = await db.from('nichtabschluesse').insert([row]);
+  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
+  showToast('✅ Nicht-Abschluss gespeichert!');
+  document.getElementById('nab-customer').value = '';
+  document.getElementById('nab-grund').value = '';
+  document.getElementById('nab-date').value = new Date().toISOString().split('T')[0];
+  await refreshNichtAbschlussListe();
 }
 
 // ============================================================
