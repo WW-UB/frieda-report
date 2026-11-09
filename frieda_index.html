@@ -281,6 +281,14 @@
     </div>
   </button>
 
+  <button class="menu-btn" onclick="loadNichtAbschluesse()">
+    <span class="menu-icon">❌</span>
+    <div>
+      <div class="menu-label">Nicht-Abschlüsse</div>
+      <div class="menu-desc">Kein Abschluss eintragen &amp; Liste</div>
+    </div>
+  </button>
+
   <button class="menu-btn" onclick="loadZiele()">
     <span class="menu-icon">🎯</span>
     <div>
@@ -647,6 +655,18 @@
   <form id="form-abschluss" onsubmit="submitAbschluss(event)">
     <div class="card">
       <div class="card-title">Neuer Abschluss</div>
+      <label>Kundenname</label>
+      <input type="text" id="ab-customer" placeholder="Vorname Nachname" />
+      <label>Produkt</label>
+      <select id="ab-product">
+        <option value="mitgliedschaft">Mitgliedschaft</option>
+        <option value="shaper">Shaper</option>
+        <option value="chair">Chair</option>
+        <option value="acp">ACP</option>
+        <option value="boots">Boots / Ballancer</option>
+        <option value="fitness">Fitness</option>
+        <option value="reha">Reha</option>
+      </select>
       <label>Datum Abschluss</label>
       <input type="date" id="ab-date" required />
       <label>Startdatum Mitgliedschaft</label>
@@ -654,7 +674,7 @@
       <label>Umsatz (€)</label>
       <input type="number" step="0.01" min="0" id="ab-umsatz" placeholder="0,00" />
       <label>Notiz (optional)</label>
-      <textarea id="ab-notiz" placeholder="z.B. Mitgliedschaftsart, Dauer …" style="min-height:60px;"></textarea>
+      <textarea id="ab-notiz" placeholder="z.B. Laufzeit, Besonderheiten …" style="min-height:60px;"></textarea>
     </div>
     <button type="submit" class="btn btn-primary">💾 Abschluss speichern</button>
     <button type="button" class="btn btn-secondary" onclick="goBack()">Abbrechen</button>
@@ -663,6 +683,38 @@
   <div class="card">
     <div class="card-title">Meine letzten Abschlüsse</div>
     <div id="ab-list"><div class="spinner">Lade …</div></div>
+  </div>
+  <div style="height:30px;"></div>
+</div>
+
+<!-- ======================== NICHT-ABSCHLÜSSE ======================== -->
+<div class="screen" id="screen-nichtabschluesse">
+  <form id="form-nichtabschluss" onsubmit="submitNichtAbschluss(event)">
+    <div class="card">
+      <div class="card-title">Neuer Nicht-Abschluss</div>
+      <label>Datum</label>
+      <input type="date" id="nab-date" required />
+      <label>Kundenname</label>
+      <input type="text" id="nab-customer" placeholder="Vorname Nachname" />
+      <label>Produkt</label>
+      <select id="nab-product">
+        <option value="shaper">Shaper</option>
+        <option value="chair">Chair</option>
+        <option value="acp">ACP</option>
+        <option value="boots">Boots/Ballancer</option>
+        <option value="fitness">Fitness</option>
+        <option value="reha">Reha</option>
+      </select>
+      <label>Grund (optional)</label>
+      <textarea id="nab-grund" placeholder="Warum kein Abschluss?" style="min-height:60px;"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">💾 Nicht-Abschluss speichern</button>
+    <button type="button" class="btn btn-secondary" onclick="goBack()">Abbrechen</button>
+    <div style="height:20px;"></div>
+  </form>
+  <div class="card">
+    <div class="card-title">Meine letzten Nicht-Abschlüsse</div>
+    <div id="nab-list"><div class="spinner">Lade …</div></div>
   </div>
   <div style="height:30px;"></div>
 </div>
@@ -731,7 +783,8 @@ function updateHeader(screenId) {
     'screen-admin':        'Mitarbeiterverwaltung',
     'screen-report':       'Report drucken',
     'screen-zieltableau':  'Zieltableau',
-    'screen-abschluesse':   'Abschlüsse',
+    'screen-abschluesse':        'Abschlüsse',
+    'screen-nichtabschluesse':   'Nicht-Abschlüsse',
     'screen-controlling':   'Abschlussquoten',
     'screen-ziele':         'Meine Ziele',
     'screen-ziele-setzen':  'Ziele setzen',
@@ -1190,6 +1243,38 @@ async function loadTeamPanel(from, to, location) {
     </div></div>`;
   });
   html+='</div>';
+
+  // Ranglisten
+  const byAq = emps.filter(em=>{const tAll=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge+em[p].nein,0);return tAll>0;})
+    .sort((a,b)=>{
+      const aAll=PRODUCTS.reduce((s,p)=>s+a[p].ab+a[p].folge+a[p].nein,0);
+      const bAll=PRODUCTS.reduce((s,p)=>s+b[p].ab+b[p].folge+b[p].nein,0);
+      const aAb=PRODUCTS.reduce((s,p)=>s+a[p].ab+a[p].folge,0);
+      const bAb=PRODUCTS.reduce((s,p)=>s+b[p].ab+b[p].folge,0);
+      return (bAb/bAll)-(aAb/aAll);
+    });
+  const byUm = emps.filter(em=>PRODUCTS.reduce((s,p)=>s+em[p].umsatz,0)>0)
+    .sort((a,b)=>PRODUCTS.reduce((s,p)=>s+b[p].umsatz,0)-PRODUCTS.reduce((s,p)=>s+a[p].umsatz,0));
+
+  if(byAq.length>0){
+    html+=`<div class="card" style="margin-top:8px"><div class="card-title">🏆 Rangliste AQ</div><table class="overview-table"><thead><tr><th style="text-align:left">#</th><th>Name</th><th>AQ</th><th>Ab.</th></tr></thead><tbody>`;
+    byAq.forEach((em,i)=>{
+      const tAb=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge,0);
+      const tAll=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge+em[p].nein,0);
+      html+=`<tr><td style="color:var(--muted)">${i+1}</td><td>${em.name}</td><td class="pct-val">${pct(tAb,tAll)}</td><td>${tAb}</td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  }
+  if(byUm.length>0){
+    html+=`<div class="card" style="margin-top:8px"><div class="card-title">💰 Rangliste Umsatz</div><table class="overview-table"><thead><tr><th style="text-align:left">#</th><th>Name</th><th>Umsatz</th><th>Ab.</th></tr></thead><tbody>`;
+    byUm.forEach((em,i)=>{
+      const tU=PRODUCTS.reduce((s,p)=>s+em[p].umsatz,0);
+      const tAb=PRODUCTS.reduce((s,p)=>s+em[p].ab+em[p].folge,0);
+      html+=`<tr><td style="color:var(--muted)">${i+1}</td><td>${em.name}</td><td class="umsatz-val">${tU.toFixed(0)}€</td><td>${tAb}</td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  }
+
   panel.innerHTML=html;
 }
 
@@ -1736,10 +1821,14 @@ async function saveZiele() {
 // ============================================================
 // Abschlüsse
 // ============================================================
+const AB_PROD_LABELS = {mitgliedschaft:'Mitgliedschaft',shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Ballancer',fitness:'Fitness',reha:'Reha'};
+
 async function loadAbschluesse() {
   navigate('screen-abschluesse');
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('ab-date').value = today;
+  document.getElementById('ab-customer').value = '';
+  document.getElementById('ab-product').value = 'mitgliedschaft';
   document.getElementById('ab-start-date').value = '';
   document.getElementById('ab-umsatz').value = '';
   document.getElementById('ab-notiz').value = '';
@@ -1753,7 +1842,7 @@ async function refreshAbschlussListe() {
     .select('*, employees(name)')
     .eq('employee_id', currentEmployee.id)
     .order('date', { ascending: false })
-    .limit(30);
+    .limit(50);
   if (error || !data || data.length === 0) {
     list.innerHTML = '<div style="color:var(--muted);font-size:14px;">Noch keine Abschlüsse eingetragen.</div>';
     return;
@@ -1761,31 +1850,108 @@ async function refreshAbschlussListe() {
   const fmt = v => v != null ? Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '–';
   list.innerHTML = data.map(a => `
     <div class="entry-item">
-      <div>
-        <div class="entry-name">${a.date}</div>
-        <div class="entry-meta">Start: ${a.start_date || '–'} · ${a.notizen || ''}</div>
+      <div style="flex:1">
+        <div class="entry-name">${a.customer_name || '(kein Name)'}</div>
+        <div class="entry-meta">${a.date} · ${AB_PROD_LABELS[a.product]||a.product||'Mitgliedschaft'}${a.start_date ? ' · Start: '+a.start_date : ''}${a.notizen ? ' · '+a.notizen : ''}</div>
       </div>
-      ${a.umsatz ? `<div class="entry-badge">${fmt(a.umsatz)}</div>` : ''}
+      <div style="display:flex;align-items:center;gap:8px">
+        ${a.umsatz ? `<div class="entry-badge">${fmt(a.umsatz)}</div>` : ''}
+        <button onclick="deleteAbschluss('${a.id}')" style="background:none;border:none;color:#dc2626;font-size:18px;cursor:pointer;padding:4px">✕</button>
+      </div>
     </div>
   `).join('');
+}
+
+async function deleteAbschluss(id) {
+  if (!confirm('Abschluss wirklich löschen?')) return;
+  const { error } = await db.from('abschluesse').delete().eq('id', id);
+  if (error) { showToast('❌ Fehler beim Löschen'); return; }
+  showToast('✅ Gelöscht');
+  await refreshAbschlussListe();
 }
 
 async function submitAbschluss(e) {
   e.preventDefault();
   const row = {
-    date:        document.getElementById('ab-date').value,
-    start_date:  document.getElementById('ab-start-date').value || null,
-    umsatz:      parseFloat(document.getElementById('ab-umsatz').value) || null,
-    notizen:     document.getElementById('ab-notiz').value || null,
-    employee_id: currentEmployee.id,
-    location_id: currentLocationId,
+    date:          document.getElementById('ab-date').value,
+    customer_name: document.getElementById('ab-customer').value || null,
+    product:       document.getElementById('ab-product').value || 'mitgliedschaft',
+    start_date:    document.getElementById('ab-start-date').value || null,
+    umsatz:        parseFloat(document.getElementById('ab-umsatz').value) || null,
+    notizen:       document.getElementById('ab-notiz').value || null,
+    employee_id:   currentEmployee.id,
+    location_id:   currentLocationId,
   };
   const { error } = await db.from('abschluesse').insert([row]);
   if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
   showToast('✅ Abschluss gespeichert!');
   e.target.reset();
   document.getElementById('ab-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('ab-product').value = 'mitgliedschaft';
   await refreshAbschlussListe();
+}
+
+// ============================================================
+// Nicht-Abschlüsse
+// ============================================================
+async function loadNichtAbschluesse() {
+  navigate('screen-nichtabschluesse');
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('nab-date').value = today;
+  document.getElementById('nab-customer').value = '';
+  document.getElementById('nab-grund').value = '';
+  await refreshNichtAbschlussListe();
+}
+
+async function refreshNichtAbschlussListe() {
+  const list = document.getElementById('nab-list');
+  list.innerHTML = '<div class="spinner">Lade …</div>';
+  const { data, error } = await db.from('nichtabschluesse')
+    .select('*, employees(name)')
+    .eq('employee_id', currentEmployee.id)
+    .order('date', { ascending: false })
+    .limit(30);
+  if (error || !data || data.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:14px;">Noch keine Nicht-Abschlüsse eingetragen.</div>';
+    return;
+  }
+  const prodLabels = {shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Ballancer',fitness:'Fitness',reha:'Reha'};
+  list.innerHTML = data.map(n => `
+    <div class="entry-item">
+      <div style="flex:1">
+        <div class="entry-name">${n.customer_name || '(kein Name)'}</div>
+        <div class="entry-meta">${n.date} · ${prodLabels[n.product]||n.product||'–'}${n.grund ? ' · ' + n.grund : ''}</div>
+      </div>
+      <button onclick="deleteNichtAbschluss('${n.id}')" style="background:none;border:none;color:#dc2626;font-size:18px;cursor:pointer;padding:4px">✕</button>
+    </div>
+  `).join('');
+}
+
+async function deleteNichtAbschluss(id) {
+  if (!confirm('Nicht-Abschluss wirklich löschen?')) return;
+  const { error } = await db.from('nichtabschluesse').delete().eq('id', id);
+  if (error) { showToast('❌ Fehler beim Löschen'); return; }
+  showToast('✅ Gelöscht');
+  await refreshNichtAbschlussListe();
+}
+
+async function submitNichtAbschluss(e) {
+  e.preventDefault();
+  const row = {
+    date:          document.getElementById('nab-date').value,
+    customer_name: document.getElementById('nab-customer').value || null,
+    product:       document.getElementById('nab-product').value,
+    grund:         document.getElementById('nab-grund').value || null,
+    employee_id:   currentEmployee.id,
+    location_id:   currentLocationId,
+  };
+  const { error } = await db.from('nichtabschluesse').insert([row]);
+  if (error) { showToast('❌ Fehler beim Speichern'); console.error(error); return; }
+  showToast('✅ Nicht-Abschluss gespeichert!');
+  document.getElementById('nab-customer').value = '';
+  document.getElementById('nab-grund').value = '';
+  document.getElementById('nab-date').value = new Date().toISOString().split('T')[0];
+  await refreshNichtAbschlussListe();
 }
 
 // ============================================================
@@ -1874,8 +2040,13 @@ async function renderControlling() {
     e.moti_e += c.moti_erreicht        || 0;
     e.moti_g += c.moti_gebucht         || 0;
   });
+  const AB_PRODS = ['mitgliedschaft','shaper','chair','acp','boots','fitness','reha'];
+  const AB_PROD_L = {mitgliedschaft:'Mitgl.',shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots',fitness:'Fitness',reha:'Reha'};
+
   (abschl || []).forEach(a => {
     const e = get(a.employees?.name || a.employee_id);
+    const prod = a.product || 'mitgliedschaft';
+    e[`p_${prod}`] = (e[`p_${prod}`] || 0) + 1;
     e.mitglieder++;
     e.mitglUmsatz += a.umsatz || 0;
   });
@@ -1886,61 +2057,52 @@ async function renderControlling() {
     return;
   }
 
+  const eur = v => v > 0 ? v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '–';
   const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + '%' : '–';
   const num  = (a, b) => b > 0 ? `${a}/${b}` : '–';
-  const eur  = v => v > 0 ? v.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €' : '–';
   const qCol = q => !q || q === '–' ? '' : (parseInt(q) >= 70 ? 'color:#16a34a;' : parseInt(q) >= 50 ? 'color:#ca8a04;' : 'color:#dc2626;');
   const pctCell = (a, b) => { const q = pct(a,b); return `<td><div style="font-weight:700;font-size:13px;${qCol(q)}">${q}</div><div style="font-size:10px;color:var(--muted)">${num(a,b)}</div></td>`; };
 
   // Totals
   const tot = emps.reduce((t, e) => {
-    t.pt_kal += e.pt_kal; t.pt_statt += e.pt_statt;
-    PRODUCTS.forEach(p => { t[`${p}_ab`]+=e[`${p}_ab`]; t[`${p}_nein`]+=e[`${p}_nein`]; t[`${p}_folge`]+=e[`${p}_folge`]; t[`${p}_umsatz`]+=e[`${p}_umsatz`]; });
-    t.aus+=e.aus; t.err+=e.err; t.geb+=e.geb; t.moti_d+=e.moti_d; t.moti_e+=e.moti_e; t.moti_g+=e.moti_g;
-    t.mitglieder+=e.mitglieder; t.mitglUmsatz+=e.mitglUmsatz;
+    AB_PRODS.forEach(p => { t[`p_${p}`] = (t[`p_${p}`]||0) + (e[`p_${p}`]||0); });
+    t.aus+=e.aus||0; t.err+=e.err||0; t.geb+=e.geb||0;
+    t.moti_d+=e.moti_d||0; t.moti_e+=e.moti_e||0; t.moti_g+=e.moti_g||0;
+    t.mitglieder+=e.mitglieder||0; t.mitglUmsatz+=e.mitglUmsatz||0;
     return t;
-  }, { pt_kal:0, pt_statt:0, ...Object.fromEntries(PRODUCTS.flatMap(p=>[[`${p}_ab`,0],[`${p}_nein`,0],[`${p}_folge`,0],[`${p}_umsatz`,0]])), aus:0,err:0,geb:0,moti_d:0,moti_e:0,moti_g:0,mitglieder:0,mitglUmsatz:0 });
+  }, { aus:0, err:0, geb:0, moti_d:0, moti_e:0, moti_g:0, mitglieder:0, mitglUmsatz:0 });
 
-  const totUmsatz = PRODUCTS.reduce((s,p)=>s+tot[`${p}_umsatz`],0);
-  const totAb     = PRODUCTS.reduce((s,p)=>s+tot[`${p}_ab`]+tot[`${p}_folge`],0);
-  const totAll    = PRODUCTS.reduce((s,p)=>s+tot[`${p}_ab`]+tot[`${p}_nein`]+tot[`${p}_folge`],0);
+  const hasAbschlData = emps.some(e => e.mitglieder > 0);
 
-  const prodLabels = { shaper:'Shaper', chair:'Chair', acp:'ACP', boots:'Boots', fitness:'Fitness', reha:'Reha' };
-
-  // ---- TABLE 1: Probetrainings + Produkte ----
-  let html = `<div class="card">
-    <div class="card-title">Probetrainings &amp; Abschlussquoten</div>
+  // ---- TABLE 1: Abschlüsse nach Produkt ----
+  let html = '';
+  if (hasAbschlData) {
+    html += `<div class="card">
+    <div class="card-title">Abschlüsse nach Produkt</div>
     <div class="overview-scroll"><table class="overview-table">
       <thead><tr>
         <th style="text-align:left;">Mitarbeiterin</th>
-        <th>PT<br><span style="font-size:9px;font-weight:400">Erscheinung</span></th>
-        ${PRODUCTS.map(p=>`<th>${prodLabels[p]}<br><span style="font-size:9px;font-weight:400">Quote</span></th>`).join('')}
-        <th>Gesamt<br><span style="font-size:9px;font-weight:400">Quote</span></th>
+        ${AB_PRODS.map(p=>`<th>${AB_PROD_L[p]}</th>`).join('')}
+        <th>Gesamt</th>
         <th>Umsatz</th>
       </tr></thead>
       <tbody>
-        ${emps.map(e => {
-          const empAb  = PRODUCTS.reduce((s,p)=>s+e[`${p}_ab`]+e[`${p}_folge`],0);
-          const empAll = PRODUCTS.reduce((s,p)=>s+e[`${p}_ab`]+e[`${p}_nein`]+e[`${p}_folge`],0);
-          const empUms = PRODUCTS.reduce((s,p)=>s+e[`${p}_umsatz`],0);
-          return `<tr>
+        ${emps.filter(e=>e.mitglieder>0).map(e => `<tr>
             <td style="text-align:left;">${e.name}</td>
-            ${pctCell(e.pt_statt, e.pt_kal)}
-            ${PRODUCTS.map(p => pctCell(e[`${p}_ab`]+e[`${p}_folge`], e[`${p}_ab`]+e[`${p}_nein`]+e[`${p}_folge`])).join('')}
-            ${pctCell(empAb, empAll)}
-            <td class="umsatz-val">${eur(empUms)}</td>
-          </tr>`;
-        }).join('')}
+            ${AB_PRODS.map(p=>`<td style="text-align:center;font-weight:${(e[`p_${p}`]||0)>0?'700':'400'};color:${(e[`p_${p}`]||0)>0?'inherit':'var(--muted)'}">${e[`p_${p}`]||'–'}</td>`).join('')}
+            <td style="text-align:center;font-weight:700">${e.mitglieder}</td>
+            <td class="umsatz-val">${eur(e.mitglUmsatz)}</td>
+          </tr>`).join('')}
         <tr class="total-row">
           <td style="text-align:left;">Gesamt</td>
-          ${pctCell(tot.pt_statt, tot.pt_kal)}
-          ${PRODUCTS.map(p => pctCell(tot[`${p}_ab`]+tot[`${p}_folge`], tot[`${p}_ab`]+tot[`${p}_nein`]+tot[`${p}_folge`])).join('')}
-          ${pctCell(totAb, totAll)}
-          <td class="umsatz-val">${eur(totUmsatz)}</td>
+          ${AB_PRODS.map(p=>`<td style="text-align:center">${tot[`p_${p}`]||'–'}</td>`).join('')}
+          <td style="text-align:center;font-weight:700">${tot.mitglieder}</td>
+          <td class="umsatz-val">${eur(tot.mitglUmsatz)}</td>
         </tr>
       </tbody>
     </table></div>
   </div>`;
+  }
 
   // ---- TABLE 2: Anrufe ----
   const hasCallData = emps.some(e => e.aus > 0 || e.moti_d > 0);
@@ -1978,28 +2140,7 @@ async function renderControlling() {
     </div>`;
   }
 
-  // ---- TABLE 3: Mitgliedschaftsabschlüsse ----
-  if (tot.mitglieder > 0) {
-    html += `<div class="card"><div class="card-title">Mitgliedschaftsabschlüsse</div>
-      <div class="overview-scroll"><table class="overview-table">
-        <thead><tr><th style="text-align:left;">Mitarbeiterin</th><th>Anzahl</th><th>Umsatz</th></tr></thead>
-        <tbody>
-          ${emps.filter(e=>e.mitglieder>0).map(e=>`<tr>
-            <td style="text-align:left;">${e.name}</td>
-            <td>${e.mitglieder}</td>
-            <td class="umsatz-val">${eur(e.mitglUmsatz)}</td>
-          </tr>`).join('')}
-          <tr class="total-row">
-            <td style="text-align:left;">Gesamt</td>
-            <td>${tot.mitglieder}</td>
-            <td class="umsatz-val">${eur(tot.mitglUmsatz)}</td>
-          </tr>
-        </tbody>
-      </table></div>
-    </div>`;
-  }
-
-  content.innerHTML = html;
+  content.innerHTML = html || '<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Daten für diesen Zeitraum.</div>';
 }
 
 // ============================================================
