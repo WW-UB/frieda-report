@@ -2005,10 +2005,15 @@ async function renderControlling() {
   if (locId !== 'all') callQ = callQ.eq('location_id', locId);
   const { data: callRows } = await callQ;
 
-  // --- Mitgliedschaftsabschlüsse ---
-  let abQ = db.from('abschluesse').select('employee_id,employees(name),umsatz').gte('date', fromDate).lte('date', toDate);
+  // --- Abschlüsse (mit Produkt) ---
+  let abQ = db.from('abschluesse').select('employee_id,employees(name),umsatz,product').gte('date', fromDate).lte('date', toDate);
   if (locId !== 'all') abQ = abQ.eq('location_id', locId);
   const { data: abschl } = await abQ;
+
+  // --- Nicht-Abschlüsse (mit Produkt) ---
+  let nabQ = db.from('nichtabschluesse').select('employee_id,employees(name),product').gte('date', fromDate).lte('date', toDate);
+  if (locId !== 'all') nabQ = nabQ.eq('location_id', locId);
+  const { data: nabschl } = await nabQ;
 
   // --- Aggregation ---
   const empMap = {};
@@ -2050,6 +2055,12 @@ async function renderControlling() {
     e.mitglieder++;
     e.mitglUmsatz += a.umsatz || 0;
   });
+  (nabschl || []).forEach(n => {
+    const e = get(n.employees?.name || n.employee_id);
+    const prod = n.product || 'mitgliedschaft';
+    e[`nab_${prod}`] = (e[`nab_${prod}`] || 0) + 1;
+    e.nabTotal = (e.nabTotal || 0) + 1;
+  });
 
   const emps = Object.values(empMap).sort((a, b) => a.name.localeCompare(b.name));
   if (emps.length === 0) {
@@ -2074,29 +2085,55 @@ async function renderControlling() {
 
   const hasAbschlData = emps.some(e => e.mitglieder > 0);
 
-  // ---- TABLE 1: Abschlüsse nach Produkt ----
+  const aq = (ab, nab) => { const tot = ab + nab; return tot > 0 ? Math.round(ab/tot*100) + '%' : '–'; };
+  const aqCol = q => !q || q === '–' ? '' : (parseInt(q) >= 70 ? 'color:#16a34a;font-weight:700' : parseInt(q) >= 50 ? 'color:#ca8a04;font-weight:700' : 'color:#dc2626;font-weight:700');
+
+  // ---- TABLE 1: Abschlüsse + AQ nach Produkt ----
   let html = '';
-  if (hasAbschlData) {
+  if (hasAbschlData || (nabschl||[]).length > 0) {
+    const relevantEmps = emps.filter(e => e.mitglieder > 0 || e.nabTotal > 0);
     html += `<div class="card">
-    <div class="card-title">Abschlüsse nach Produkt</div>
+    <div class="card-title">Abschlussquoten nach Produkt</div>
     <div class="overview-scroll"><table class="overview-table">
-      <thead><tr>
-        <th style="text-align:left;">Mitarbeiterin</th>
-        ${AB_PRODS.map(p=>`<th>${AB_PROD_L[p]}</th>`).join('')}
-        <th>Gesamt</th>
-        <th>Umsatz</th>
-      </tr></thead>
+      <thead>
+        <tr>
+          <th style="text-align:left;">Mitarbeiterin</th>
+          ${AB_PRODS.map(p=>`<th>${AB_PROD_L[p]}</th>`).join('')}
+          <th>Gesamt AQ</th>
+          <th>Umsatz</th>
+        </tr>
+        <tr style="font-size:10px;color:var(--muted)">
+          <th></th>
+          ${AB_PRODS.map(()=>`<th>AB / AQ</th>`).join('')}
+          <th></th><th></th>
+        </tr>
+      </thead>
       <tbody>
-        ${emps.filter(e=>e.mitglieder>0).map(e => `<tr>
+        ${relevantEmps.map(e => {
+          const totAb = e.mitglieder || 0;
+          const totNab = e.nabTotal || 0;
+          const gesamtAq = aq(totAb, totNab);
+          return `<tr>
             <td style="text-align:left;">${e.name}</td>
-            ${AB_PRODS.map(p=>`<td style="text-align:center;font-weight:${(e[`p_${p}`]||0)>0?'700':'400'};color:${(e[`p_${p}`]||0)>0?'inherit':'var(--muted)'}">${e[`p_${p}`]||'–'}</td>`).join('')}
-            <td style="text-align:center;font-weight:700">${e.mitglieder}</td>
-            <td class="umsatz-val">${eur(e.mitglUmsatz)}</td>
-          </tr>`).join('')}
+            ${AB_PRODS.map(p => {
+              const ab = e[`p_${p}`]||0;
+              const nab = e[`nab_${p}`]||0;
+              const q = aq(ab, nab);
+              return `<td style="text-align:center"><div style="${aqCol(q)}">${q}</div><div style="font-size:10px;color:var(--muted)">${ab>0||nab>0?ab+'/'+(ab+nab):''}</div></td>`;
+            }).join('')}
+            <td style="text-align:center;${aqCol(gesamtAq)}">${gesamtAq}<div style="font-size:10px;color:var(--muted);font-weight:400">${totAb}/${totAb+totNab}</div></td>
+            <td class="umsatz-val">${eur(e.mitglUmsatz||0)}</td>
+          </tr>`;
+        }).join('')}
         <tr class="total-row">
           <td style="text-align:left;">Gesamt</td>
-          ${AB_PRODS.map(p=>`<td style="text-align:center">${tot[`p_${p}`]||'–'}</td>`).join('')}
-          <td style="text-align:center;font-weight:700">${tot.mitglieder}</td>
+          ${AB_PRODS.map(p => {
+            const ab = tot[`p_${p}`]||0;
+            const nab = relevantEmps.reduce((s,e)=>s+(e[`nab_${p}`]||0),0);
+            const q = aq(ab, nab);
+            return `<td style="text-align:center"><div style="${aqCol(q)}">${q}</div><div style="font-size:10px;color:var(--muted);font-weight:400">${ab>0||nab>0?ab+'/'+(ab+nab):''}</div></td>`;
+          }).join('')}
+          <td style="text-align:center;${aqCol(aq(tot.mitglieder, relevantEmps.reduce((s,e)=>s+(e.nabTotal||0),0)))}">${aq(tot.mitglieder, relevantEmps.reduce((s,e)=>s+(e.nabTotal||0),0))}<div style="font-size:10px;color:var(--muted);font-weight:400">${tot.mitglieder}/${tot.mitglieder+relevantEmps.reduce((s,e)=>s+(e.nabTotal||0),0)}</div></td>
           <td class="umsatz-val">${eur(tot.mitglUmsatz)}</td>
         </tr>
       </tbody>
