@@ -345,6 +345,13 @@
         <div class="menu-desc">Quote pro Mitarbeiterin &amp; Gesamt</div>
       </div>
     </button>
+    <button class="menu-btn" onclick="loadProduktZieleScreen()">
+      <span class="menu-icon">🎯</span>
+      <div>
+        <div class="menu-label">Produktziele</div>
+        <div class="menu-desc">Monatsziele je Produkt &amp; Standort</div>
+      </div>
+    </button>
     <button class="menu-btn" onclick="loadZieleSetzen()">
       <span class="menu-icon">⚙️</span>
       <div>
@@ -640,6 +647,19 @@
   <div style="height:30px;"></div>
 </div>
 
+<!-- ======================== PRODUKTZIELE ======================== -->
+<div class="screen" id="screen-produktziele">
+  <div class="card">
+    <div class="card-title">Standort &amp; Jahr</div>
+    <div style="display:flex;gap:8px">
+      <select id="pz-location" onchange="loadProduktZiele()" style="flex:2"></select>
+      <select id="pz-year" onchange="loadProduktZiele()" style="flex:1"></select>
+    </div>
+  </div>
+  <div id="pz-content"><div class="spinner">Lade …</div></div>
+  <div style="height:30px;"></div>
+</div>
+
 <!-- ======================== ZIELE SETZEN ======================== -->
 <div class="screen" id="screen-ziele-setzen">
   <div class="card">
@@ -675,6 +695,10 @@
       <input type="number" step="0.01" min="0" id="ab-umsatz" placeholder="0,00" />
       <label>Notiz (optional)</label>
       <textarea id="ab-notiz" placeholder="z.B. Laufzeit, Besonderheiten …" style="min-height:60px;"></textarea>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <input type="checkbox" id="ab-is-folge" style="width:auto;margin:0;" />
+        <label for="ab-is-folge" style="margin:0;color:var(--text);font-size:14px;">🔄 Folgeabschluss</label>
+      </div>
     </div>
     <button type="submit" class="btn btn-primary">💾 Abschluss speichern</button>
     <button type="button" class="btn btn-secondary" onclick="goBack()">Abbrechen</button>
@@ -788,6 +812,7 @@ function updateHeader(screenId) {
     'screen-controlling':   'Abschlussquoten',
     'screen-ziele':         'Meine Ziele',
     'screen-ziele-setzen':  'Ziele setzen',
+    'screen-produktziele':  'Produktziele',
   };
   document.getElementById('header-title').textContent = titles[screenId] || 'Frieda Report';
   const sub = currentEmployee ? `${currentEmployee.name} · ${currentLocation}` : '';
@@ -1730,6 +1755,109 @@ async function renderZiele() {
 }
 
 // ============================================================
+// Produktziele
+// ============================================================
+const PZ_COLS = ['mitglieder','shaper','chair','acp','boots','fitness','reha'];
+const PZ_LABELS = {mitglieder:'Mitgl.',shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots',fitness:'Fitness',reha:'Reha'};
+const PZ_MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+let _pzGoalMap = {};
+
+function loadProduktZieleScreen() {
+  navigate('screen-produktziele');
+  const now = new Date(); const year = now.getFullYear();
+  const locSel = document.getElementById('pz-location');
+  locSel.innerHTML = (_locsCache||[]).map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+  const yearSel = document.getElementById('pz-year');
+  yearSel.innerHTML = [year-1,year,year+1].map(y=>`<option value="${y}" ${y===year?'selected':''}>${y}</option>`).join('');
+  loadProduktZiele();
+}
+
+async function loadProduktZiele() {
+  const locId = document.getElementById('pz-location').value;
+  const year  = parseInt(document.getElementById('pz-year').value);
+  if (!locId) return;
+  document.getElementById('pz-content').innerHTML = '<div class="spinner">Lade …</div>';
+  const { data } = await db.from('produkt_ziele').select('*').eq('location_id',locId).eq('year',year);
+  _pzGoalMap = {};
+  (data||[]).forEach(r => { _pzGoalMap[r.month] = r; });
+  renderProduktZieleTable(year);
+}
+
+function renderProduktZieleTable(year) {
+  const now = new Date(); const curM = now.getMonth()+1; const curY = now.getFullYear();
+  const totals = Object.fromEntries(PZ_COLS.map(c=>[c,0]));
+  const rows = PZ_MONTHS.map((name,i) => {
+    const m = i+1; const g = _pzGoalMap[m]||{};
+    PZ_COLS.forEach(c => { totals[c] += g[c]||0; });
+    const isCur = m===curM && year===curY;
+    return `<tr onclick="editProduktZiel(${m})" style="cursor:pointer;${isCur?'background:#fdf4f5':''}">
+      <td style="padding:7px 10px;font-size:13px;white-space:nowrap;${isCur?'font-weight:700;color:var(--primary)':''}">${name.slice(0,3)}</td>
+      ${PZ_COLS.map(c=>`<td style="text-align:center;padding:7px 6px;font-size:13px;${(g[c]||0)>0?'font-weight:700':'color:var(--muted)'}">${g[c]||'–'}</td>`).join('')}
+    </tr>`;
+  }).join('');
+  document.getElementById('pz-content').innerHTML = `
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:14px 16px 10px;font-size:13px;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.5px">Monatsziele ${year}</div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;min-width:420px">
+          <thead><tr style="background:#f9eaed">
+            <th style="padding:8px 10px;text-align:left;font-size:11px;font-weight:700">Monat</th>
+            ${PZ_COLS.map(c=>`<th style="padding:8px 6px;text-align:center;font-size:11px;font-weight:700">${PZ_LABELS[c]}</th>`).join('')}
+          </tr></thead>
+          <tbody>${rows}</tbody>
+          <tfoot><tr style="border-top:2px solid var(--border);background:#fafafa">
+            <td style="padding:8px 10px;font-size:12px;font-weight:700">Gesamt</td>
+            ${PZ_COLS.map(c=>`<td style="text-align:center;padding:8px 6px;font-size:13px;font-weight:900">${totals[c]||'–'}</td>`).join('')}
+          </tr></tfoot>
+        </table>
+      </div>
+      <div style="padding:8px 16px 12px;font-size:11px;color:var(--muted)">Auf einen Monat tippen zum Bearbeiten.</div>
+    </div>
+    <div id="pz-edit-wrap"></div>`;
+}
+
+function editProduktZiel(month) {
+  const year = parseInt(document.getElementById('pz-year').value);
+  const g = _pzGoalMap[month] || {};
+  document.getElementById('pz-edit-wrap').innerHTML = `
+    <div class="card">
+      <div class="card-title">Ziele – ${PZ_MONTHS[month-1]} ${year}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${PZ_COLS.map(c=>`<div>
+          <label style="font-size:12px;color:var(--muted);margin-bottom:3px">${PZ_LABELS[c]}</label>
+          <input type="number" id="pz-${c}" value="${g[c]||''}" min="0" placeholder="0" style="margin-bottom:0;padding:10px 12px;font-size:15px">
+        </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-primary" style="flex:1" onclick="saveProduktZiel(${month})">Speichern</button>
+        ${g.id ? `<button class="btn btn-secondary" style="flex:0;padding:14px 16px;color:var(--primary)" onclick="deleteProduktZiel(${month})">Löschen</button>` : ''}
+      </div>
+    </div>`;
+  document.getElementById('pz-edit-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+async function saveProduktZiel(month) {
+  const locId = document.getElementById('pz-location').value;
+  const year  = parseInt(document.getElementById('pz-year').value);
+  const row = { location_id:locId, year, month,
+    ...Object.fromEntries(PZ_COLS.map(c=>[c,parseInt(document.getElementById('pz-'+c).value)||0])) };
+  const { error } = await db.from('produkt_ziele').upsert([row],{onConflict:'location_id,year,month'});
+  if (error) { showToast('❌ '+error.message); return; }
+  showToast('✅ Gespeichert');
+  await loadProduktZiele();
+}
+
+async function deleteProduktZiel(month) {
+  if (!confirm('Ziele für diesen Monat wirklich löschen?')) return;
+  const locId = document.getElementById('pz-location').value;
+  const year  = parseInt(document.getElementById('pz-year').value);
+  const { error } = await db.from('produkt_ziele').delete().eq('location_id',locId).eq('year',year).eq('month',month);
+  if (error) { showToast('❌ '+error.message); return; }
+  showToast('✅ Gelöscht');
+  await loadProduktZiele();
+}
+
+// ============================================================
 // Ziele setzen (Controller / Manager)
 // ============================================================
 function loadZieleSetzen() {
@@ -1823,15 +1951,16 @@ async function saveZiele() {
 // ============================================================
 const AB_PROD_LABELS = {mitgliedschaft:'Mitgliedschaft',shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Ballancer',fitness:'Fitness',reha:'Reha'};
 
-async function loadAbschluesse() {
+async function loadAbschluesse(prefill) {
   navigate('screen-abschluesse');
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('ab-date').value = today;
-  document.getElementById('ab-customer').value = '';
-  document.getElementById('ab-product').value = 'mitgliedschaft';
+  document.getElementById('ab-customer').value = prefill?.name || '';
+  document.getElementById('ab-product').value = prefill?.product || 'mitgliedschaft';
   document.getElementById('ab-start-date').value = '';
   document.getElementById('ab-umsatz').value = '';
   document.getElementById('ab-notiz').value = '';
+  document.getElementById('ab-is-folge').checked = prefill?.isFolge || false;
   await refreshAbschlussListe();
 }
 
@@ -1851,7 +1980,7 @@ async function refreshAbschlussListe() {
   list.innerHTML = data.map(a => `
     <div class="entry-item">
       <div style="flex:1">
-        <div class="entry-name">${a.customer_name || '(kein Name)'}</div>
+        <div class="entry-name">${a.customer_name || '(kein Name)'}${a.is_folge ? ' <span style="font-size:11px;background:#e0f2fe;color:#0369a1;border-radius:4px;padding:1px 5px">Folge</span>' : ''}</div>
         <div class="entry-meta">${a.date} · ${AB_PROD_LABELS[a.product]||a.product||'Mitgliedschaft'}${a.start_date ? ' · Start: '+a.start_date : ''}${a.notizen ? ' · '+a.notizen : ''}</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
@@ -1876,6 +2005,7 @@ async function submitAbschluss(e) {
     date:          document.getElementById('ab-date').value,
     customer_name: document.getElementById('ab-customer').value || null,
     product:       document.getElementById('ab-product').value || 'mitgliedschaft',
+    is_folge:      document.getElementById('ab-is-folge').checked || false,
     start_date:    document.getElementById('ab-start-date').value || null,
     umsatz:        parseFloat(document.getElementById('ab-umsatz').value) || null,
     notizen:       document.getElementById('ab-notiz').value || null,
@@ -1888,6 +2018,7 @@ async function submitAbschluss(e) {
   e.target.reset();
   document.getElementById('ab-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('ab-product').value = 'mitgliedschaft';
+  document.getElementById('ab-is-folge').checked = false;
   await refreshAbschlussListe();
 }
 
@@ -1922,9 +2053,16 @@ async function refreshNichtAbschlussListe() {
         <div class="entry-name">${n.customer_name || '(kein Name)'}</div>
         <div class="entry-meta">${n.date} · ${prodLabels[n.product]||n.product||'–'}${n.grund ? ' · ' + n.grund : ''}</div>
       </div>
-      <button onclick="deleteNichtAbschluss('${n.id}')" style="background:none;border:none;color:#dc2626;font-size:18px;cursor:pointer;padding:4px">✕</button>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="convertToFolgeAbschluss('${n.customer_name||''}','${n.product||'mitgliedschaft'}')" style="background:none;border:1px solid var(--primary);color:var(--primary);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;padding:4px 8px">→ Abschluss</button>
+        <button onclick="deleteNichtAbschluss('${n.id}')" style="background:none;border:none;color:#dc2626;font-size:18px;cursor:pointer;padding:4px">✕</button>
+      </div>
     </div>
   `).join('');
+}
+
+function convertToFolgeAbschluss(name, product) {
+  loadAbschluesse({ name, product, isFolge: true });
 }
 
 async function deleteNichtAbschluss(id) {
