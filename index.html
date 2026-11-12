@@ -1477,8 +1477,6 @@ async function loadRepEntries() {
   const empId=document.getElementById('rep-employee').value;
   const from=document.getElementById('rep-from').value;
   const to=document.getElementById('rep-to').value;
-  const uMin=parseFloat(document.getElementById('rep-umsatz-min').value)||0;
-  const uMax=parseFloat(document.getElementById('rep-umsatz-max').value)||999999;
   if(!locId||!from||!to){content.innerHTML='<div class="spinner">Bitte Filter wählen.</div>';return;}
 
   // populate employee select for this location
@@ -1492,22 +1490,68 @@ async function loadRepEntries() {
 
   const [,toM1]=to.split('-').map(Number);const toY1=parseInt(to.split('-')[0]);
   const toEnd1=new Date(toY1,toM1,0).toISOString().split('T')[0];
-  let q=db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',from+'-01').lte('date',toEnd1);
-  if(empId)q=q.eq('employee_id',empId);
-  const{data:rows,error}=await q.order('date',{ascending:false});
-  if(error||!rows){content.innerHTML='<div class="spinner">Fehler beim Laden.</div>';return;}
+  const fromDate=from+'-01';
 
-  const filtered=rows.filter(r=>{const u=PRODUCTS.reduce((s,p)=>s+(r[`${p}_umsatz`]||0),0);return u>=uMin&&u<=uMax;});
-  if(filtered.length===0){content.innerHTML='<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Einträge gefunden.</div>';return;}
+  // Kundeneinträge (reports)
+  let qR=db.from('reports').select('*, employees(name)').eq('location_id',locId).gte('date',fromDate).lte('date',toEnd1);
+  if(empId)qR=qR.eq('employee_id',empId);
+  const{data:rows}=await qR.order('date',{ascending:false});
 
-  let html=`<div class="card"><div class="card-title">Kundeneinträge (${filtered.length})</div>`;
-  filtered.forEach(r=>{
-    const u=PRODUCTS.reduce((s,p)=>s+(r[`${p}_umsatz`]||0),0);
-    const abschl=PRODUCTS.filter(p=>r[`${p}_ergebnis`]==='abschluss'||r[`${p}_ergebnis`]==='folge_abschluss').map(p=>PROD_LABELS[p]).join(', ');
-    html+=`<div class="entry-item"><div><div class="entry-name">${r.customer_name||'(kein Name)'}</div><div class="entry-meta">${r.date} · ${r.employees?.name||'–'} · ${abschl||'Kein Abschluss'}</div></div>${u>0?`<div class="entry-badge">${u.toFixed(2)} €</div>`:''}</div>`;
-  });
-  const total=filtered.reduce((s,r)=>s+PRODUCTS.reduce((ss,p)=>ss+(r[`${p}_umsatz`]||0),0),0);
-  html+=`<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-weight:700;text-align:right;font-size:14px;">Gesamt: ${total.toFixed(2)} €</div></div>`;
+  // Abschlüsse
+  let qA=db.from('abschluesse').select('*, employees(name)').eq('location_id',locId).gte('date',fromDate).lte('date',toEnd1);
+  if(empId)qA=qA.eq('employee_id',empId);
+  const{data:abRows}=await qA.order('date',{ascending:false});
+
+  // Nicht-Abschlüsse
+  let qN=db.from('nichtabschluesse').select('*, employees(name)').eq('location_id',locId).gte('date',fromDate).lte('date',toEnd1);
+  if(empId)qN=qN.eq('employee_id',empId);
+  const{data:nabRows}=await qN.order('date',{ascending:false});
+
+  const fmtE=v=>v!=null?Number(v).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':'–';
+  let html='';
+
+  // --- Abschlüsse ---
+  if((abRows||[]).length>0){
+    const totalAb=(abRows||[]).reduce((s,a)=>s+(a.umsatz||0),0);
+    html+=`<div class="card"><div class="card-title">🤝 Abschlüsse (${abRows.length})</div>`;
+    abRows.forEach(a=>{
+      html+=`<div class="entry-item">
+        <div><div class="entry-name">${a.customer_name||'(kein Name)'}${a.is_folge?' <span style="font-size:10px;background:#e0f2fe;color:#0369a1;border-radius:4px;padding:1px 4px">Folge</span>':''}</div>
+        <div class="entry-meta">${a.date} · ${a.employees?.name||'–'} · ${AB_PROD_LABELS[a.product]||a.product||'Mitgliedschaft'}${a.notizen?' · '+a.notizen:''}</div></div>
+        ${a.umsatz?`<div class="entry-badge">${fmtE(a.umsatz)}</div>`:''}
+      </div>`;
+    });
+    html+=`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-weight:700;text-align:right;font-size:14px;">Gesamt: ${fmtE(totalAb)}</div></div>`;
+  }
+
+  // --- Nicht-Abschlüsse ---
+  if((nabRows||[]).length>0){
+    const prodLabels={shaper:'Shaper',chair:'Chair',acp:'ACP',boots:'Boots/Ballancer',fitness:'Fitness',reha:'Reha'};
+    html+=`<div class="card"><div class="card-title">❌ Nicht-Abschlüsse (${nabRows.length})</div>`;
+    nabRows.forEach(n=>{
+      html+=`<div class="entry-item">
+        <div><div class="entry-name">${n.customer_name||'(kein Name)'}</div>
+        <div class="entry-meta">${n.date} · ${n.employees?.name||'–'} · ${prodLabels[n.product]||n.product||'–'}${n.grund?' · '+n.grund:''}</div></div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+
+  // --- Kundeneinträge (reports) ---
+  if((rows||[]).length>0){
+    html+=`<div class="card"><div class="card-title">👤 Kundeneinträge (${rows.length})</div>`;
+    rows.forEach(r=>{
+      const u=PRODUCTS.reduce((s,p)=>s+(r[`${p}_umsatz`]||0),0);
+      const abschl=PRODUCTS.filter(p=>r[`${p}_ergebnis`]==='abschluss'||r[`${p}_ergebnis`]==='folge_abschluss').map(p=>PROD_LABELS[p]).join(', ');
+      html+=`<div class="entry-item"><div><div class="entry-name">${r.customer_name||'(kein Name)'}</div><div class="entry-meta">${r.date} · ${r.employees?.name||'–'} · ${abschl||'Kein Abschluss'}</div></div>${u>0?`<div class="entry-badge">${fmtE(u)}</div>`:''}</div>`;
+    });
+    const total=(rows||[]).reduce((s,r)=>s+PRODUCTS.reduce((ss,p)=>ss+(r[`${p}_umsatz`]||0),0),0);
+    html+=`<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-weight:700;text-align:right;font-size:14px;">Gesamt: ${fmtE(total)}</div></div>`;
+  }
+
+  if(!html){
+    html='<div class="card" style="color:var(--muted);text-align:center;padding:30px;">Keine Einträge gefunden.</div>';
+  }
   content.innerHTML=html;
 }
 
